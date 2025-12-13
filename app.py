@@ -351,6 +351,8 @@ h1, h2, h3 {
     background-color: #0F172A;
     background-image: linear-gradient(180deg, #0F172A 0%, #1E293B 100%);
     border-right: 1px solid #1E293B;
+    min-width: 350px;
+    width: 350px;
 }
 
 [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
@@ -6036,8 +6038,7 @@ def main():
             with col2:
                 st.image("assets/hero.png", use_container_width=True)
     
-    if os.path.exists("assets/abstract.png"):
-        st.sidebar.image("assets/abstract.png", use_container_width=True, caption="Game Theory Analytics")
+
     st.markdown(
         '<h1 class="main-header">'
         '<span style="-webkit-text-fill-color: initial;">🎓 🇺🇸</span> '
@@ -6063,7 +6064,7 @@ def main():
     # ==========================================================================
     # SIDEBAR NAVIGATION
     # ==========================================================================
-    st.sidebar.markdown("## 🧭 Research Navigator")
+    st.sidebar.markdown("#### 🧭 Research Navigator")
     
     # Hierarchical Navigation
     nav_category = st.sidebar.selectbox(
