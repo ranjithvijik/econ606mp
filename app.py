@@ -63,7 +63,7 @@ logger = logging.getLogger(__name__)
 
 st.set_page_config(
     page_title="U.S.-China Game Theory Analysis | PhD Research Tool",
-    page_icon="🎓",
+    page_icon="🇨🇳↔🇺🇸",
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
@@ -1550,11 +1550,11 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
             
             with col1:
                 fig = AdvancedVisualizationEngine.create_tournament_heatmap(results)
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, width='stretch')
             
             with col2:
                 fig = AdvancedVisualizationEngine.create_tournament_rankings(results)
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, width='stretch')
             
             # Winner announcement
             rankings = results.groupby('Strategy_1')['Payoff_1'].sum().sort_values(ascending=False)
@@ -1569,7 +1569,7 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
             """, unsafe_allow_html=True)
             
             with st.expander("📋 View Detailed Results"):
-                st.dataframe(results, use_container_width=True, hide_index=True)
+                st.dataframe(results, width='stretch', hide_index=True)
 
     # =========================================================================
     # EVOLUTIONARY DYNAMICS
@@ -1625,7 +1625,7 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
             results = st.session_state.evo_results
             
             fig = AdvancedVisualizationEngine.create_evolutionary_dynamics_chart(results)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
             
             # Final state
             final_row = results.iloc[-1]
@@ -1698,7 +1698,7 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
             fig = AdvancedVisualizationEngine.create_learning_dynamics_chart(
                 results, algorithm_map[algorithm]
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
             
             # Summary statistics
             st.markdown('<h4 class="section-header">Learning Summary</h4>', unsafe_allow_html=True)
@@ -1752,7 +1752,7 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
         if st.session_state.stochastic_results is not None:
             results = st.session_state.stochastic_results
             fig = AdvancedVisualizationEngine.create_stochastic_game_chart(results)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
             
             # State stats
             state_counts = results['State'].value_counts(normalize=True)
@@ -1931,11 +1931,11 @@ def render_interactive_parameter_explorer(harmony_matrix: PayoffMatrix, pd_matri
     
     with col1:
         fig = VisualizationEngine.create_payoff_matrix_heatmap(custom_matrix, f"Custom {game_type} Game")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     
     with col2:
         fig = VisualizationEngine.create_cooperation_margin_chart(engine, show_historical=False)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     
     # Comparative statics
     st.markdown('<h3 class="section-header">Comparative Statics</h3>', unsafe_allow_html=True)
@@ -2005,7 +2005,7 @@ def render_interactive_parameter_explorer(harmony_matrix: PayoffMatrix, pd_matri
         for j in range(1, 3):
             fig.update_yaxes(title_text="δ*", row=i, col=j)
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
     
 # =============================================================================
 # ABSTRACT BASE CLASSES (Dependency Injection Support)
@@ -2086,6 +2086,19 @@ class GameTheoryEngine(IGameTheoryEngine):
         self.params = payoff_matrix.get_payoff_parameters()
         self._cache: Dict[str, any] = {}
         logger.info(f"GameTheoryEngine initialized with matrix: {payoff_matrix}")
+    
+    def copy(self):
+        """Create a copy of the engine."""
+        return GameTheoryEngine(self.matrix)
+
+    def set_payoff(self, parameter: str, value: float):
+        """Update a payoff parameter and recreate matrix."""
+        new_params = self.params.copy()
+        new_params[parameter] = value
+        R, T, P, S = new_params['R'], new_params['T'], new_params['P'], new_params['S']
+        self.matrix = PayoffMatrix(cc=(R, R), cd=(S, T), dc=(T, S), dd=(P, P))
+        self.params = new_params
+        self._cache.clear()
     
     def _validate_matrix(self, matrix: PayoffMatrix) -> None:
         """Validate the payoff matrix."""
@@ -3109,6 +3122,809 @@ class StatisticalEngine:
         
         return pd.DataFrame(results)
 
+class EnhancedStatisticalEngine:
+    """Enhanced statistical analysis engine with advanced Monte Carlo capabilities."""
+    
+    @staticmethod
+    def monte_carlo_simulation(
+        engine: 'GameTheoryEngine',
+        n_simulations: int = 1000,
+        delta_range: Tuple[float, float] = (0.3, 0.9),
+        payoff_variation: float = 0.0,
+        include_shocks: bool = False,
+        shock_probability: float = 0.1,
+        shock_magnitude: float = 0.2,
+        seed: Optional[int] = 42
+    ) -> pd.DataFrame:
+        """
+        Enhanced Monte Carlo simulation with payoff variations and shock scenarios.
+        
+        Args:
+            engine: GameTheoryEngine instance
+            n_simulations: Number of simulations to run
+            delta_range: Range of discount factors (min, max)
+            payoff_variation: Standard deviation for payoff perturbations (0 = no variation)
+            include_shocks: Whether to include random shock events
+            shock_probability: Probability of shock occurring in each simulation
+            shock_magnitude: Magnitude of shock impact on discount factor
+            seed: Random seed for reproducibility
+            
+        Returns:
+            DataFrame with comprehensive simulation results
+        """
+        if seed is not None:
+            np.random.seed(seed)
+        
+        results = []
+        
+        for sim_id in range(n_simulations):
+            # Sample discount factor
+            delta = np.random.uniform(delta_range[0], delta_range[1])
+            
+            # Apply shock if enabled
+            shock_occurred = False
+            if include_shocks and np.random.random() < shock_probability:
+                shock_occurred = True
+                delta = max(0.01, delta - np.random.uniform(0, shock_magnitude))
+            
+            # Add payoff variation if specified
+            if payoff_variation > 0:
+                # Perturb payoffs slightly
+                perturbed_engine = engine.copy()
+                perturbed_engine.add_noise(payoff_variation)
+                margin = perturbed_engine.calculate_cooperation_margin(delta)
+                v_coop = perturbed_engine.calculate_cooperation_value(delta)
+                v_defect = perturbed_engine.calculate_defection_value(delta)
+            else:
+                margin = engine.calculate_cooperation_margin(delta)
+                v_coop = engine.calculate_cooperation_value(delta)
+                v_defect = engine.calculate_defection_value(delta)
+            
+            sustainable = margin > 0
+            
+            # Calculate additional metrics
+            sharpe_ratio = margin / abs(v_coop - v_defect) if v_coop != v_defect else 0
+            cooperation_probability = 1 / (1 + np.exp(-margin))  # Logistic transformation
+            
+            results.append({
+                'simulation_id': sim_id + 1,
+                'delta': delta,
+                'margin': margin,
+                'sustainable': sustainable,
+                'v_coop': v_coop,
+                'v_defect': v_defect,
+                'sharpe_ratio': sharpe_ratio,
+                'cooperation_probability': cooperation_probability,
+                'shock_occurred': shock_occurred,
+                'delta_category': categorize_delta(delta)
+            })
+        
+        df = pd.DataFrame(results)
+        
+        # Add summary statistics
+        df['margin_percentile'] = df['margin'].rank(pct=True)
+        df['delta_percentile'] = df['delta'].rank(pct=True)
+        
+        return df
+    
+    @staticmethod
+    def sensitivity_analysis(
+        engine: 'GameTheoryEngine',
+        parameter: str,
+        param_range: Tuple[float, float],
+        n_points: int = 50,
+        fixed_delta: float = 0.65
+    ) -> pd.DataFrame:
+        """
+        Perform sensitivity analysis on specific game parameters.
+        
+        Args:
+            engine: GameTheoryEngine instance
+            parameter: Parameter to vary ('R', 'T', 'P', 'S')
+            param_range: Range of parameter values
+            n_points: Number of points to evaluate
+            fixed_delta: Fixed discount factor for analysis
+            
+        Returns:
+            DataFrame with sensitivity results
+        """
+        param_values = np.linspace(param_range[0], param_range[1], n_points)
+        results = []
+        
+        for value in param_values:
+            # Create modified engine
+            modified_engine = engine.copy()
+            modified_engine.set_payoff(parameter, value)
+            
+            # Calculate metrics
+            margin = modified_engine.calculate_cooperation_margin(fixed_delta)
+            critical_delta = modified_engine.calculate_critical_delta()
+            
+            results.append({
+                'parameter': parameter,
+                'value': value,
+                'margin': margin,
+                'critical_delta': critical_delta,
+                'sustainable': margin > 0
+            })
+        
+        return pd.DataFrame(results)
+    
+    @staticmethod
+    def bootstrap_confidence_intervals(
+        mc_results: pd.DataFrame,
+        metric: str = 'margin',
+        n_bootstrap: int = 1000,
+        confidence_level: float = 0.95
+    ) -> Dict[str, float]:
+        """
+        Calculate bootstrap confidence intervals for simulation metrics.
+        
+        Args:
+            mc_results: Monte Carlo simulation results
+            metric: Metric to analyze
+            n_bootstrap: Number of bootstrap samples
+            confidence_level: Confidence level (e.g., 0.95 for 95%)
+            
+        Returns:
+            Dictionary with mean, lower, and upper bounds
+        """
+        data = mc_results[metric].values
+        bootstrap_means = []
+        
+        for _ in range(n_bootstrap):
+            sample = np.random.choice(data, size=len(data), replace=True)
+            bootstrap_means.append(np.mean(sample))
+        
+        alpha = 1 - confidence_level
+        lower = np.percentile(bootstrap_means, alpha/2 * 100)
+        upper = np.percentile(bootstrap_means, (1 - alpha/2) * 100)
+        
+        return {
+            'mean': np.mean(data),
+            'lower': lower,
+            'upper': upper,
+            'std': np.std(bootstrap_means)
+        }
+
+
+class EnhancedVisualizationEngine:
+    """Enhanced visualization engine with advanced Monte Carlo charts."""
+    
+    COLORS = {
+        'cooperation': '#48bb78',
+        'defection': '#e53e3e',
+        'highlight': '#667eea',
+        'china': '#f6ad55',
+        'neutral': '#a0aec0'
+    }
+    
+    @staticmethod
+    def create_comprehensive_monte_carlo_dashboard(
+        mc_results: pd.DataFrame,
+        engine: 'GameTheoryEngine'
+    ) -> go.Figure:
+        """
+        Create comprehensive Monte Carlo dashboard with multiple visualizations.
+        
+        Args:
+            mc_results: Monte Carlo simulation results
+            engine: GameTheoryEngine instance
+            
+        Returns:
+            Plotly Figure with comprehensive dashboard
+        """
+        fig = make_subplots(
+            rows=3, cols=3,
+            subplot_titles=(
+                '<b>Cooperation Margin Distribution</b>',
+                '<b>Sustainability by Discount Factor</b>',
+                '<b>Cumulative Distribution Function</b>',
+                '<b>Cooperation vs. Defection Values</b>',
+                '<b>Sharpe Ratio Distribution</b>',
+                '<b>Cooperation Probability Heatmap</b>',
+                '<b>Delta Category Analysis</b>',
+                '<b>Margin Percentile Analysis</b>',
+                '<b>Shock Impact Analysis</b>'
+            ),
+            specs=[
+                [{'type': 'histogram'}, {'type': 'scatter'}, {'type': 'scatter'}],
+                [{'type': 'scatter'}, {'type': 'histogram'}, {'type': 'heatmap'}],
+                [{'type': 'bar'}, {'type': 'box'}, {'type': 'bar'}]
+            ],
+            vertical_spacing=0.10,
+            horizontal_spacing=0.10
+        )
+        
+        # 1. Cooperation Margin Distribution
+        fig.add_trace(
+            go.Histogram(
+                x=mc_results['margin'],
+                nbinsx=50,
+                name='Margin Distribution',
+                marker_color=EnhancedVisualizationEngine.COLORS['highlight'],
+                opacity=0.7,
+                showlegend=False
+            ),
+            row=1, col=1
+        )
+        
+        # Add mean and median lines
+        mean_margin = mc_results['margin'].mean()
+        median_margin = mc_results['margin'].median()
+        
+        fig.add_vline(x=mean_margin, line_dash="dash", line_color="blue", 
+                     annotation_text=f"Mean: {mean_margin:.2f}", row=1, col=1)
+        fig.add_vline(x=0, line_dash="solid", line_color="red", 
+                     annotation_text="Break-even", row=1, col=1)
+        
+        # 2. Sustainability by Discount Factor
+        sustainable = mc_results[mc_results['sustainable']]
+        unsustainable = mc_results[~mc_results['sustainable']]
+        
+        fig.add_trace(
+            go.Scatter(
+                x=sustainable['delta'],
+                y=sustainable['margin'],
+                mode='markers',
+                name='Sustainable',
+                marker=dict(
+                    color=EnhancedVisualizationEngine.COLORS['cooperation'],
+                    size=6,
+                    opacity=0.6
+                )
+            ),
+            row=1, col=2
+        )
+        
+        fig.add_trace(
+            go.Scatter(
+                x=unsustainable['delta'],
+                y=unsustainable['margin'],
+                mode='markers',
+                name='Unsustainable',
+                marker=dict(
+                    color=EnhancedVisualizationEngine.COLORS['defection'],
+                    size=6,
+                    opacity=0.6
+                )
+            ),
+            row=1, col=2
+        )
+        
+        fig.add_hline(y=0, line_dash="dash", line_color="gray", row=1, col=2)
+        
+        # 3. Cumulative Distribution Function
+        sorted_margins = np.sort(mc_results['margin'])
+        cumulative = np.arange(1, len(sorted_margins) + 1) / len(sorted_margins)
+        
+        fig.add_trace(
+            go.Scatter(
+                x=sorted_margins,
+                y=cumulative,
+                mode='lines',
+                name='CDF',
+                line=dict(color=EnhancedVisualizationEngine.COLORS['highlight'], width=3),
+                showlegend=False
+            ),
+            row=1, col=3
+        )
+        
+        # Add percentile markers
+        percentiles = [5, 25, 50, 75, 95]
+        for p in percentiles:
+            value = np.percentile(mc_results['margin'], p)
+            fig.add_trace(
+                go.Scatter(
+                    x=[value],
+                    y=[p/100],
+                    mode='markers+text',
+                    marker=dict(size=10, color='red'),
+                    text=[f'P{p}'],
+                    textposition='top center',
+                    showlegend=False
+                ),
+                row=1, col=3
+            )
+        
+        # 4. Cooperation vs. Defection Values
+        fig.add_trace(
+            go.Scatter(
+                x=mc_results['v_coop'],
+                y=mc_results['v_defect'],
+                mode='markers',
+                marker=dict(
+                    color=mc_results['margin'],
+                    colorscale='RdYlGn',
+                    size=6,
+                    opacity=0.6,
+                    colorbar=dict(title='Margin', x=0.46, y=0.5, len=0.3)
+                ),
+                showlegend=False
+            ),
+            row=2, col=1
+        )
+        
+        # Add diagonal line (V_coop = V_defect)
+        max_val = max(mc_results['v_coop'].max(), mc_results['v_defect'].max())
+        fig.add_trace(
+            go.Scatter(
+                x=[0, max_val],
+                y=[0, max_val],
+                mode='lines',
+                line=dict(dash='dash', color='gray'),
+                showlegend=False
+            ),
+            row=2, col=1
+        )
+        
+        # 5. Sharpe Ratio Distribution
+        fig.add_trace(
+            go.Histogram(
+                x=mc_results['sharpe_ratio'],
+                nbinsx=50,
+                name='Sharpe Ratio',
+                marker_color=EnhancedVisualizationEngine.COLORS['cooperation'],
+                opacity=0.7,
+                showlegend=False
+            ),
+            row=2, col=2
+        )
+        
+        # 6. Cooperation Probability Heatmap
+        # Create 2D histogram for heatmap
+        delta_bins = np.linspace(mc_results['delta'].min(), mc_results['delta'].max(), 20)
+        margin_bins = np.linspace(mc_results['margin'].min(), mc_results['margin'].max(), 20)
+        
+        H, xedges, yedges = np.histogram2d(
+            mc_results['delta'],
+            mc_results['margin'],
+            bins=[delta_bins, margin_bins]
+        )
+        
+        fig.add_trace(
+            go.Heatmap(
+                z=H.T,
+                x=delta_bins,
+                y=margin_bins,
+                colorscale='Viridis',
+                showscale=False
+            ),
+            row=2, col=3
+        )
+        
+        # 7. Delta Category Analysis
+        category_counts = mc_results['delta_category'].value_counts()
+        
+        fig.add_trace(
+            go.Bar(
+                x=category_counts.index,
+                y=category_counts.values,
+                marker_color=EnhancedVisualizationEngine.COLORS['highlight'],
+                showlegend=False
+            ),
+            row=3, col=1
+        )
+        
+        # 8. Margin Percentile Box Plot
+        fig.add_trace(
+            go.Box(
+                y=mc_results['margin'],
+                name='Margin',
+                marker_color=EnhancedVisualizationEngine.COLORS['cooperation'],
+                showlegend=False
+            ),
+            row=3, col=2
+        )
+        
+        # 9. Shock Impact Analysis
+        if 'shock_occurred' in mc_results.columns:
+            shock_impact = mc_results.groupby('shock_occurred')['margin'].mean()
+            
+            fig.add_trace(
+                go.Bar(
+                    x=['No Shock', 'Shock'],
+                    y=[shock_impact.get(False, 0), shock_impact.get(True, 0)],
+                    marker_color=[
+                        EnhancedVisualizationEngine.COLORS['cooperation'],
+                        EnhancedVisualizationEngine.COLORS['defection']
+                    ],
+                    showlegend=False
+                ),
+                row=3, col=3
+            )
+        
+        # Update layout
+        sustainability_rate = mc_results['sustainable'].mean() * 100
+        
+        fig.update_layout(
+            title=dict(
+                text=f"<b>Comprehensive Monte Carlo Analysis Dashboard</b><br>" +
+                     f"<sup>n = {len(mc_results):,} simulations | " +
+                     f"Sustainability Rate: {sustainability_rate:.1f}%</sup>",
+                x=0.5,
+                font=dict(size=20)
+            ),
+            height=1200,
+            showlegend=True,
+            legend=dict(x=1.02, y=0.5)
+        )
+        
+        # Update axes labels
+        fig.update_xaxes(title_text='Cooperation Margin', row=1, col=1)
+        fig.update_xaxes(title_text='Discount Factor (δ)', row=1, col=2)
+        fig.update_xaxes(title_text='Cooperation Margin', row=1, col=3)
+        fig.update_xaxes(title_text='V_coop', row=2, col=1)
+        fig.update_xaxes(title_text='Sharpe Ratio', row=2, col=2)
+        fig.update_xaxes(title_text='Discount Factor (δ)', row=2, col=3)
+        fig.update_xaxes(title_text='Delta Category', row=3, col=1)
+        
+        fig.update_yaxes(title_text='Frequency', row=1, col=1)
+        fig.update_yaxes(title_text='Cooperation Margin', row=1, col=2)
+        fig.update_yaxes(title_text='Cumulative Probability', row=1, col=3)
+        fig.update_yaxes(title_text='V_defect', row=2, col=1)
+        fig.update_yaxes(title_text='Frequency', row=2, col=2)
+        fig.update_yaxes(title_text='Cooperation Margin', row=2, col=3)
+        fig.update_yaxes(title_text='Count', row=3, col=1)
+        fig.update_yaxes(title_text='Cooperation Margin', row=3, col=2)
+        fig.update_yaxes(title_text='Average Margin', row=3, col=3)
+        
+        return fig
+    
+    @staticmethod
+    def create_sensitivity_analysis_chart(
+        sensitivity_results: pd.DataFrame
+    ) -> go.Figure:
+        """
+        Create sensitivity analysis visualization.
+        
+        Args:
+            sensitivity_results: Sensitivity analysis results
+            
+        Returns:
+            Plotly Figure
+        """
+        fig = make_subplots(
+            rows=1, cols=2,
+            subplot_titles=(
+                '<b>Cooperation Margin Sensitivity</b>',
+                '<b>Critical Discount Factor Sensitivity</b>'
+            )
+        )
+        
+        # Margin sensitivity
+        fig.add_trace(
+            go.Scatter(
+                x=sensitivity_results['value'],
+                y=sensitivity_results['margin'],
+                mode='lines+markers',
+                name='Cooperation Margin',
+                line=dict(color=EnhancedVisualizationEngine.COLORS['cooperation'], width=3),
+                marker=dict(size=8)
+            ),
+            row=1, col=1
+        )
+        
+        fig.add_hline(y=0, line_dash="dash", line_color="red", row=1, col=1)
+        
+        # Critical delta sensitivity
+        fig.add_trace(
+            go.Scatter(
+                x=sensitivity_results['value'],
+                y=sensitivity_results['critical_delta'],
+                mode='lines+markers',
+                name='Critical δ*',
+                line=dict(color=EnhancedVisualizationEngine.COLORS['highlight'], width=3),
+                marker=dict(size=8)
+            ),
+            row=1, col=2
+        )
+        
+        parameter = sensitivity_results['parameter'].iloc[0]
+        
+        fig.update_layout(
+            title=dict(
+                text=f"<b>Sensitivity Analysis: Parameter {parameter}</b>",
+                x=0.5,
+                font=dict(size=18)
+            ),
+            height=500,
+            showlegend=True
+        )
+        
+        fig.update_xaxes(title_text=f'Parameter Value ({parameter})', row=1, col=1)
+        fig.update_xaxes(title_text=f'Parameter Value ({parameter})', row=1, col=2)
+        fig.update_yaxes(title_text='Cooperation Margin', row=1, col=1)
+        fig.update_yaxes(title_text='Critical Discount Factor (δ*)', row=1, col=2)
+        
+        return fig
+
+
+def categorize_delta(delta: float) -> str:
+    """Categorize discount factor into interpretable ranges."""
+    if delta < 0.4:
+        return 'Very Low (< 0.4)'
+    elif delta < 0.6:
+        return 'Low (0.4-0.6)'
+    elif delta < 0.75:
+        return 'Medium (0.6-0.75)'
+    else:
+        return 'High (≥ 0.75)'
+
+
+def render_advanced_analytics_page(
+    macro_data: pd.DataFrame,
+    coop_data: pd.DataFrame,
+    harmony_matrix: 'PayoffMatrix',
+    pd_matrix: 'PayoffMatrix'
+):
+    """Enhanced Advanced Analytics page with comprehensive Monte Carlo functionality."""
+    
+    st.markdown('<h2 class="sub-header">📈 Advanced Analytics & Monte Carlo Simulation</h2>', 
+                unsafe_allow_html=True)
+    
+    # Initialize engine
+    engine = GameTheoryEngine(pd_matrix)
+    
+    # Sidebar for simulation parameters
+    st.sidebar.markdown("### 🎛️ Simulation Parameters")
+    
+    n_simulations = st.sidebar.slider(
+        "Number of Simulations",
+        min_value=100,
+        max_value=10000,
+        value=1000,
+        step=100,
+        help="More simulations = more accurate results but slower computation"
+    )
+    
+    delta_min = st.sidebar.slider(
+        "Minimum Discount Factor (δ)",
+        min_value=0.1,
+        max_value=0.9,
+        value=0.3,
+        step=0.05
+    )
+    
+    delta_max = st.sidebar.slider(
+        "Maximum Discount Factor (δ)",
+        min_value=0.1,
+        max_value=0.95,
+        value=0.9,
+        step=0.05
+    )
+    
+    payoff_variation = st.sidebar.slider(
+        "Payoff Variation (σ)",
+        min_value=0.0,
+        max_value=1.0,
+        value=0.0,
+        step=0.1,
+        help="Standard deviation for random payoff perturbations"
+    )
+    
+    include_shocks = st.sidebar.checkbox(
+        "Include Random Shocks",
+        value=False,
+        help="Simulate random economic shocks"
+    )
+    
+    if include_shocks:
+        shock_probability = st.sidebar.slider(
+            "Shock Probability",
+            min_value=0.0,
+            max_value=0.5,
+            value=0.1,
+            step=0.05
+        )
+        
+        shock_magnitude = st.sidebar.slider(
+            "Shock Magnitude",
+            min_value=0.0,
+            max_value=0.5,
+            value=0.2,
+            step=0.05
+        )
+    else:
+        shock_probability = 0.0
+        shock_magnitude = 0.0
+    
+    # Main content
+    st.markdown("""
+    ### Monte Carlo Sensitivity Analysis
+    
+    This advanced simulation explores equilibrium stability across thousands of scenarios with:
+    - **Random discount factor variations** to test cooperation sustainability
+    - **Payoff perturbations** to assess robustness to measurement error
+    - **Economic shock scenarios** to evaluate resilience
+    - **Comprehensive statistical analysis** with confidence intervals
+    """)
+    
+    # Run simulation button
+    col1, col2, col3 = st.columns([1, 1, 1])
+    
+    with col2:
+        run_simulation = st.button(
+            "🚀 Run Monte Carlo Simulation",
+            type="primary",
+            width='stretch'
+        )
+    
+    if run_simulation:
+        with st.spinner('Running Monte Carlo simulation...'):
+            # Run simulation
+            mc_results = EnhancedStatisticalEngine.monte_carlo_simulation(
+                engine=engine,
+                n_simulations=n_simulations,
+                delta_range=(delta_min, delta_max),
+                payoff_variation=payoff_variation,
+                include_shocks=include_shocks,
+                shock_probability=shock_probability,
+                shock_magnitude=shock_magnitude
+            )
+            
+            # Store in session state
+            st.session_state['mc_results'] = mc_results
+        
+        st.success(f'✅ Simulation complete! Analyzed {n_simulations:,} scenarios.')
+    
+    # Display results if available
+    if 'mc_results' in st.session_state:
+        mc_results = st.session_state['mc_results']
+        
+        # Summary statistics
+        st.markdown("### 📊 Simulation Summary")
+        
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric(
+                "Sustainability Rate",
+                f"{mc_results['sustainable'].mean() * 100:.1f}%",
+                delta=f"{(mc_results['sustainable'].mean() - 0.5) * 100:.1f}% vs 50%"
+            )
+        
+        with col2:
+            st.metric(
+                "Average Margin",
+                f"{mc_results['margin'].mean():.2f}",
+                delta=f"σ = {mc_results['margin'].std():.2f}"
+            )
+        
+        with col3:
+            st.metric(
+                "Critical δ*",
+                f"{engine.calculate_critical_delta():.3f}",
+                delta="Theoretical threshold"
+            )
+        
+        with col4:
+            st.metric(
+                "Sharpe Ratio",
+                f"{mc_results['sharpe_ratio'].mean():.2f}",
+                delta=f"Risk-adjusted return"
+            )
+        
+        # Comprehensive dashboard
+        st.markdown("### 📈 Comprehensive Analysis Dashboard")
+        
+        fig = EnhancedVisualizationEngine.create_comprehensive_monte_carlo_dashboard(
+            mc_results, engine
+        )
+        st.plotly_chart(fig, width='stretch')
+        
+        # Statistical analysis
+        st.markdown("### 📉 Statistical Analysis")
+        
+        tab1, tab2, tab3 = st.tabs([
+            "📊 Descriptive Statistics",
+            "🔬 Confidence Intervals",
+            "📋 Raw Data"
+        ])
+        
+        with tab1:
+            st.markdown("#### Descriptive Statistics")
+            
+            desc_stats = mc_results[['delta', 'margin', 'v_coop', 'v_defect', 
+                                    'sharpe_ratio', 'cooperation_probability']].describe()
+            st.dataframe(desc_stats, width='stretch')
+            
+            # Percentile analysis
+            st.markdown("#### Percentile Analysis")
+            percentiles = [1, 5, 10, 25, 50, 75, 90, 95, 99]
+            percentile_data = {}
+            
+            for p in percentiles:
+                percentile_data[f'P{p}'] = [
+                    np.percentile(mc_results['margin'], p),
+                    np.percentile(mc_results['delta'], p)
+                ]
+            
+            percentile_df = pd.DataFrame(
+                percentile_data,
+                index=['Cooperation Margin', 'Discount Factor']
+            ).T
+            
+            st.dataframe(percentile_df, width='stretch')
+        
+        with tab2:
+            st.markdown("#### Bootstrap Confidence Intervals (95%)")
+            
+            metrics = ['margin', 'v_coop', 'v_defect', 'sharpe_ratio']
+            ci_results = []
+            
+            for metric in metrics:
+                ci = EnhancedStatisticalEngine.bootstrap_confidence_intervals(
+                    mc_results, metric=metric
+                )
+                ci_results.append({
+                    'Metric': metric.replace('_', ' ').title(),
+                    'Mean': f"{ci['mean']:.3f}",
+                    'Lower (2.5%)': f"{ci['lower']:.3f}",
+                    'Upper (97.5%)': f"{ci['upper']:.3f}",
+                    'Std Error': f"{ci['std']:.3f}"
+                })
+            
+            ci_df = pd.DataFrame(ci_results)
+            st.dataframe(ci_df, width='stretch')
+        
+        with tab3:
+            st.markdown("#### Raw Simulation Data")
+            st.dataframe(mc_results, width='stretch')
+            
+            # Download button
+            csv = mc_results.to_csv(index=False)
+            st.download_button(
+                label="📥 Download Results as CSV",
+                data=csv,
+                file_name=f"monte_carlo_results_{n_simulations}_sims.csv",
+                mime="text/csv"
+            )
+        
+        # Sensitivity Analysis Section
+        st.markdown("### 🔬 Parameter Sensitivity Analysis")
+        
+        st.markdown("""
+        Analyze how changes in individual payoff parameters affect cooperation sustainability.
+        """)
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            param_to_analyze = st.selectbox(
+                "Select Parameter",
+                options=['R', 'T', 'P', 'S'],
+                help="R=Reward, T=Temptation, P=Punishment, S=Sucker"
+            )
+        
+        with col2:
+            fixed_delta = st.slider(
+                "Fixed Discount Factor",
+                min_value=0.1,
+                max_value=0.95,
+                value=0.65,
+                step=0.05
+            )
+        
+        if st.button("Run Sensitivity Analysis"):
+            with st.spinner('Running sensitivity analysis...'):
+                # Determine parameter range
+                current_value = engine.params[param_to_analyze]
+                param_range = (current_value * 0.5, current_value * 1.5)
+                
+                sensitivity_results = EnhancedStatisticalEngine.sensitivity_analysis(
+                    engine=engine,
+                    parameter=param_to_analyze,
+                    param_range=param_range,
+                    fixed_delta=fixed_delta
+                )
+                
+                fig = EnhancedVisualizationEngine.create_sensitivity_analysis_chart(
+                    sensitivity_results
+                )
+                st.plotly_chart(fig, width='stretch')
+                
+                st.dataframe(sensitivity_results, width='stretch')
 
 # =============================================================================
 # VISUALIZATION ENGINE (Enhanced)
@@ -4221,7 +5037,7 @@ def main():
     # ==========================================================================
     # SIDEBAR NAVIGATION
     # ==========================================================================
-    st.sidebar.markdown("## 📊 Navigation")
+    st.sidebar.markdown("## 📊 Menu")
     st.sidebar.markdown("---")
     
     page = st.sidebar.radio(
@@ -4309,20 +5125,18 @@ def main():
         render_mathematical_proofs_page()
     
     elif page == "📈 Advanced Analytics":
-        render_advanced_analytics_page(macro_data, coop_data, harmony_matrix, pd_matrix)
+        render_advanced_analytics_page(
+        macro_data=macro_data,
+        coop_data=coop_data,
+        harmony_matrix=harmony_matrix,
+        pd_matrix=pd_matrix
+        )
     
     elif page == "📖 Methodology & Citations":
         render_methodology_page()
     
-    # Sidebar footer
-    render_sidebar_footer()
-
-
 # =============================================================================
-# NEW PAGE RENDERERS FOR ADVANCED SIMULATIONS
-# =============================================================================
-# =============================================================================
-# PAGE RENDERERS (MISSING FUNCTIONS)
+# PAGE RENDERERS FOR ADVANCED SIMULATIONS
 # =============================================================================
 
 def render_executive_summary(harmony_matrix: PayoffMatrix, pd_matrix: PayoffMatrix, 
@@ -4372,13 +5186,13 @@ def render_executive_summary(harmony_matrix: PayoffMatrix, pd_matrix: PayoffMatr
     with col1:
         st.markdown("### 📉 Cooperation Collapse")
         fig = VisualizationEngine.create_cooperation_index_chart(coop_data)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
         st.caption("Figure 1: The composite cooperation index shows a structural break starting in 2018.")
     
     with col2:
         st.markdown("### ⚔️ Tariff Escalation")
         fig = VisualizationEngine.create_tariff_escalation_chart(tariff_data)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
         st.caption("Figure 2: Tariff rates follow a strict Tit-for-Tat retaliation pattern.")
 
     st.markdown("""
@@ -4433,7 +5247,7 @@ def render_nash_equilibrium_page(harmony_matrix: PayoffMatrix, pd_matrix: Payoff
     # Display payoff matrix
     st.markdown("### Payoff Matrix Visualization")
     fig = VisualizationEngine.create_payoff_matrix_heatmap(matrix, f"Payoff Matrix: {game_type}")
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
     
     # Nash equilibrium results
     st.markdown("### Nash Equilibrium Results")
@@ -4477,7 +5291,7 @@ def render_nash_equilibrium_page(harmony_matrix: PayoffMatrix, pd_matrix: Payoff
                 'Cooperate' if matrix.cd[0] >= matrix.dd[0] else 'Defect'
             ]
         })
-        st.dataframe(br_table, use_container_width=True)
+        st.dataframe(br_table, width='stretch')
     
     with col2:
         st.markdown("**China Best Response Function:**")
@@ -4491,7 +5305,7 @@ def render_nash_equilibrium_page(harmony_matrix: PayoffMatrix, pd_matrix: Payoff
                 'Cooperate' if matrix.dc[1] >= matrix.dd[1] else 'Defect'
             ]
         })
-        st.dataframe(br_table_china, use_container_width=True)
+        st.dataframe(br_table_china, width='stretch')
 
 
 def render_pareto_efficiency_page(harmony_matrix: PayoffMatrix, pd_matrix: PayoffMatrix):
@@ -4527,7 +5341,7 @@ def render_pareto_efficiency_page(harmony_matrix: PayoffMatrix, pd_matrix: Payof
         'Pareto Efficient': ['✅ Yes' if efficiency[k] else '❌ No' for k in outcomes.keys()]
     })
     
-    st.dataframe(efficiency_df, use_container_width=True)
+    st.dataframe(efficiency_df, width='stretch')
     
     # Pareto frontier visualization
     st.markdown("### Pareto Frontier Visualization")
@@ -4565,7 +5379,7 @@ def render_pareto_efficiency_page(harmony_matrix: PayoffMatrix, pd_matrix: Payof
         height=500
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
     
     # Nash-Pareto alignment analysis
     st.markdown("### Nash-Pareto Alignment Analysis")
@@ -4640,7 +5454,7 @@ def render_repeated_games_page(harmony_matrix: PayoffMatrix, pd_matrix: PayoffMa
     st.markdown("### Cooperation Margin vs. Discount Factor")
     
     fig = VisualizationEngine.create_cooperation_margin_chart(engine)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
     
     st.markdown("""
     <div class="citation-box">
@@ -4652,7 +5466,7 @@ def render_repeated_games_page(harmony_matrix: PayoffMatrix, pd_matrix: PayoffMa
     # Discount factor evolution
     st.markdown("### Historical Discount Factor Evolution")
     
-    st.dataframe(discount_data, use_container_width=True)
+    st.dataframe(discount_data, width='stretch')
     
     # Interactive discount factor calculator
     st.markdown("### Interactive Calculator")
@@ -4709,10 +5523,10 @@ def render_empirical_data_page(macro_data: pd.DataFrame, tariff_data: pd.DataFra
     with tab1:
         st.markdown("### Macroeconomic Indicators (2001-2024)")
         fig = VisualizationEngine.create_macroeconomic_dashboard(macro_data)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
         
         st.markdown("### Raw Data")
-        st.dataframe(macro_data, use_container_width=True)
+        st.dataframe(macro_data, width='stretch')
         
         st.markdown("""
         <div class="citation-box">
@@ -4727,10 +5541,10 @@ def render_empirical_data_page(macro_data: pd.DataFrame, tariff_data: pd.DataFra
     with tab2:
         st.markdown("### Tit-for-Tat Tariff Escalation (2018-2025)")
         fig = VisualizationEngine.create_tariff_escalation_chart(tariff_data)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
         
         st.markdown("### Tariff Data")
-        st.dataframe(tariff_data, use_container_width=True)
+        st.dataframe(tariff_data, width='stretch')
         
         # TFT validation metrics
         st.markdown("### Tit-for-Tat Validation Metrics")
@@ -4809,9 +5623,9 @@ def render_empirical_data_page(macro_data: pd.DataFrame, tariff_data: pd.DataFra
             hovermode='x unified'
         )
         
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
         
-        st.dataframe(treasury_data, use_container_width=True)
+        st.dataframe(treasury_data, width='stretch')
         
         st.markdown("""
         <div class="citation-box">
@@ -4824,7 +5638,7 @@ def render_empirical_data_page(macro_data: pd.DataFrame, tariff_data: pd.DataFra
         st.markdown("### Yield Suppression Analysis")
         
         fig = VisualizationEngine.create_yield_suppression_chart(yield_data)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
         
         st.markdown("""
         <div class="info-box">
@@ -4833,7 +5647,7 @@ def render_empirical_data_page(macro_data: pd.DataFrame, tariff_data: pd.DataFra
         </div>
         """, unsafe_allow_html=True)
         
-        st.dataframe(yield_data, use_container_width=True)
+        st.dataframe(yield_data, width='stretch')
         
         st.markdown("""
         <div class="citation-box">
@@ -4847,7 +5661,7 @@ def render_empirical_data_page(macro_data: pd.DataFrame, tariff_data: pd.DataFra
         st.markdown("### Federal Debt and China Holdings")
         
         fig = VisualizationEngine.create_federal_debt_chart(debt_data)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
         
         st.markdown("### Key Observations")
         
@@ -4868,14 +5682,14 @@ def render_empirical_data_page(macro_data: pd.DataFrame, tariff_data: pd.DataFra
             current_share = debt_data['China_Share_Pct'].iloc[-1]
             st.metric("Current Share", f"{current_share:.1f}%", "of Total Debt")
         
-        st.dataframe(debt_data, use_container_width=True)
+        st.dataframe(debt_data, width='stretch')
     
     with tab6:
         st.markdown("### Correlation Analysis")
         
         # Correlation heatmap
         fig = VisualizationEngine.create_correlation_heatmap(macro_data)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
         
         # Period-specific correlations
         st.markdown("### Period-Specific Correlations")
@@ -4925,7 +5739,7 @@ def render_empirical_data_page(macro_data: pd.DataFrame, tariff_data: pd.DataFra
             trendline='ols'
         )
         
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
 def render_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_matrix: PayoffMatrix):
     """Render strategy simulator page."""
@@ -4976,7 +5790,8 @@ def render_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_matrix: Payo
     if st.button("🎮 Run Simulation", type="primary"):
         with st.spinner("Running simulation..."):
             if strategy == "Tit-for-Tat":
-                simulation_df = engine.simulate_tit_for_tat(rounds)
+                result = engine.simulate_strategy(StrategyType.TIT_FOR_TAT, rounds)
+                simulation_df = result.actions_df   
             elif strategy == "Tit-for-Tat with Defection":
                 simulation_df = engine.simulate_tit_for_tat(rounds, defection_round)
             elif strategy == "Grim Trigger":
@@ -5002,7 +5817,7 @@ def render_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_matrix: Payo
         
         # Display results
         fig = VisualizationEngine.create_tft_simulation_chart(simulation_df)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
         
         # Summary statistics
         st.markdown("### Simulation Summary")
@@ -5041,23 +5856,13 @@ def render_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_matrix: Payo
         
         # Show data table
         st.markdown("### Round-by-Round Results")
-        st.dataframe(simulation_df, use_container_width=True)
+        st.dataframe(simulation_df, width='stretch')
 
 
 def render_mathematical_proofs_page():
-    """
-    Render complete mathematical proofs page with all 26 proofs.
+    """Render complete mathematical proofs page with all 26 proofs."""
     
-    Enhanced with:
-    - Categorized navigation
-    - Interactive proof selection
-    - Visual generation capabilities
-    - Complete LaTeX formatting
-    - Academic citations
-    
-    """
-    
-    # Header with enhanced styling
+    # Header
     st.markdown('''
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
                 padding: 2rem; border-radius: 10px; margin-bottom: 2rem;">
@@ -5070,43 +5875,88 @@ def render_mathematical_proofs_page():
     </div>
     ''', unsafe_allow_html=True)
     
-    # Enhanced proof selection with categories
+    # Initialize session state
+    if 'selected_category' not in st.session_state:
+        st.session_state['selected_category'] = "1. Nash Equilibrium Analysis"
+    if 'selected_proof' not in st.session_state:
+        st.session_state['selected_proof'] = None
+    
+    # Category options - MUST match exactly with proof_data keys
+    category_options = [
+        "1. Nash Equilibrium Analysis",
+        "2. Dominant Strategy Proofs",
+        "3. Pareto Efficiency Analysis",
+        "4. Folk Theorem & Repeated Games",
+        "5. Discount Factor Thresholds",
+        "6. Yield Suppression Model",
+        "7. Payoff Matrix Transformations",
+        "8. Cooperation Margin Erosion",
+        "9. Statistical Correlations"
+    ]
+    
+    # Get default category index
+    try:
+        default_cat_idx = category_options.index(st.session_state['selected_category'])
+    except (ValueError, KeyError):
+        default_cat_idx = 0
+    
+    # UI Layout
     col1, col2 = st.columns([2, 1])
     
     with col1:
         proof_category = st.selectbox(
             "📂 Select Proof Category:",
-            [
-                "1. Nash Equilibrium Analysis",
-                "2. Dominant Strategy Proofs",
-                "3. Pareto Efficiency Analysis",
-                "4. Folk Theorem & Repeated Games",
-                "5. Discount Factor Thresholds",
-                "6. Yield Suppression Model",
-                "7. Payoff Matrix Transformations",
-                "8. Cooperation Margin Erosion",
-                "9. Statistical Correlations"
-            ]
+            category_options,
+            index=default_cat_idx,
+            key="main_category_select"
         )
+        # Update session state when user manually changes category
+        st.session_state['selected_category'] = proof_category
     
     with col2:
-        show_visuals = st.checkbox("🖼️ Generate Visuals", value=True)
-        show_citations = st.checkbox("📖 Show Citations", value=True)
+        show_visuals = st.checkbox("🖼️ Generate Visuals", value=True, key="show_vis")
+        show_citations = st.checkbox("📖 Show Citations", value=True, key="show_cite")
     
-    # Proof selection based on category
+    # Get proof options for selected category
     proof_options = get_proof_options(proof_category)
-    proof_type = st.selectbox("Select Specific Proof:", proof_options)
     
-    # Render selected proof with enhancements
+    # Determine default proof index
+    default_proof_idx = 0
+    if st.session_state['selected_proof']:
+        for i, option in enumerate(proof_options):
+            if st.session_state['selected_proof'] == option:
+                default_proof_idx = i
+                break
+    
+    # Proof selection
+    proof_type = st.selectbox(
+        "Select Specific Proof:",
+        proof_options,
+        index=default_proof_idx,
+        key="main_proof_select"
+    )
+    
+    # Update session state
+    st.session_state['selected_proof'] = proof_type
+    
+    # Show selection indicator
+    if st.session_state.get('selected_proof'):
+        st.info(f"📌 **Currently Viewing:** {proof_type}")
+    
+    st.markdown("---")
+    
+    # Render the selected proof
     render_enhanced_proof(proof_type, show_visuals, show_citations)
     
-    # Additional features
-    with st.expander("🧭 Quick Navigation"):
+    st.markdown("---")
+    
+    # Quick Navigation at the bottom
+    with st.expander("🧭 Quick Navigation - Jump to Any Proof", expanded=False):
         render_proof_navigator()
     
+    # Related Concepts
     with st.expander("🔗 Related Concepts"):
         render_related_concepts(proof_type)
-
 
 def get_proof_options(category: str) -> List[str]:
     """Return proof options based on selected category."""
@@ -5160,8 +6010,7 @@ def get_proof_options(category: str) -> List[str]:
         ]
     }
     
-    return proof_map.get(category, [])
-
+    return proof_map.get(category, ["No proofs found for this category"])
 
 def render_enhanced_proof(proof_type: str, show_visuals: bool, show_citations: bool):
     """Render enhanced proof with visuals and citations."""
@@ -5362,7 +6211,7 @@ def render_nash_uniqueness_harmony(show_citations: bool):
         'China: Cooperate': ['(8, 8)', '(5, 2)'],
         'China: Defect': ['(2, 5)', '(1, 1)']
     }, index=['U.S.: Cooperate', 'U.S.: Defect'])
-    st.dataframe(payoff_df, use_container_width=True)
+    st.dataframe(payoff_df, width='stretch')
     
     with st.expander("🔍 **Proof**", expanded=True):
         st.markdown("""
@@ -5427,7 +6276,7 @@ def render_nash_prisoners_dilemma(show_citations: bool):
         'China: Cooperate': ['(6, 6)', '(8, 2)'],
         'China: Defect': ['(2, 8)', '(3, 3)']
     }, index=['U.S.: Cooperate', 'U.S.: Defect'])
-    st.dataframe(payoff_df, use_container_width=True)
+    st.dataframe(payoff_df, width='stretch')
     
     with st.expander("🔍 **Proof**", expanded=True):
         st.markdown("""
@@ -5496,7 +6345,7 @@ def render_dominant_strategy_harmony(show_citations: bool):
         'China: Cooperate': ['(8, 8)', '(5, 2)'],
         'China: Defect': ['(2, 5)', '(1, 1)']
     }, index=['U.S.: Cooperate', 'U.S.: Defect'])
-    st.dataframe(payoff_df, use_container_width=True)
+    st.dataframe(payoff_df, width='stretch')
     
     with st.expander("🇺🇸 **Proof for United States**", expanded=True):
         st.markdown("""
@@ -5582,7 +6431,7 @@ def render_dominant_strategy_prisoners(show_citations: bool):
         'China: Cooperate': ['(6, 6)', '(8, 2)'],
         'China: Defect': ['(2, 8)', '(3, 3)']
     }, index=['U.S.: Cooperate', 'U.S.: Defect'])
-    st.dataframe(payoff_df, use_container_width=True)
+    st.dataframe(payoff_df, width='stretch')
     
     with st.expander("🇺🇸 **Proof for United States**", expanded=True):
         st.markdown("""
@@ -5940,7 +6789,7 @@ def render_folk_theorem_proof(show_citations: bool):
         'δ*': ['-0.75 (always cooperate)', '0.40 (cooperation fragile)'],
         'Cooperation': ['Extremely Stable', 'Requires High δ']
     })
-    st.dataframe(comparison_df, use_container_width=True)
+    st.dataframe(comparison_df, width='stretch')
     
     if show_citations:
         render_citation_box(
@@ -6155,7 +7004,7 @@ def render_discount_factor_derivation(show_citations: bool):
         ]
     })
     
-    st.dataframe(examples_df, use_container_width=True)
+    st.dataframe(examples_df, width='stretch')
     
     if show_citations:
         render_citation_box(
@@ -6223,7 +7072,7 @@ def render_cooperation_margin_proof(show_citations: bool):
         'Erosion from δ=0.85': ['0.0%', '40.9%', '62.5%', '74.5%', '81.7%', '84.1%']
     })
     
-    st.dataframe(margin_df, use_container_width=True)
+    st.dataframe(margin_df, width='stretch')
     
     if show_citations:
         render_citation_box(
@@ -6285,7 +7134,7 @@ def render_discount_factor_comparison(show_citations: bool):
         ]
     })
     
-    st.dataframe(comparison_df, use_container_width=True)
+    st.dataframe(comparison_df, width='stretch')
     
     if show_citations:
         render_citation_box(
@@ -6412,7 +7261,7 @@ def render_total_yield_suppression(show_citations: bool):
         ]
     })
     
-    st.dataframe(suppression_df, use_container_width=True)
+    st.dataframe(suppression_df, width='stretch')
     
     if show_citations:
         render_citation_box(
@@ -6473,7 +7322,7 @@ def render_counterfactual_yield(show_citations: bool):
         'Counterfactual Yield (%)': [5.23, 4.12, 3.35, 2.64, 1.39]
     })
     
-    st.dataframe(counterfactual_df, use_container_width=True)
+    st.dataframe(counterfactual_df, width='stretch')
     
     if show_citations:
         render_citation_box(
@@ -6539,7 +7388,7 @@ def render_payoff_normalization(show_citations: bool):
         'Normalized Payoffs': ['(10, 10)', '(1.4, 5.7)', '(5.7, 1.4)', '(0, 0)']
     })
     
-    st.dataframe(normalization_df, use_container_width=True)
+    st.dataframe(normalization_df, width='stretch')
     
     if show_citations:
         render_citation_box(
@@ -6694,7 +7543,7 @@ def render_game_identification_criteria(show_citations: bool):
         ]
     })
     
-    st.dataframe(classification_df, use_container_width=True)
+    st.dataframe(classification_df, width='stretch')
     
     with st.expander("🔍 **Identification Algorithm**", expanded=True):
         st.markdown("""
@@ -6779,7 +7628,7 @@ def render_margin_erosion_rate(show_citations: bool):
         ]
     })
     
-    st.dataframe(erosion_df, use_container_width=True)
+    st.dataframe(erosion_df, width='stretch')
     
     if show_citations:
         render_citation_box(
@@ -7013,7 +7862,7 @@ def render_tariff_correlation_proof(show_citations: bool):
         'Correlation': ['-', '0.85', '0.87', '0.88', '0.89', '0.89', '0.89']
     })
     
-    st.dataframe(tariff_df, use_container_width=True)
+    st.dataframe(tariff_df, width='stretch')
     
     if show_citations:
         render_citation_box(
@@ -7086,7 +7935,7 @@ def render_trade_fx_correlation(show_citations: bool):
         ]
     })
     
-    st.dataframe(trade_fx_df, use_container_width=True)
+    st.dataframe(trade_fx_df, width='stretch')
     
     if show_citations:
         render_citation_box(
@@ -7377,27 +8226,106 @@ def render_related_proofs(proof_type: str):
 
 
 def render_proof_navigator():
-    """Render quick navigation for all proofs."""
+    """Render quick navigation for all proofs with working clickable buttons."""
     
     st.markdown("### 🧭 All Proofs Quick Access")
+    st.markdown("*Click any theorem to jump directly to it*")
     
-    categories = {
-        "Nash Equilibrium (3)": ["1.1", "1.2", "1.3"],
-        "Dominant Strategy (2)": ["2.1", "2.2"],
-        "Pareto Efficiency (4)": ["3.1", "3.2", "3.3", "3.4"],
-        "Folk Theorem & Repeated Games (3)": ["4.1", "4.2", "4.3"],
-        "Discount Factor Thresholds (3)": ["5.1", "5.2", "5.3"],
-        "Yield Suppression (3)": ["6.1", "6.2", "6.3"],
-        "Payoff Transformations (4)": ["7.1", "7.2", "7.3", "7.4"],
-        "Cooperation Margin (3)": ["8.1", "8.2", "8.3"],
-        "Statistical Correlations (3)": ["9.1", "9.2", "9.3"]
+    # Complete proof data structure
+    proof_data = {
+        "1. Nash Equilibrium Analysis": {
+            "display": "Nash Equilibrium (3)",
+            "proofs": [
+                ("1.1", "1.1 Nash Equilibrium Existence (Theorem 1.1)"),
+                ("1.2", "1.2 Nash Equilibrium Uniqueness - Harmony Game (Theorem 1.2)"),
+                ("1.3", "1.3 Nash Equilibrium - Prisoner's Dilemma (Theorem 1.3)")
+            ]
+        },
+        "2. Dominant Strategy Proofs": {
+            "display": "Dominant Strategy (2)",
+            "proofs": [
+                ("2.1", "2.1 Dominant Strategy - Harmony Game (Theorem 2.1)"),
+                ("2.2", "2.2 Dominant Strategy - Prisoner's Dilemma (Theorem 2.2)")
+            ]
+        },
+        "3. Pareto Efficiency Analysis": {
+            "display": "Pareto Efficiency (4)",
+            "proofs": [
+                ("3.1", "3.1 Pareto Efficiency of (C, C) (Theorem 3.1)"),
+                ("3.2", "3.2 Pareto Inefficiency of (D, D) (Theorem 3.2)"),
+                ("3.3", "3.3 Nash-Pareto Alignment - Harmony Game (Theorem 3.3)"),
+                ("3.4", "3.4 Nash-Pareto Divergence - Prisoner's Dilemma (Theorem 3.4)")
+            ]
+        },
+        "4. Folk Theorem & Repeated Games": {
+            "display": "Folk Theorem (3)",
+            "proofs": [
+                ("4.1", "4.1 Folk Theorem Application (Theorem 4.1)"),
+                ("4.2", "4.2 Grim Trigger Strategy Analysis (Theorem 4.2)"),
+                ("4.3", "4.3 Tit-for-Tat Sustainability (Theorem 4.3)")
+            ]
+        },
+        "5. Discount Factor Thresholds": {
+            "display": "Discount Factor (3)",
+            "proofs": [
+                ("5.1", "5.1 Critical Discount Factor Formula (Theorem 5.1)"),
+                ("5.2", "5.2 Cooperation Margin Formula (Theorem 5.2)"),
+                ("5.3", "5.3 Discount Factor Comparative Analysis (Theorem 5.3)")
+            ]
+        },
+        "6. Yield Suppression Model": {
+            "display": "Yield Suppression (3)",
+            "proofs": [
+                ("6.1", "6.1 Yield Suppression Coefficient"),
+                ("6.2", "6.2 Total Yield Suppression Calculation (Theorem 6.1)"),
+                ("6.3", "6.3 Counterfactual Yield Derivation (Theorem 6.2)")
+            ]
+        },
+        "7. Payoff Matrix Transformations": {
+            "display": "Payoff Matrix (4)",
+            "proofs": [
+                ("7.1", "7.1 Payoff Normalization (Theorem 7.1)"),
+                ("7.2", "7.2 Harmony Game Classification (Theorem 7.2)"),
+                ("7.3", "7.3 Prisoner's Dilemma Classification (Theorem 7.3)"),
+                ("7.4", "7.4 Game Type Identification Criteria (Theorem 7.4)")
+            ]
+        },
+        "8. Cooperation Margin Erosion": {
+            "display": "Margin Erosion (3)",
+            "proofs": [
+                ("8.1", "8.1 Margin Erosion Rate (Theorem 8.1)"),
+                ("8.2", "8.2 Discount Factor Decline Rate (Theorem 8.2)"),
+                ("8.3", "8.3 Cooperation Stability Analysis (Theorem 8.3)")
+            ]
+        },
+        "9. Statistical Correlations": {
+            "display": "Statistics (3)",
+            "proofs": [
+                ("9.1", "9.1 Pearson Correlation Coefficient (Theorem 9.1)"),
+                ("9.2", "9.2 Tariff Correlation Test (Theorem 9.2)"),
+                ("9.3", "9.3 Trade Deficit-FX Reserve Correlation (Theorem 9.3)")
+            ]
+        }
     }
     
-    for category, proofs in categories.items():
-        with st.expander(f"📂 {category}"):
-            for proof in proofs:
-                st.markdown(f"- Theorem {proof}")
-
+    # Render each category
+    for category_key, category_info in proof_data.items():
+        with st.expander(f"📂 {category_info['display']}"):
+            for proof_id, proof_full_name in category_info['proofs']:
+                col1, col2 = st.columns([1, 4])
+                with col1:
+                    if st.button(
+                        f"📐 {proof_id}",
+                        key=f"quick_nav_btn_{proof_id}",
+                        use_container_width=True
+                    ):
+                        # Store in session state
+                        st.session_state['selected_category'] = category_key
+                        st.session_state['selected_proof'] = proof_full_name
+                        st.toast(f"✅ Selected Theorem {proof_id}", icon="📐")
+                        st.rerun()
+                with col2:
+                    st.caption(proof_full_name)
 
 def render_related_concepts(proof_type: str):
     """Render related concepts and applications."""
@@ -7472,24 +8400,6 @@ def render_citation_box(citation: str, url: Optional[str] = None):
     """
     
     st.markdown(citation_html, unsafe_allow_html=True)
-
-def render_advanced_analytics_page(macro_data: pd.DataFrame, coop_data: pd.DataFrame, 
-                                 harmony_matrix: PayoffMatrix, pd_matrix: PayoffMatrix):
-    """Render Advanced Analytics page."""
-    st.markdown('<h2 class="sub-header">📈 Advanced Analytics</h2>', unsafe_allow_html=True)
-    
-    engine = GameTheoryEngine(pd_matrix)
-    
-    # Monte Carlo Simulation
-    st.markdown("### Monte Carlo Sensitivity Analysis")
-    st.markdown("Simulating 1,000 scenarios with random variations in discount factor to test equilibrium stability.")
-    
-    if st.button("Run Monte Carlo Simulation"):
-        results = StatisticalEngine.monte_carlo_simulation(engine)
-        fig = VisualizationEngine.create_monte_carlo_results_chart(results)
-        st.plotly_chart(fig, use_container_width=True)
-        
-        st.dataframe(results.describe(), use_container_width=True)
 
 def render_methodology_page():
     """Render enhanced Methodology & Citations page with complete APA references."""
@@ -8048,11 +8958,11 @@ def render_tournament_arena_page(harmony_matrix: PayoffMatrix, pd_matrix: Payoff
             
             with col1:
                 fig = AdvancedVisualizationEngine.create_tournament_heatmap(results)
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, width='stretch')
             
             with col2:
                 fig = AdvancedVisualizationEngine.create_tournament_rankings(results)
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, width='stretch')
             
             # Winner announcement
             rankings = results.groupby('Strategy_1')['Payoff_1'].sum().sort_values(ascending=False)
@@ -8068,7 +8978,7 @@ def render_tournament_arena_page(harmony_matrix: PayoffMatrix, pd_matrix: Payoff
             
             # Detailed results
             with st.expander("📋 View Detailed Match Results"):
-                st.dataframe(results, use_container_width=True, hide_index=True)
+                st.dataframe(results, width='stretch', hide_index=True)
 
 
 def render_evolutionary_lab_page(harmony_matrix: PayoffMatrix, pd_matrix: PayoffMatrix):
@@ -8145,7 +9055,7 @@ def render_evolutionary_lab_page(harmony_matrix: PayoffMatrix, pd_matrix: Payoff
         st.markdown('<h3 class="section-header">Evolution Results</h3>', unsafe_allow_html=True)
         
         fig = AdvancedVisualizationEngine.create_evolutionary_dynamics_chart(results)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
         
         # Final state analysis
         st.markdown('<h3 class="section-header">Final Population Analysis</h3>', unsafe_allow_html=True)
@@ -8267,7 +9177,7 @@ def render_learning_dynamics_page(harmony_matrix: PayoffMatrix, pd_matrix: Payof
         fig = AdvancedVisualizationEngine.create_learning_dynamics_chart(
             results, algorithm_map[algorithm]
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
         
         # Summary statistics
         st.markdown('<h3 class="section-header">Learning Summary</h3>', unsafe_allow_html=True)
@@ -8401,11 +9311,11 @@ def render_parameter_explorer_page(harmony_matrix: PayoffMatrix, pd_matrix: Payo
         fig = VisualizationEngine.create_payoff_matrix_heatmap(
             custom_matrix, f"Custom {game_type} Game"
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     
     with col2:
         fig = VisualizationEngine.create_cooperation_margin_chart(engine, show_historical=False)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     
     # Comparative statics
     st.markdown('<h3 class="section-header">Comparative Statics</h3>', unsafe_allow_html=True)
@@ -8445,59 +9355,7 @@ def render_parameter_explorer_page(harmony_matrix: PayoffMatrix, pd_matrix: Payo
     fig.update_layout(height=500, showlegend=False,
                      title_text="<b>How Parameters Affect δ*</b>")
     
-    st.plotly_chart(fig, use_container_width=True)
-
-
-# =============================================================================
-# UPDATED SIDEBAR FOOTER
-# =============================================================================
-
-def render_sidebar_footer():
-    """Render enhanced sidebar footer with metadata."""
-    
-    st.sidebar.markdown("---")
-    
-    st.sidebar.markdown("""
-    ### 📚 Quick References
-    
-    **Key Equations:**
-    - Nash: $u_i(s^*) \\geq u_i(s_i, s^*_{-i})$
-    - Critical δ: $\\delta^* = \\frac{T-R}{T-P}$
-    - V_coop: $\\frac{R}{1-\\delta}$
-    
-    **Key Results:**
-    - Harmony NE: (C,C) = (8,8)
-    - PD NE: (D,D) = (3,3)
-    - TFT Correlation: r = 0.96
-    
-    ---
-    
-    ### 🔬 New Features
-    
-    - 🏆 Tournament Arena
-    - 🧬 Evolutionary Lab
-    - 🧠 Learning Dynamics
-    - 🔧 Parameter Explorer
-    
-    ---
-    
-    ### 📖 Citation
-    
-    ```
-    Author (2025). Game-Theoretic 
-    Analysis of U.S.-China Economic 
-    Relations. ECON 606 Research.
-    ```
-    
-    ---
-    
-    ### ℹ️ Version Info
-    
-    **Version:** 4.0.0 Enhanced Edition  
-    **Updated:** December 2025  
-    **Framework:** Streamlit + Plotly
-    """)
-
+    st.plotly_chart(fig, width='stretch')
 
 # =============================================================================
 # RUN APPLICATION
