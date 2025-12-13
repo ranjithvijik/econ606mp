@@ -1434,16 +1434,35 @@ class AdvancedVisualizationEngine:
         fig.update_yaxes(title_text='Rate (%)', row=2, col=1)
         fig.update_yaxes(title_text='Value', row=2, col=2)
         
+        # Updated professional styling
         fig.update_layout(
+            template="plotly_white",
             title=dict(
                 text=f"<b>Learning Dynamics: {algorithm.replace('_', ' ').title()}</b>",
                 x=0.5,
-                font=dict(size=18)
+                font=dict(size=18, family="Arial")
             ),
-            height=700,
+            font=dict(
+                family="Arial",
+                size=12,
+                color="#0F172A"
+            ),
+            plot_bgcolor="white",
+            height=800,
             showlegend=True,
-            legend=dict(x=0.5, y=-0.05, orientation='h')
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1
+            )
         )
+        
+        # Consistent grid styling
+        fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='#F1F5F9', zeroline=False)
+        fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='#F1F5F9', zeroline=False)
+
         
         return fig
     
@@ -1561,6 +1580,14 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
         if "tournament_results" not in st.session_state:
             st.session_state.tournament_results = None
 
+        # Presets
+        preset_config = render_simulation_presets()
+        if preset_config:
+            st.session_state['tournament_strategies'] = [s.value for s in preset_config['strategies']]
+            st.session_state['tournament_rounds'] = preset_config['rounds']
+            st.session_state['tournament_noise'] = preset_config['noise']
+            st.rerun()
+
         col1, col2 = st.columns(2)
         
         with col1:
@@ -1586,8 +1613,12 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
                     sim_engine = AdvancedSimulationEngine(matrix, config)
                     strategies = [StrategyType(s) for s in selected_strategies]
                     
-                    # Store results in session state
-                    st.session_state.tournament_results = sim_engine.run_tournament(strategies, rounds_per_match)
+                    # Store results in session state using safe wrapper
+                    st.session_state.tournament_results = safe_simulation_wrapper(
+                        sim_engine.run_tournament,
+                        strategies,
+                        rounds_per_match
+                    )
 
         # Render Results from Session State
         if st.session_state.tournament_results is not None:
@@ -1615,7 +1646,8 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
             </div>
             """, unsafe_allow_html=True)
             
-            with st.expander("📋 View Detailed Results"):
+            with st.expander("📋 View Detailed Results", expanded=True):
+                add_export_buttons(results, "tournament_results")
                 st.dataframe(results, width='stretch', hide_index=True)
 
     # =========================================================================
@@ -3197,72 +3229,88 @@ class EnhancedStatisticalEngine:
     ) -> pd.DataFrame:
         """
         Enhanced Monte Carlo simulation with payoff variations and shock scenarios.
-        
-        Args:
-            engine: GameTheoryEngine instance
-            n_simulations: Number of simulations to run
-            delta_range: Range of discount factors (min, max)
-            payoff_variation: Standard deviation for payoff perturbations (0 = no variation)
-            include_shocks: Whether to include random shock events
-            shock_probability: Probability of shock occurring in each simulation
-            shock_magnitude: Magnitude of shock impact on discount factor
-            seed: Random seed for reproducibility
-            
-        Returns:
-            DataFrame with comprehensive simulation results
+        Uses chunking to manage memory and provide user feedback.
         """
         if seed is not None:
             np.random.seed(seed)
         
-        results = []
+        all_results = []
+        chunk_size = 500  # Process in chunks of 500
         
-        for sim_id in range(n_simulations):
-            # Sample discount factor
-            delta = np.random.uniform(delta_range[0], delta_range[1])
+        # Helper to categorize delta
+        def categorize_delta(d):
+            if d < 0.4: return 'Low (<0.4)'
+            elif d < 0.7: return 'Medium (0.4-0.7)'
+            else: return 'High (>0.7)'
+
+        # Create a progress bar if running many simulations
+        progress_bar = None
+        if n_simulations > 1000:
+            progress_bar = st.progress(0, text="Initializing simulation...")
             
-            # Apply shock if enabled
-            shock_occurred = False
-            if include_shocks and np.random.random() < shock_probability:
-                shock_occurred = True
-                delta = max(0.01, delta - np.random.uniform(0, shock_magnitude))
+        for chunk_start in range(0, n_simulations, chunk_size):
+            chunk_end = min(chunk_start + chunk_size, n_simulations)
+            chunk_results = []
             
-            # Add payoff variation if specified
-            if payoff_variation > 0:
-                # Perturb payoffs slightly
-                perturbed_engine = engine.copy()
-                perturbed_engine.add_noise(payoff_variation)
-                margin = perturbed_engine.calculate_cooperation_margin(delta)
-                v_coop = perturbed_engine.calculate_cooperation_value(delta)
-                v_defect = perturbed_engine.calculate_defection_value(delta)
-            else:
-                margin = engine.calculate_cooperation_margin(delta)
-                v_coop = engine.calculate_cooperation_value(delta)
-                v_defect = engine.calculate_defection_value(delta)
+            # Update progress
+            if progress_bar:
+                progress = chunk_end / n_simulations
+                progress_bar.progress(progress, text=f"Simulating... {chunk_end}/{n_simulations}")
             
-            sustainable = margin > 0
+            for sim_id in range(chunk_start, chunk_end):
+                # Sample discount factor
+                delta = np.random.uniform(delta_range[0], delta_range[1])
+                
+                # Apply shock if enabled
+                shock_occurred = False
+                if include_shocks and np.random.random() < shock_probability:
+                    shock_occurred = True
+                    delta = max(0.01, delta - np.random.uniform(0, shock_magnitude))
+                
+                # Add payoff variation if specified
+                if payoff_variation > 0:
+                    # Perturb payoffs slightly
+                    perturbed_engine = engine.copy()
+                    perturbed_engine.add_noise(payoff_variation)
+                    margin = perturbed_engine.calculate_cooperation_margin(delta)
+                    v_coop = perturbed_engine.calculate_cooperation_value(delta)
+                    v_defect = perturbed_engine.calculate_defection_value(delta)
+                else:
+                    margin = engine.calculate_cooperation_margin(delta)
+                    v_coop = engine.calculate_cooperation_value(delta)
+                    v_defect = engine.calculate_defection_value(delta)
+                
+                sustainable = margin > 0
+                
+                # Calculate additional metrics
+                sharpe_ratio = margin / abs(v_coop - v_defect) if v_coop != v_defect else 0
+                cooperation_probability = 1 / (1 + np.exp(-margin))  # Logistic transformation
+                
+                chunk_results.append({
+                    'simulation_id': sim_id + 1,
+                    'delta': delta,
+                    'margin': margin,
+                    'sustainable': sustainable,
+                    'v_coop': v_coop,
+                    'v_defect': v_defect,
+                    'sharpe_ratio': sharpe_ratio,
+                    'cooperation_probability': cooperation_probability,
+                    'shock_occurred': shock_occurred,
+                    'delta_category': categorize_delta(delta)
+                })
             
-            # Calculate additional metrics
-            sharpe_ratio = margin / abs(v_coop - v_defect) if v_coop != v_defect else 0
-            cooperation_probability = 1 / (1 + np.exp(-margin))  # Logistic transformation
-            
-            results.append({
-                'simulation_id': sim_id + 1,
-                'delta': delta,
-                'margin': margin,
-                'sustainable': sustainable,
-                'v_coop': v_coop,
-                'v_defect': v_defect,
-                'sharpe_ratio': sharpe_ratio,
-                'cooperation_probability': cooperation_probability,
-                'shock_occurred': shock_occurred,
-                'delta_category': categorize_delta(delta)
-            })
+            all_results.extend(chunk_results)
         
-        df = pd.DataFrame(results)
+        # Determine if all_results is empty to avoid pandas error
+        if not all_results:
+            return pd.DataFrame()
+
+        df = pd.DataFrame(all_results)
         
-        # Add summary statistics
-        df['margin_percentile'] = df['margin'].rank(pct=True)
-        df['delta_percentile'] = df['delta'].rank(pct=True)
+        # Add summary statistics if data exists
+        if not df.empty:
+            df['margin_percentile'] = df['margin'].rank(pct=True)
+            df['delta_percentile'] = df['delta'].rank(pct=True)
         
         return df
     
@@ -3598,20 +3646,46 @@ class EnhancedVisualizationEngine:
         sustainability_rate = mc_results['sustainable'].mean() * 100
         
         fig.update_layout(
+            template="plotly_white",
             title=dict(
                 text=f"<b>Comprehensive Monte Carlo Analysis Dashboard</b><br>" +
                      f"<sup>n = {len(mc_results):,} simulations | " +
                      f"Sustainability Rate: {sustainability_rate:.1f}%</sup>",
                 x=0.5,
-                font=dict(size=24, family="Inter, sans-serif", color="#1E293B")
+                font=dict(size=24, family="Arial")
+            ),
+            font=dict(
+                family="Arial",
+                size=12,
+                color="#0F172A"
             ),
             height=1400,
             showlegend=True,
-            legend=dict(x=1.02, y=0.5, bgcolor='rgba(255,255,255,0.8)'),
-            font=dict(family="Inter, sans-serif"),
-            paper_bgcolor='white',
-            plot_bgcolor='white',
-            margin=dict(t=120, b=50, l=50, r=50)
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.002,
+                xanchor="right",
+                x=1
+            ),
+            plot_bgcolor="white",
+            margin=dict(t=140, b=50, l=60, r=40)
+        )
+        
+        # Consistent professional grid and axes styling
+        fig.update_xaxes(
+            showgrid=True, 
+            gridwidth=1, 
+            gridcolor='#F1F5F9', 
+            zeroline=False,
+            title_font=dict(size=12, family="Arial", color="#334155")
+        )
+        fig.update_yaxes(
+            showgrid=True, 
+            gridwidth=1, 
+            gridcolor='#F1F5F9', 
+            zeroline=False,
+            title_font=dict(size=12, family="Arial", color="#334155")
         )
         
         # Update axes labels with better formatting
@@ -3843,8 +3917,13 @@ def render_monte_carlo_dashboard(
         st.success(f'✅ Simulation complete! Analyzed {n_simulations:,} scenarios.')
     
     # Display results if available
-    if 'mc_results' in st.session_state:
+    if 'mc_results' in st.session_state and st.session_state['mc_results'] is not None:
         mc_results = st.session_state['mc_results']
+        
+        # Add Export Options
+        st.markdown("### 💾 Export Results")
+        add_export_buttons(mc_results, "monte_carlo_results")
+        st.markdown("---")
         
         # Summary statistics
         st.markdown("### 📊 Simulation Summary")
@@ -9465,17 +9544,24 @@ def render_research_documents_page():
             st.markdown(f"### 📄 {selected_file}")
             
             # Construct GitHub Raw URL
-            # Note: We must use the 'raw' version or 'githubusercontent' optimized link for the viewer
-            # GITHUB_BASE_URL was blob, we need raw
             raw_base_url = "https://raw.githubusercontent.com/ranjithvijik/econ606mp/main/"
             pdf_url = raw_base_url + pdf_mapping[selected_file]
             
-            # Use Google Docs Viewer for robust embedding
-            # This is often more reliable than data URI if the file is hosted online
+            # Primary: Google Docs Viewer
             viewer_url = f"https://docs.google.com/viewer?url={pdf_url}&embedded=true"
+            # Fallback: Mozilla PDF.js
+            pdfjs_url = f"https://mozilla.github.io/pdf.js/web/viewer.html?file={pdf_url}"
             
-            pdf_display = f'<iframe src="{viewer_url}" width="100%" height="800" style="border: none;"></iframe>'
-            st.markdown(pdf_display, unsafe_allow_html=True)
+            # Display with tabs for multiple viewers
+            tab1, tab2 = st.tabs(["📄 Google Viewer", "🔧 Alternative Viewer"])
+            
+            with tab1:
+                st.markdown(f'<iframe src="{viewer_url}" width="100%" height="800" style="border: none;"></iframe>', 
+                           unsafe_allow_html=True)
+            
+            with tab2:
+                st.markdown(f'<iframe src="{pdfjs_url}" width="100%" height="800" style="border: none;"></iframe>', 
+                           unsafe_allow_html=True)
             
             # Fallback link
             st.markdown(f"[📥 Download / View on GitHub]({GITHUB_BASE_URL + pdf_mapping[selected_file]})")
@@ -9685,6 +9771,14 @@ def render_tournament_arena_page(harmony_matrix: PayoffMatrix, pd_matrix: Payoff
     # Tournament configuration
     st.markdown('<h3 class="section-header">Tournament Configuration</h3>', unsafe_allow_html=True)
     
+    # Presets
+    preset_config = render_simulation_presets()
+    if preset_config:
+        st.session_state['t_strategies'] = [s.value for s in preset_config['strategies']]
+        st.session_state['t_rounds'] = preset_config['rounds']
+        st.session_state['t_noise'] = preset_config['noise']
+        st.rerun()
+
     col1, col2 = st.columns(2)
     
     with col1:
@@ -9734,36 +9828,44 @@ def render_tournament_arena_page(harmony_matrix: PayoffMatrix, pd_matrix: Payoff
                 sim_engine = AdvancedSimulationEngine(matrix, config)
                 
                 strategies = [StrategyType(s) for s in selected_strategies]
-                results = sim_engine.run_tournament(strategies, rounds_per_match)
+                
+                # Use safe wrapper
+                results = safe_simulation_wrapper(
+                    sim_engine.run_tournament, 
+                    strategies, 
+                    rounds_per_match
+                )
             
-            # Results visualization
-            st.markdown('<h3 class="section-header">Tournament Results</h3>', unsafe_allow_html=True)
-            
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                fig = AdvancedVisualizationEngine.create_tournament_heatmap(results)
-                st.plotly_chart(fig, width='stretch')
-            
-            with col2:
-                fig = AdvancedVisualizationEngine.create_tournament_rankings(results)
-                st.plotly_chart(fig, width='stretch')
-            
-            # Winner announcement
-            rankings = results.groupby('Strategy_1')['Payoff_1'].sum().sort_values(ascending=False)
-            winner = rankings.index[0]
-            winner_score = rankings.iloc[0]
-            
-            st.markdown(f"""
-            <div class="success-box">
-            <h3>🏆 Tournament Winner: {winner}</h3>
-            <p>Total Payoff: <strong>{winner_score:.0f}</strong></p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # Detailed results
-            with st.expander("📋 View Detailed Match Results"):
-                st.dataframe(results, width='stretch', hide_index=True)
+            if results is not None:
+                # Results visualization
+                st.markdown('<h3 class="section-header">Tournament Results</h3>', unsafe_allow_html=True)
+                
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    fig = AdvancedVisualizationEngine.create_tournament_heatmap(results)
+                    st.plotly_chart(fig, width='stretch')
+                
+                with col2:
+                    fig = AdvancedVisualizationEngine.create_tournament_rankings(results)
+                    st.plotly_chart(fig, width='stretch')
+                
+                # Winner announcement
+                rankings = results.groupby('Strategy_1')['Payoff_1'].sum().sort_values(ascending=False)
+                winner = rankings.index[0]
+                winner_score = rankings.iloc[0]
+                
+                st.markdown(f"""
+                <div class="success-box">
+                <h3>🏆 Tournament Winner: {winner}</h3>
+                <p>Total Payoff: <strong>{winner_score:.0f}</strong></p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # Detailed results
+                with st.expander("📋 View Detailed Match Results", expanded=True):
+                    add_export_buttons(results, "tournament_results")
+                    st.dataframe(results, width='stretch', hide_index=True)
 
 
 def render_evolutionary_lab_page(harmony_matrix: PayoffMatrix, pd_matrix: PayoffMatrix):
@@ -10143,8 +10245,120 @@ def render_parameter_explorer_page(harmony_matrix: PayoffMatrix, pd_matrix: Payo
     st.plotly_chart(fig, width='stretch')
 
 # =============================================================================
+# HELPER FUNCTIONS
+# =============================================================================
+
+def initialize_session_state():
+    """Initialize all session state variables with defaults."""
+    defaults = {
+        'tournament_results': None,
+        'evo_results': None,
+        'learning_results': None,
+        'stochastic_results': None,
+        'quick_results': None,
+        'quick_results_strategies': None,
+        'mc_results': None,
+        'selected_category': "1. Nash Equilibrium Analysis",
+        'selected_proof': None,
+        'dark_mode': False,
+        'simulation_history': []
+    }
+    for key, value in defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = value
+
+def add_export_buttons(df: pd.DataFrame, filename_prefix: str):
+    """Add export buttons for CSV, Excel, and JSON."""
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        csv = df.to_csv(index=False)
+        st.download_button(
+            label="📥 Download CSV",
+            data=csv,
+            file_name=f"{filename_prefix}.csv",
+            mime="text/csv",
+            use_container_width=True
+        )
+    
+    with col2:
+        # JSON export
+        json_str = df.to_json(orient='records', indent=2)
+        st.download_button(
+            label="📥 Download JSON",
+            data=json_str,
+            file_name=f"{filename_prefix}.json",
+            mime="application/json",
+            use_container_width=True
+        )
+        
+    with col3:
+        # Simple text summary
+        summary = str(df.describe())
+        st.download_button(
+            label="📥 Download Summary",
+            data=summary,
+            file_name=f"{filename_prefix}_summary.txt",
+            mime="text/plain",
+            use_container_width=True
+        )
+
+def safe_simulation_wrapper(simulation_func, *args, **kwargs):
+    """Wrapper for safe simulation execution with error handling."""
+    import traceback
+    try:
+        return simulation_func(*args, **kwargs)
+    except ValueError as e:
+        st.error(f"❌ **Invalid Input:** {str(e)}")
+        st.info("💡 **Tip:** Check that all parameters are within valid ranges.")
+        return None
+    except MemoryError:
+        st.error("❌ **Memory Error:** Simulation too large. Try reducing parameters.")
+        return None
+    except Exception as e:
+        st.error(f"❌ **Unexpected Error:** {str(e)}")
+        st.code(traceback.format_exc(), language="python")
+        return None
+
+def render_simulation_presets():
+    """Render preset simulation configurations."""
+    st.markdown("### 🎯 Quick Start Presets")
+    
+    presets = {
+        "Classic Axelrod Tournament": {
+            "strategies": [StrategyType.TIT_FOR_TAT, StrategyType.ALWAYS_COOPERATE,
+                          StrategyType.ALWAYS_DEFECT, StrategyType.GRIM_TRIGGER],
+            "rounds": 200,
+            "noise": 0.0
+        },
+        "Noisy Environment": {
+            "strategies": [StrategyType.TIT_FOR_TAT, StrategyType.GENEROUS_TFT,
+                          StrategyType.PAVLOV, StrategyType.ALWAYS_DEFECT],
+            "rounds": 150,
+            "noise": 0.1
+        },
+        "Evolutionary Pressure": {
+            "strategies": [StrategyType.TIT_FOR_TAT, StrategyType.ALWAYS_COOPERATE,
+                          StrategyType.ALWAYS_DEFECT, StrategyType.RANDOM],
+            "rounds": 100,
+            "noise": 0.05
+        }
+    }
+    
+    selected_preset = st.selectbox("Select Preset:", list(presets.keys()))
+    
+    if st.button("⚡ Load Preset"):
+        return presets[selected_preset]
+    return None
+
+def add_help_tooltip(text: str, help_text: str):
+    """Add an interactive help tooltip."""
+    return f"{text} ℹ️"
+
+# =============================================================================
 # RUN APPLICATION
 # =============================================================================
 
 if __name__ == "__main__":
+    initialize_session_state()
     main()
