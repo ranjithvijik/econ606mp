@@ -9146,298 +9146,228 @@ def render_methodology_page():
     st.markdown('<h2 class="sub-header">📖 Methodology & Citations</h2>', unsafe_allow_html=True)
     
     # Primary Data Sources Section
-    st.markdown("""
-    <div class="citation-box">
-    <h3 style="color: #667eea; margin-top: 0;">📊 Primary Data Sources</h3>
-    <ul style="line-height: 1.8;">
-        <li><strong>Trade Data:</strong> U.S. Census Bureau. (2024). <em>Trade in goods with China</em>. 
-            <a href="https://www.census.gov/foreign-trade/balance/c5700.html" target="_blank">
-            https://www.census.gov/foreign-trade/balance/c5700.html</a></li>
-        
-        <li><strong>Financial Data:</strong> U.S. Department of the Treasury. (2024). <em>Major foreign holders of Treasury securities</em>. 
-            Treasury International Capital (TIC) System. 
-            <a href="https://home.treasury.gov/data/treasury-international-capital-tic-system" target="_blank">
-            https://home.treasury.gov/data/treasury-international-capital-tic-system</a></li>
-        
-        <li><strong>Foreign Exchange Reserves:</strong> State Administration of Foreign Exchange (SAFE). (2024). 
-            <em>China foreign exchange reserves statistics</em>. People's Republic of China Ministry of Finance. 
-            <a href="https://www.safe.gov.cn/en/" target="_blank">https://www.safe.gov.cn/en/</a></li>
-        
-        <li><strong>Treasury Yields:</strong> Federal Reserve Bank of St. Louis. (2024). <em>Market yield on U.S. Treasury securities at 10-year constant maturity</em> [Data set]. FRED. 
-            <a href="https://fred.stlouisfed.org/series/DGS10" target="_blank">
-            https://fred.stlouisfed.org/series/DGS10</a></li>
-        
-        <li><strong>Tariff Data:</strong> Bown, C. P. (2023). <em>US-China trade war tariffs: An up-to-date chart</em>. 
-            Peterson Institute for International Economics. 
-            <a href="https://www.piie.com/research/piie-charts/us-china-trade-war-tariffs-date-chart" target="_blank">
-            https://www.piie.com/research/piie-charts/us-china-trade-war-tariffs-date-chart</a></li>
-        
-        <li><strong>GDP Data:</strong> World Bank. (2024). <em>GDP growth (annual %)</em> [Data set]. World Bank Open Data. 
-            <a href="https://data.worldbank.org/indicator/NY.GDP.MKTP.KD.ZG" target="_blank">
-            https://data.worldbank.org/indicator/NY.GDP.MKTP.KD.ZG</a></li>
-        
-        <li><strong>Savings & Investment:</strong> World Bank. (2024). <em>Gross domestic savings (% of GDP)</em> [Data set]. 
-            <a href="https://data.worldbank.org/indicator/NY.GDS.TOTL.ZS" target="_blank">
-            https://data.worldbank.org/indicator/NY.GDS.TOTL.ZS</a></li>
-        
-        <li><strong>Federal Debt:</strong> Federal Reserve Bank of St. Louis. (2024). <em>Federal debt: Total public debt</em> [Data set]. FRED. 
-            <a href="https://fred.stlouisfed.org/series/GFDEBTN" target="_blank">
-            https://fred.stlouisfed.org/series/GFDEBTN</a></li>
-    </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("""<div class="citation-box">
+<h3 style="color: #667eea; margin-top: 0;">📊 Primary Data Sources</h3>
+<ul style="line-height: 1.8;">
+<li><strong>Trade Data:</strong> U.S. Census Bureau. (2024). <em>Trade in goods with China</em>. 
+<a href="https://www.census.gov/foreign-trade/balance/c5700.html" target="_blank">
+https://www.census.gov/foreign-trade/balance/c5700.html</a></li>
+<li><strong>Financial Data:</strong> U.S. Department of the Treasury. (2024). <em>Major foreign holders of Treasury securities</em>. 
+Treasury International Capital (TIC) System. 
+<a href="https://home.treasury.gov/data/treasury-international-capital-tic-system" target="_blank">
+https://home.treasury.gov/data/treasury-international-capital-tic-system</a></li>
+<li><strong>Foreign Exchange Reserves:</strong> State Administration of Foreign Exchange (SAFE). (2024). 
+<em>China foreign exchange reserves statistics</em>. People's Republic of China Ministry of Finance. 
+<a href="https://www.safe.gov.cn/en/" target="_blank">https://www.safe.gov.cn/en/</a></li>
+<li><strong>Treasury Yields:</strong> Federal Reserve Bank of St. Louis. (2024). <em>Market yield on U.S. Treasury securities at 10-year constant maturity</em> [Data set]. FRED. 
+<a href="https://fred.stlouisfed.org/series/DGS10" target="_blank">
+https://fred.stlouisfed.org/series/DGS10</a></li>
+<li><strong>Tariff Data:</strong> Bown, C. P. (2023). <em>US-China trade war tariffs: An up-to-date chart</em>. 
+Peterson Institute for International Economics. 
+<a href="https://www.piie.com/research/piie-charts/us-china-trade-war-tariffs-date-chart" target="_blank">
+https://www.piie.com/research/piie-charts/us-china-trade-war-tariffs-date-chart</a></li>
+<li><strong>GDP Data:</strong> World Bank. (2024). <em>GDP growth (annual %)</em> [Data set]. World Bank Open Data. 
+<a href="https://data.worldbank.org/indicator/NY.GDP.MKTP.KD.ZG" target="_blank">
+https://data.worldbank.org/indicator/NY.GDP.MKTP.KD.ZG</a></li>
+<li><strong>Savings & Investment:</strong> World Bank. (2024). <em>Gross domestic savings (% of GDP)</em> [Data set]. 
+<a href="https://data.worldbank.org/indicator/NY.GDS.TOTL.ZS" target="_blank">
+https://data.worldbank.org/indicator/NY.GDS.TOTL.ZS</a></li>
+<li><strong>Federal Debt:</strong> Federal Reserve Bank of St. Louis. (2024). <em>Federal debt: Total public debt</em> [Data set]. FRED. 
+<a href="https://fred.stlouisfed.org/series/GFDEBTN" target="_blank">
+https://fred.stlouisfed.org/series/GFDEBTN</a></li>
+</ul>
+</div>""", unsafe_allow_html=True)
     
     # Game Theory & Economics References
-    st.markdown("""
-    <div class="citation-box">
-    <h3 style="color: #667eea; margin-top: 0;">📚 Game Theory & Economic Theory References</h3>
-    <ul style="line-height: 1.8;">
-        <li>Axelrod, R. (1984). <em>The evolution of cooperation</em>. Basic Books.</li>
-        
-        <li>Friedman, J. W. (1971). A non-cooperative equilibrium for supergames. 
-            <em>The Review of Economic Studies</em>, 38(1), 1-12. 
-            <a href="https://doi.org/10.2307/2296617" target="_blank">https://doi.org/10.2307/2296617</a></li>
-        
-        <li>Nash, J. (1950). Equilibrium points in n-person games. 
-            <em>Proceedings of the National Academy of Sciences</em>, 36(1), 48-49. 
-            <a href="https://doi.org/10.1073/pnas.36.1.48" target="_blank">https://doi.org/10.1073/pnas.36.1.48</a></li>
-        
-        <li>Nowak, M. A., & Sigmund, K. (1992). Tit for tat in heterogeneous populations. 
-            <em>Nature</em>, 355(6357), 250-253. 
-            <a href="https://doi.org/10.1038/355250a0" target="_blank">https://doi.org/10.1038/355250a0</a></li>
-        
-        <li>Osborne, M. J. (2004). <em>An introduction to game theory</em> (2nd ed.). Oxford University Press.</li>
-        
-        <li>Perloff, J. M., & Brander, J. A. (2020). <em>Managerial economics and strategy</em> (3rd ed.). Pearson Education.</li>
-    </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("""<div class="citation-box">
+<h3 style="color: #667eea; margin-top: 0;">📚 Game Theory & Economic Theory References</h3>
+<ul style="line-height: 1.8;">
+<li>Axelrod, R. (1984). <em>The evolution of cooperation</em>. Basic Books.</li>
+<li>Friedman, J. W. (1971). A non-cooperative equilibrium for supergames. 
+<em>The Review of Economic Studies</em>, 38(1), 1-12. 
+<a href="https://doi.org/10.2307/2296617" target="_blank">https://doi.org/10.2307/2296617</a></li>
+<li>Nash, J. (1950). Equilibrium points in n-person games. 
+<em>Proceedings of the National Academy of Sciences</em>, 36(1), 48-49. 
+<a href="https://doi.org/10.1073/pnas.36.1.48" target="_blank">https://doi.org/10.1073/pnas.36.1.48</a></li>
+<li>Nowak, M. A., & Sigmund, K. (1992). Tit for tat in heterogeneous populations. 
+<em>Nature</em>, 355(6357), 250-253. 
+<a href="https://doi.org/10.1038/355250a0" target="_blank">https://doi.org/10.1038/355250a0</a></li>
+<li>Osborne, M. J. (2004). <em>An introduction to game theory</em> (2nd ed.). Oxford University Press.</li>
+<li>Perloff, J. M., & Brander, J. A. (2020). <em>Managerial economics and strategy</em> (3rd ed.). Pearson Education.</li>
+</ul>
+</div>""", unsafe_allow_html=True)
     
     # International Economics & Trade References
-    st.markdown("""
-    <div class="citation-box">
-    <h3 style="color: #667eea; margin-top: 0;">🌍 International Economics & Trade Policy References</h3>
-    <ul style="line-height: 1.8;">
-        <li>Fajgelbaum, P. D., Goldberg, P. K., Kennedy, P. J., & Amiti, M. (2020). The return to protectionism. 
-            <em>The Quarterly Journal of Economics</em>, 135(1), 1-55. 
-            <a href="https://doi.org/10.1093/qje/qjz036" target="_blank">https://doi.org/10.1093/qje/qjz036</a></li>
-        
-        <li>Morrison, W. M. (2018). <em>China-U.S. trade issues</em>. Congressional Research Service. 
-            <a href="https://crsreports.congress.gov" target="_blank">https://crsreports.congress.gov</a></li>
-        
-        <li>Rickard, S. J. (2017). Compensating the losers: An examination of congressional votes on trade adjustment assistance. 
-            <em>International Interactions</em>, 43(3), 1-25. 
-            <a href="https://doi.org/10.1080/03050629.2017.1239468" target="_blank">https://doi.org/10.1080/03050629.2017.1239468</a></li>
-        
-        <li>Scott, R. E. (2018). <em>The China toll deepens: Growth in the bilateral trade deficit between 2001 and 2017 cost 3.4 million jobs</em>. 
-            Economic Policy Institute. 
-            <a href="https://www.epi.org/publication/the-china-toll-deepens/" target="_blank">
-            https://www.epi.org/publication/the-china-toll-deepens/</a></li>
-    </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("""<div class="citation-box">
+<h3 style="color: #667eea; margin-top: 0;">🌍 International Economics & Trade Policy References</h3>
+<ul style="line-height: 1.8;">
+<li>Fajgelbaum, P. D., Goldberg, P. K., Kennedy, P. J., & Amiti, M. (2020). The return to protectionism. 
+<em>The Quarterly Journal of Economics</em>, 135(1), 1-55. 
+<a href="https://doi.org/10.1093/qje/qjz036" target="_blank">https://doi.org/10.1093/qje/qjz036</a></li>
+<li>Morrison, W. M. (2018). <em>China-U.S. trade issues</em>. Congressional Research Service. 
+<a href="https://crsreports.congress.gov" target="_blank">https://crsreports.congress.gov</a></li>
+<li>Rickard, S. J. (2017). Compensating the losers: An examination of congressional votes on trade adjustment assistance. 
+<em>International Interactions</em>, 43(3), 1-25. 
+<a href="https://doi.org/10.1080/03050629.2017.1239468" target="_blank">https://doi.org/10.1080/03050629.2017.1239468</a></li>
+<li>Scott, R. E. (2018). <em>The China toll deepens: Growth in the bilateral trade deficit between 2001 and 2017 cost 3.4 million jobs</em>. 
+Economic Policy Institute. 
+<a href="https://www.epi.org/publication/the-china-toll-deepens/" target="_blank">
+https://www.epi.org/publication/the-china-toll-deepens/</a></li>
+</ul>
+</div>""", unsafe_allow_html=True)
     
     # Macroeconomics & Financial Markets References
-    st.markdown("""
-    <div class="citation-box">
-    <h3 style="color: #667eea; margin-top: 0;">💰 Macroeconomics & Financial Markets References</h3>
-    <ul style="line-height: 1.8;">
-        <li>Dallas Federal Reserve. (2025). <em>International capital flows and Treasury yields</em> [Working Paper WP2513]. 
-            <a href="https://www.dallasfed.org/-/media/documents/research/papers/2025/wp2513.pdf" target="_blank">
-            https://www.dallasfed.org/-/media/documents/research/papers/2025/wp2513.pdf</a></li>
-        
-        <li>Greenspan, A. (2005, March 10). <em>Remarks on the global saving glut and the U.S. current account deficit</em> [Speech]. 
-            Federal Reserve Board. 
-            <a href="https://www.federalreserve.gov/boarddocs/speeches/2005/200503102/" target="_blank">
-            https://www.federalreserve.gov/boarddocs/speeches/2005/200503102/</a></li>
-        
-        <li>Meyer, T. (2022). <em>Testimony before the U.S.-China Economic and Security Review Commission</em>. 
-            U.S.-China Economic and Security Review Commission.</li>
-        
-        <li>Shapiro, D., MacDonald, D., & Greenlaw, S. A. (2022). <em>Principles of macroeconomics</em> (3rd ed.). OpenStax. 
-            <a href="https://openstax.org/details/books/principles-macroeconomics-3e" target="_blank">
-            https://openstax.org/details/books/principles-macroeconomics-3e</a></li>
-        
-        <li>Shapiro, D., MacDonald, D., & Greenlaw, S. A. (2022). <em>Principles of microeconomics</em> (3rd ed.). OpenStax. 
-            <a href="https://openstax.org/details/books/principles-microeconomics-3e" target="_blank">
-            https://openstax.org/details/books/principles-microeconomics-3e</a></li>
-        
-        <li>Warnock, F. E., & Warnock, V. C. (2009). International capital flows and U.S. interest rates. 
-            <em>Journal of International Money and Finance</em>, 28(6), 903-919. 
-            <a href="https://doi.org/10.1016/j.jimonfin.2009.06.004" target="_blank">
-            https://doi.org/10.1016/j.jimonfin.2009.06.004</a></li>
-    </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("""<div class="citation-box">
+<h3 style="color: #667eea; margin-top: 0;">💰 Macroeconomics & Financial Markets References</h3>
+<ul style="line-height: 1.8;">
+<li>Dallas Federal Reserve. (2025). <em>International capital flows and Treasury yields</em> [Working Paper WP2513]. 
+<a href="https://www.dallasfed.org/-/media/documents/research/papers/2025/wp2513.pdf" target="_blank">
+https://www.dallasfed.org/-/media/documents/research/papers/2025/wp2513.pdf</a></li>
+<li>Greenspan, A. (2005, March 10). <em>Remarks on the global saving glut and the U.S. current account deficit</em> [Speech]. 
+Federal Reserve Board. 
+<a href="https://www.federalreserve.gov/boarddocs/speeches/2005/200503102/" target="_blank">
+https://www.federalreserve.gov/boarddocs/speeches/2005/200503102/</a></li>
+<li>Meyer, T. (2022). <em>Testimony before the U.S.-China Economic and Security Review Commission</em>. 
+U.S.-China Economic and Security Review Commission.</li>
+<li>Shapiro, D., MacDonald, D., & Greenlaw, S. A. (2022). <em>Principles of macroeconomics</em> (3rd ed.). OpenStax. 
+<a href="https://openstax.org/details/books/principles-macroeconomics-3e" target="_blank">
+https://openstax.org/details/books/principles-macroeconomics-3e</a></li>
+<li>Shapiro, D., MacDonald, D., & Greenlaw, S. A. (2022). <em>Principles of microeconomics</em> (3rd ed.). OpenStax. 
+<a href="https://openstax.org/details/books/principles-microeconomics-3e" target="_blank">
+https://openstax.org/details/books/principles-microeconomics-3e</a></li>
+<li>Warnock, F. E., & Warnock, V. C. (2009). International capital flows and U.S. interest rates. 
+<em>Journal of International Money and Finance</em>, 28(6), 903-919. 
+<a href="https://doi.org/10.1016/j.jimonfin.2009.06.004" target="_blank">
+https://doi.org/10.1016/j.jimonfin.2009.06.004</a></li>
+</ul>
+</div>""", unsafe_allow_html=True)
     
     # Government & Policy Documents
-    st.markdown("""
-    <div class="citation-box">
-    <h3 style="color: #667eea; margin-top: 0;">🏛️ Government & Policy Documents</h3>
-    <ul style="line-height: 1.8;">
-        <li>People's Bank of China. (2024). <em>Monetary policy statements and foreign reserve management</em>. 
-            <a href="http://www.pbc.gov.cn/en/" target="_blank">http://www.pbc.gov.cn/en/</a></li>
-        
-        <li>U.S. Census Bureau. (2023). <em>Trade in goods with China</em>. Bureau of the Census, Department of Commerce. 
-            <a href="https://www.census.gov/foreign-trade/balance/c5700.html" target="_blank">
-            https://www.census.gov/foreign-trade/balance/c5700.html</a></li>
-        
-        <li>U.S. Department of the Treasury. (2024). <em>Treasury Bulletin</em>. 
-            <a href="https://fiscal.treasury.gov/reports-statements/treasury-bulletin/" target="_blank">
-            https://fiscal.treasury.gov/reports-statements/treasury-bulletin/</a></li>
-    </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("""<div class="citation-box">
+<h3 style="color: #667eea; margin-top: 0;">🏛️ Government & Policy Documents</h3>
+<ul style="line-height: 1.8;">
+<li>People's Bank of China. (2024). <em>Monetary policy statements and foreign reserve management</em>. 
+<a href="http://www.pbc.gov.cn/en/" target="_blank">http://www.pbc.gov.cn/en/</a></li>
+<li>U.S. Census Bureau. (2023). <em>Trade in goods with China</em>. Bureau of the Census, Department of Commerce. 
+<a href="https://www.census.gov/foreign-trade/balance/c5700.html" target="_blank">
+https://www.census.gov/foreign-trade/balance/c5700.html</a></li>
+<li>U.S. Department of the Treasury. (2024). <em>Treasury Bulletin</em>. 
+<a href="https://fiscal.treasury.gov/reports-statements/treasury-bulletin/" target="_blank">
+https://fiscal.treasury.gov/reports-statements/treasury-bulletin/</a></li>
+</ul>
+</div>""", unsafe_allow_html=True)
     
     # Methodology Section
-    st.markdown("""
-    <div class="methodology-box">
-    <h3 style="color: #667eea; margin-top: 0;">🔬 Modeling Methodology</h3>
-    
-    <h4>Game-Theoretic Framework</h4>
-    <p>This analysis employs normal-form game theory to model U.S.-China economic relations as a strategic interaction 
-    between two rational players. The framework integrates:</p>
-    
-    <ol style="line-height: 1.8;">
-        <li><strong>Static Game Analysis:</strong> Nash equilibrium identification in 2×2 normal-form games with 
-            dominant strategy characterization (Nash, 1950; Osborne, 2004).</li>
-        
-        <li><strong>Pareto Efficiency Analysis:</strong> Assessment of static efficiency versus dynamic sustainability, 
-            distinguishing Nash equilibria from Pareto-optimal outcomes (Perloff & Brander, 2020).</li>
-        
-        <li><strong>Repeated Game Theory:</strong> Infinitely repeated games with discounting, Folk theorem applications, 
-            and trigger strategy analysis (Friedman, 1971; Axelrod, 1984).</li>
-        
-        <li><strong>Empirical Validation:</strong> Correlation analysis of tariff escalation patterns to validate 
-            tit-for-tat behavioral predictions (Bown, 2023).</li>
-    </ol>
-    
-    <h4>Key Modeling Assumptions</h4>
-    <ol style="line-height: 1.8;">
-        <li><strong>Rationality:</strong> Both players (U.S. and China) are assumed to maximize expected utility 
-            based on well-defined preference orderings over outcomes.</li>
-        
-        <li><strong>Complete Information:</strong> Payoff matrices are common knowledge—both players know the 
-            structure of the game, available strategies, and resulting payoffs.</li>
-        
-        <li><strong>Strategic Symmetry:</strong> While the U.S. and China differ substantially in economic size 
-            and institutional structure, the strategic interaction is modeled as symmetric for the 2×2 normal-form 
-            game to isolate game-theoretic dynamics from asymmetric power considerations.</li>
-        
-        <li><strong>Exponential Discounting:</strong> Future payoffs are discounted exponentially with discount 
-            factor δ ∈ (0,1), representing players' time preferences and the shadow of the future in repeated interactions.</li>
-        
-        <li><strong>Payoff Calibration:</strong> Payoffs are normalized on a cardinal 1-10 scale based on weighted 
-            composite indices incorporating GDP growth, employment, financial stability, and strategic autonomy 
-            (see ECON 606 Mini Project Report for detailed calibration methodology).</li>
-    </ol>
-    
-    <h4>Data Processing & Validation</h4>
-    <ul style="line-height: 1.8;">
-        <li><strong>Time Series Analysis:</strong> Annual data (2001-2025) from primary government sources 
-            (U.S. Census Bureau, U.S. Treasury, SAFE, FRED, World Bank).</li>
-        
-        <li><strong>Correlation Analysis:</strong> Pearson correlation coefficients with two-tailed t-tests 
-            for statistical significance (α = 0.001).</li>
-        
-        <li><strong>Yield Suppression Estimation:</strong> Based on Warnock & Warnock (2009) methodology: 
-            -2.4 basis points per $100 billion in foreign official inflows.</li>
-        
-        <li><strong>Cross-Validation:</strong> All empirical claims cross-referenced against multiple independent 
-            data sources to ensure robustness.</li>
-    </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("""<div class="methodology-box">
+<h3 style="color: #667eea; margin-top: 0;">🔬 Modeling Methodology</h3>
+<h4>Game-Theoretic Framework</h4>
+<p>This analysis employs normal-form game theory to model U.S.-China economic relations as a strategic interaction 
+between two rational players. The framework integrates:</p>
+<ol style="line-height: 1.8;">
+<li><strong>Static Game Analysis:</strong> Nash equilibrium identification in 2×2 normal-form games with 
+dominant strategy characterization (Nash, 1950; Osborne, 2004).</li>
+<li><strong>Pareto Efficiency Analysis:</strong> Assessment of static efficiency versus dynamic sustainability, 
+distinguishing Nash equilibria from Pareto-optimal outcomes (Perloff & Brander, 2020).</li>
+<li><strong>Repeated Game Theory:</strong> Infinitely repeated games with discounting, Folk theorem applications, 
+and trigger strategy analysis (Friedman, 1971; Axelrod, 1984).</li>
+<li><strong>Empirical Validation:</strong> Correlation analysis of tariff escalation patterns to validate 
+tit-for-tat behavioral predictions (Bown, 2023).</li>
+</ol>
+<h4>Key Modeling Assumptions</h4>
+<ol style="line-height: 1.8;">
+<li><strong>Rationality:</strong> Both players (U.S. and China) are assumed to maximize expected utility 
+based on well-defined preference orderings over outcomes.</li>
+<li><strong>Complete Information:</strong> Payoff matrices are common knowledge—both players know the 
+structure of the game, available strategies, and resulting payoffs.</li>
+<li><strong>Strategic Symmetry:</strong> While the U.S. and China differ substantially in economic size 
+and institutional structure, the strategic interaction is modeled as symmetric for the 2×2 normal-form 
+game to isolate game-theoretic dynamics from asymmetric power considerations.</li>
+<li><strong>Exponential Discounting:</strong> Future payoffs are discounted exponentially with discount 
+factor δ ∈ (0,1), representing players' time preferences and the shadow of the future in repeated interactions.</li>
+<li><strong>Payoff Calibration:</strong> Payoffs are normalized on a cardinal 1-10 scale based on weighted 
+composite indices incorporating GDP growth, employment, financial stability, and strategic autonomy 
+(see ECON 606 Mini Project Report for detailed calibration methodology).</li>
+</ol>
+<h4>Data Processing & Validation</h4>
+<ul style="line-height: 1.8;">
+<li><strong>Time Series Analysis:</strong> Annual data (2001-2025) from primary government sources 
+(U.S. Census Bureau, U.S. Treasury, SAFE, FRED, World Bank).</li>
+<li><strong>Correlation Analysis:</strong> Pearson correlation coefficients with two-tailed t-tests 
+for statistical significance (α = 0.001).</li>
+<li><strong>Yield Suppression Estimation:</strong> Based on Warnock & Warnock (2009) methodology: 
+-2.4 basis points per $100 billion in foreign official inflows.</li>
+<li><strong>Cross-Validation:</strong> All empirical claims cross-referenced against multiple independent 
+data sources to ensure robustness.</li>
+</ul>
+</div>""", unsafe_allow_html=True)
     
     # Limitations Section
-    st.markdown("""
-    <div class="methodology-box">
-    <h3 style="color: #e53e3e; margin-top: 0;">⚠️ Limitations & Caveats</h3>
-    
-    <ol style="line-height: 1.8;">
-        <li><strong>Simplification of Complex Reality:</strong> The 2×2 game structure necessarily abstracts 
-            from the multidimensional complexity of U.S.-China relations, including security considerations, 
-            technological competition, and multilateral dynamics.</li>
-        
-        <li><strong>Payoff Calibration Subjectivity:</strong> While grounded in empirical data, the normalization 
-            of payoffs to a 1-10 scale involves subjective weighting of multiple dimensions (GDP growth, employment, 
-            financial stability, strategic autonomy).</li>
-        
-        <li><strong>Discount Factor Estimation:</strong> The evolution of discount factors (δ) is inferred from 
-            observed behavioral patterns rather than directly measured, introducing estimation uncertainty.</li>
-        
-        <li><strong>Assumption of Rationality:</strong> The model assumes fully rational actors with consistent 
-            preferences, which may not fully capture domestic political pressures, bureaucratic politics, or 
-            cognitive biases in actual decision-making.</li>
-        
-        <li><strong>Static Payoff Matrices:</strong> The analysis models discrete regime shifts (Harmony Game → 
-            Prisoner's Dilemma) rather than continuous payoff evolution, potentially oversimplifying the transition dynamics.</li>
-        
-        <li><strong>Omitted Variables:</strong> The model does not explicitly incorporate third-party actors 
-            (EU, Japan, emerging markets), technological disruption, or pandemic shocks, which may influence 
-            strategic calculations.</li>
-    </ol>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("""<div class="methodology-box">
+<h3 style="color: #e53e3e; margin-top: 0;">⚠️ Limitations & Caveats</h3>
+<ol style="line-height: 1.8;">
+<li><strong>Simplification of Complex Reality:</strong> The 2×2 game structure necessarily abstracts 
+from the multidimensional complexity of U.S.-China relations, including security considerations, 
+technological competition, and multilateral dynamics.</li>
+<li><strong>Payoff Calibration Subjectivity:</strong> While grounded in empirical data, the normalization 
+of payoffs to a 1-10 scale involves subjective weighting of multiple dimensions (GDP growth, employment, 
+financial stability, strategic autonomy).</li>
+<li><strong>Discount Factor Estimation:</strong> The evolution of discount factors (δ) is inferred from 
+observed behavioral patterns rather than directly measured, introducing estimation uncertainty.</li>
+<li><strong>Assumption of Rationality:</strong> The model assumes fully rational actors with consistent 
+preferences, which may not fully capture domestic political pressures, bureaucratic politics, or 
+cognitive biases in actual decision-making.</li>
+<li><strong>Static Payoff Matrices:</strong> The analysis models discrete regime shifts (Harmony Game → 
+Prisoner's Dilemma) rather than continuous payoff evolution, potentially oversimplifying the transition dynamics.</li>
+<li><strong>Omitted Variables:</strong> The model does not explicitly incorporate third-party actors 
+(EU, Japan, emerging markets), technological disruption, or pandemic shocks, which may influence 
+strategic calculations.</li>
+</ol>
+</div>""", unsafe_allow_html=True)
     
     # Additional Resources
-    st.markdown("""
-    <div class="citation-box">
-    <h3 style="color: #667eea; margin-top: 0;">📖 Additional Resources</h3>
-    
-    <h4>Course Materials</h4>
-    <ul style="line-height: 1.8;">
-        <li><strong>ECON 606 Mini Project Report:</strong> Comprehensive analysis of U.S.-China vendor financing 
-            mechanism with detailed appendices on data sources, statistical correlations, and yield suppression calculations.</li>
-        
-        <li><strong>Game Theory Analysis Presentation:</strong> Visual summary of game-theoretic framework, 
-            payoff matrix evolution, and empirical validation of tit-for-tat dynamics.</li>
-    </ul>
-    
-    <h4>Recommended Further Reading</h4>
-    <ul style="line-height: 1.8;">
-        <li>Dixit, A. K., & Nalebuff, B. J. (2008). <em>The art of strategy: A game theorist's guide to success 
-            in business and life</em>. W. W. Norton & Company.</li>
-        
-        <li>Gibbons, R. (1992). <em>Game theory for applied economists</em>. Princeton University Press.</li>
-        
-        <li>Krugman, P. R., Obstfeld, M., & Melitz, M. J. (2018). <em>International economics: Theory and policy</em> 
-            (11th ed.). Pearson Education.</li>
-        
-        <li>Myerson, R. B. (1991). <em>Game theory: Analysis of conflict</em>. Harvard University Press.</li>
-    </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("""<div class="citation-box">
+<h3 style="color: #667eea; margin-top: 0;">📖 Additional Resources</h3>
+<h4>Course Materials</h4>
+<ul style="line-height: 1.8;">
+<li><strong>ECON 606 Mini Project Report:</strong> Comprehensive analysis of U.S.-China vendor financing 
+mechanism with detailed appendices on data sources, statistical correlations, and yield suppression calculations.</li>
+<li><strong>Game Theory Analysis Presentation:</strong> Visual summary of game-theoretic framework, 
+payoff matrix evolution, and empirical validation of tit-for-tat dynamics.</li>
+</ul>
+<h4>Recommended Further Reading</h4>
+<ul style="line-height: 1.8;">
+<li>Dixit, A. K., & Nalebuff, B. J. (2008). <em>The art of strategy: A game theorist's guide to success 
+in business and life</em>. W. W. Norton & Company.</li>
+<li>Gibbons, R. (1992). <em>Game theory for applied economists</em>. Princeton University Press.</li>
+<li>Krugman, P. R., Obstfeld, M., & Melitz, M. J. (2018). <em>International economics: Theory and policy</em> 
+(11th ed.). Pearson Education.</li>
+<li>Myerson, R. B. (1991). <em>Game theory: Analysis of conflict</em>. Harvard University Press.</li>
+</ul>
+</div>""", unsafe_allow_html=True)
     
     # Data Transparency Statement
-    st.markdown("""
-    <div class="methodology-box" style="background-color: #e6fffa; border-left: 4px solid #319795;">
-    <h3 style="color: #319795; margin-top: 0;">✅ Data Transparency & Reproducibility</h3>
-    
-    <p><strong>All data sources, calculations, and methodologies are fully documented and reproducible.</strong></p>
-    
-    <ul style="line-height: 1.8;">
-        <li><strong>Raw Data Access:</strong> All primary data sources are publicly available through the hyperlinks 
-            provided above.</li>
-        
-        <li><strong>Calculation Transparency:</strong> All formulas, derivations, and statistical tests are documented 
-            in the "Mathematical Proofs & Derivations" section.</li>
-        
-        <li><strong>Code Availability:</strong> The complete Python codebase for data processing, visualization, 
-            and simulation is available in the application source code.</li>
-        
-        <li><strong>Peer Review:</strong> This analysis has been reviewed by ECON 606 course faculty and incorporates 
-            feedback from peer review sessions.</li>
-    </ul>
-    
-    <p style="margin-top: 1rem;"><em>For questions about methodology, data sources, or reproducibility, 
-    please contact the course instructor or refer to the ECON 606 Mini Project Report.</em></p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("""<div class="methodology-box" style="background-color: #e6fffa; border-left: 4px solid #319795;">
+<h3 style="color: #319795; margin-top: 0;">✅ Data Transparency & Reproducibility</h3>
+<p><strong>All data sources, calculations, and methodologies are fully documented and reproducible.</strong></p>
+<ul style="line-height: 1.8;">
+<li><strong>Raw Data Access:</strong> All primary data sources are publicly available through the hyperlinks 
+provided above.</li>
+<li><strong>Calculation Transparency:</strong> All formulas, derivations, and statistical tests are documented 
+in the "Mathematical Proofs & Derivations" section.</li>
+<li><strong>Code Availability:</strong> The complete Python codebase for data processing, visualization, 
+and simulation is available in the application source code.</li>
+<li><strong>Peer Review:</strong> This analysis has been reviewed by ECON 606 course faculty and incorporates 
+feedback from peer review sessions.</li>
+</ul>
+<p style="margin-top: 1rem;"><em>For questions about methodology, data sources, or reproducibility, 
+please contact the course instructor or refer to the ECON 606 Mini Project Report.</em></p>
+</div>""", unsafe_allow_html=True)
 
 
 def render_research_documents_page():
     """Render page for viewing research documents."""
+    import base64
+
     st.markdown('<h2 class="sub-header">📑 Research Documents</h2>', unsafe_allow_html=True)
     
     st.markdown("""
@@ -9454,15 +9384,17 @@ def render_research_documents_page():
     except NameError:
         current_dir = os.getcwd()
         
-    files = [f for f in os.listdir(current_dir) if f.lower().endswith(('.pdf', '.docx'))]
+    # Filter only PDF files as requested
+    files = [f for f in os.listdir(current_dir) if f.lower().endswith('.pdf')]
     files.sort()
     
     if not files:
-        st.warning("No .pdf or .docx files found in the application directory.")
+        st.warning("No .pdf files found in the application directory. Please add PDF research documents to the directory.")
         return
 
-    # File selection
-    col1, col2 = st.columns([1, 2])
+    # File selection layout
+    # Use a wider column for the viewer
+    col1, col2 = st.columns([1, 3])
     
     with col1:
         st.markdown("### 📂 Select File")
@@ -9470,14 +9402,17 @@ def render_research_documents_page():
         
         if selected_file:
             file_path = os.path.join(current_dir, selected_file)
-            file_stats = os.stat(file_path)
-            file_size_mb = file_stats.st_size / (1024 * 1024)  # MB
-            
-            st.info(f"""
-            **File Details:**
-            - Type: {selected_file.split('.')[-1].upper()}
-            - Size: {file_size_mb:.2f} MB
-            """)
+            try:
+                file_stats = os.stat(file_path)
+                file_size_mb = file_stats.st_size / (1024 * 1024)  # MB
+                
+                st.info(f"""
+                **File Details:**
+                - Type: PDF Document
+                - Size: {file_size_mb:.2f} MB
+                """)
+            except Exception:
+                pass
         
         if st.button("🔄 Refresh List"):
             st.rerun()
@@ -9487,35 +9422,16 @@ def render_research_documents_page():
             file_path = os.path.join(current_dir, selected_file)
             st.markdown(f"### 📄 {selected_file}")
             
-            with st.spinner("Extracting text..."):
-                try:
-                    text_content = ""
-                    ext = os.path.splitext(selected_file)[1].lower()
-                    
-                    if ext == '.pdf':
-                        if PyPDF2:
-                            with open(file_path, 'rb') as f:
-                                reader = PyPDF2.PdfReader(f)
-                                for i, page in enumerate(reader.pages):
-                                    text_content += f"--- Page {i+1} ---\n\n"
-                                    text_content += page.extract_text() + "\n\n"
-                        else:
-                            st.error("PyPDF2 library is missing. Please install it to view PDF files.")
-                            text_content = "Error: Library missing."
-
-                    elif ext == '.docx':
-                        if docx:
-                            doc = docx.Document(file_path)
-                            text_content = "\\n".join([para.text for para in doc.paragraphs])
-                        else:
-                            st.error("python-docx library is missing. Please install it to view DOCX files.")
-                            text_content = "Error: Library missing."
-                    
-                    # Display text in a scrollable area
-                    st.text_area("Extended Content:", value=text_content, height=600)
-                    
-                except Exception as e:
-                    st.error(f"Error reading file: {str(e)}")
+            try:
+                with open(file_path, "rb") as f:
+                    base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+                
+                # Embed PDF using iframe
+                pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}#toolbar=0" width="100%" height="800" type="application/pdf"></iframe>'
+                st.markdown(pdf_display, unsafe_allow_html=True)
+                
+            except Exception as e:
+                st.error(f"Error displaying PDF: {str(e)}")
 
 
 # CSS styling for enhanced visual presentation
