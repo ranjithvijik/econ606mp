@@ -39,20 +39,10 @@ from enum import Enum
 from abc import ABC, abstractmethod
 import warnings
 from scipy import stats
-from scipy.optimize import minimize_scalar
 import logging
-from datetime import datetime
 import hashlib
 import json
 import os
-try:
-    import PyPDF2
-except ImportError:
-    PyPDF2 = None
-try:
-    import docx
-except ImportError:
-    docx = None
 
 warnings.filterwarnings('ignore')
 
@@ -166,288 +156,210 @@ st.markdown("""
    ============================================ */
 
 /* Import Premium Font Collection */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-/* ============================================
-   FONT SYSTEM & VARIABLES
-   ============================================ */
 :root {
-    /* Font Families */
-    --font-hero: 'Space Grotesk', sans-serif;
-    --font-heading: 'Sora', sans-serif;
-    --font-body: 'Plus Jakarta Sans', sans-serif;
-    --font-ui: 'DM Sans', sans-serif;
-    --font-accent: 'Instrument Serif', serif;
-    --font-mono: 'JetBrains Mono', monospace;
+    /* Brand Palette - Deep & Vibrant */
+    --us-blue: #0A2472;
+    --china-red: #D62828;
+    --china-gold: #F77F00;
+    --accent: #FFD700;
     
-    /* U.S. Colors (Vibrant) */
-    --us-blue: #0A3161;
-    --us-red: #B31942;
-    --us-white: #FFFFFF;
+    /* Neutral System */
+    --bg-light: #F8FAFC;
+    --bg-dark: #0F172A;
+    --text-primary: #1E293B;
+    --text-secondary: #475569;
     
-    /* China Colors (Vibrant) */
-    --china-red: #EE1C25;
-    --china-gold: #FFE135; /* Banana Pro Yellow */
+    /* Glassmorphism Tokens */
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.6);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    --backdrop-blur: blur(12px);
     
-    /* Brand Identity */
-    --primary: #0A3161;
-    --secondary: #EE1C25;
-    --accent: #FFE135;
-    
-    /* Semantic Colors */
-    --success: #00C853;
-    --warning: #FFAB00;
-    --danger: #D50000;
-    --info: #0091EA;
-    
-    /* Neutral Palette */
-    --background: #FAFAFA;
-    --surface: #FFFFFF;
-    --text-primary: #0F0F0F;
-    --text-secondary: #333333;
-    --border: #E0E0E0;
-    
-    /* Shadows */
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.12);
-    
-    /* Radii */
-    --radius-sm: 8px;
-    --radius-md: 16px;
-    --radius-lg: 24px;
+    /* Animation Tokens */
+    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Base Typography Enhancement */
-html {
-    font-size: 18px; /* Increased base font size */
-}
-
-* {
-    font-family: var(--font-body);
-    -webkit-font-smoothing: antialiased;
+/* Base Canvas Enhancement */
+.stApp {
+    background: radial-gradient(circle at 10% 20%, rgb(248, 250, 252) 0%, rgb(241, 245, 249) 90%);
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(10, 36, 114, 0.03) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(214, 40, 40, 0.03) 0px, transparent 50%);
+    font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 /* ============================================
-   HEADERS & TYPOGRAPHY
+   TYPOGRAPHY - BOLD & MODERN
    ============================================ */
+h1, h2, h3 {
+    font-family: 'Sora', sans-serif !important;
+    letter-spacing: -0.025em;
+}
+
 .main-header {
-    font-family: var(--font-hero) !important;
-    font-size: 5rem; /* Massive Header */
-    font-weight: 700;
     background: linear-gradient(135deg, var(--us-blue) 0%, var(--china-red) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    font-size: 3.5rem;
+    font-weight: 800;
     text-align: center;
-    padding: 3rem 1rem;
-    line-height: 1.1;
-    letter-spacing: -0.03em;
-}
-
-h1, h2, h3 {
-    font-family: var(--font-heading) !important;
-    color: var(--text-primary) !important;
-}
-
-h1 { font-size: 3.5rem !important; font-weight: 800 !important; letter-spacing: -0.02em; }
-h2 { font-size: 2.75rem !important; font-weight: 700 !important; margin-top: 3rem !important; }
-h3 { font-size: 2.25rem !important; font-weight: 600 !important; }
-
-/* Sub-headers with Accent Underline */
-.sub-header {
-    font-family: var(--font-heading) !important;
-    font-size: 3rem;
-    font-weight: 700;
-    color: var(--text-primary) !important;
-    margin-top: 4rem;
+    padding: 2.5rem 1rem;
     margin-bottom: 2rem;
-    position: relative;
-    padding-bottom: 1rem;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+    animation: fadeInDown 0.8s ease-out;
 }
 
-.sub-header::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 120px;
-    height: 6px;
-    background: var(--accent);
-    border-radius: 4px;
+.sub-header {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    position: relative;
+    padding-left: 1rem;
+    border-left: 5px solid var(--china-gold);
 }
 
 /* ============================================
-   UI COMPONENTS
+   CARDS & CONTAINERS (Glassmorphism)
    ============================================ */
-/* Buttons - Banana Pro Style */
-.stButton > button {
-    background: linear-gradient(135deg, var(--primary) 0%, #1a237e 100%);
-    color: #FFFFFF !important;
-    border: none;
-    padding: 1.25rem 3rem;
-    font-size: 1.2rem;
-    font-weight: 700;
-    font-family: 'Outfit', sans-serif;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    border-bottom: 4px solid rgba(0,0,0,0.2);
-}
-
-.stButton > button:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-    filter: brightness(1.1);
-    border-bottom: 4px solid rgba(0,0,0,0.3);
-}
-
-/* Cards & Containers */
 .metric-card {
-    background: #FFFFFF;
-    border-radius: var(--radius-lg);
-    padding: 2.5rem;
-    box-shadow: var(--shadow-md);
-    border: 1px solid var(--border);
-    transition: all 0.3s ease;
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: var(--transition-smooth);
+    animation: fadeInUp 0.6s ease-out both;
 }
 
 .metric-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--accent);
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    border-color: var(--china-gold);
 }
 
-.metric-card .metric-value {
-    font-size: 4rem; /* Huge numbers */
-    background: linear-gradient(45deg, var(--us-blue), var(--china-red));
+.metric-card h3 {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.metric-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--us-blue), var(--china-red));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-weight: 800;
-}
-
-/* Info Boxes */
-.info-box {
-    background: linear-gradient(135deg, var(--us-blue) 0%, #1565C0 100%);
-    color: white !important;
-    padding: 2rem;
-    border-radius: var(--radius-md);
-    border-left: 8px solid var(--accent); /* Banana accent */
-    box-shadow: var(--shadow-md);
-}
-
-.info-box strong, .info-box p, .info-box li {
-    color: white !important;
-    font-size: 1.15rem;
-}
-
-/* Plotly Charts */
-.js-plotly-plot .plotly text {
-    font-family: var(--font-ui) !important;
-    font-size: 14px !important;
-}
-
-/* Markdown Reading Experience */
-.stMarkdown p {
-    font-size: 1.25rem !important;
-    line-height: 1.8 !important;
-    color: var(--text-secondary) !important;
-    max-width: 80ch;
-}
-
-/* Sidebar */
-[data-testid="stSidebar"] {
-    background: #0F172A;
-}
-
-[data-testid="stSidebar"] * {
-    color: #E2E8F0 !important;
-}
-
-[data-testid="stSidebar"] .stButton > button {
-    background: var(--accent);
-    color: var(--text-primary) !important;
-    border: none;
 }
 
 /* ============================================
-   TABS - BIGGER & BOLD
+   INFO & CITATION BOXES
    ============================================ */
-.stTabs [data-baseweb="tab-list"] {
+.info-box, .citation-box, .methodology-box {
     background: #FFFFFF;
-    border-radius: var(--radius-lg);
-    padding: 0.5rem;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border);
-}
-
-.stTabs [data-baseweb="tab"] {
-    font-family: var(--font-ui);
-    font-size: 1.15rem;
-    font-weight: 600;
-    padding: 1rem 2rem;
-    border-radius: var(--radius-md);
-    transition: all 0.2s ease;
-}
-
-.stTabs [data-baseweb="tab"]:hover {
-    background: #F5F5F5;
-    color: var(--primary) !important;
-}
-
-.stTabs [aria-selected="true"] {
-    background: var(--primary);
-    color: #FFFFFF !important;
-}
-
-/* ============================================
-   EXPANDER STYLING
-   ============================================ */
-.streamlit-expanderHeader {
-    background: #FFFFFF;
-    border-radius: var(--radius-md);
-    font-weight: 600;
-    font-size: 1.2rem; /* Larger */
-    color: var(--text-primary) !important;
-    border: 1px solid var(--border);
-    padding: 1rem;
-}
-
-.streamlit-expanderHeader:hover {
-    border-color: var(--accent);
-    color: var(--primary) !important;
-}
-
-/* ============================================
-   CUSTOM COMPONENTS
-   ============================================ */
-.academic-citation {
-    background: #FFFDE7; /* Light Yellow */
-    border-left: 6px solid var(--china-gold);
+    border-radius: 12px;
     padding: 1.5rem;
-    border-radius: var(--radius-md);
-    margin: 1.5rem 0;
-    font-family: Georgia, serif;
-    font-size: 1.2rem;
-    line-height: 1.6;
-    color: #37474F !important;
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid #E2E8F0;
+    transition: var(--transition-fast);
+    margin: 1rem 0;
+}
+
+.info-box {
+    border-left: 5px solid var(--us-blue);
+    background: linear-gradient(to right, rgba(10, 36, 114, 0.02), rgba(255,255,255,0));
 }
 
 .citation-box {
+    border-left: 5px solid var(--china-red);
+}
+
+.info-box:hover, .citation-box:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+/* ============================================
+   UI ELEMENTS: BUTTONS & TABS
+   ============================================ */
+.stButton > button {
+    background: linear-gradient(135deg, var(--us-blue) 0%, #1e40af 100%);
+    color: white !important;
+    border-radius: 10px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    font-family: 'Sora', sans-serif;
+    border: none;
+    box-shadow: 0 4px 6px rgba(10, 36, 114, 0.2);
+    transition: var(--transition-fast);
+}
+
+.stButton > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 12px rgba(10, 36, 114, 0.25);
+}
+
+/* Tabs */
+.stTabs [data-baseweb="tab-list"] {
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 6px;
+    gap: 8px;
+    border: 1px solid rgba(255,255,255,0.4);
+}
+
+.stTabs [data-baseweb="tab"] {
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 8px 20px;
+    color: var(--text-secondary);
+}
+
+.stTabs [aria-selected="true"] {
     background: #FFFFFF;
-    border: 1px solid var(--border);
-    padding: 1.5rem;
-    border-radius: var(--radius-md);
-    margin: 1.5rem 0;
-    font-size: 1.15rem;
-    box-shadow: var(--shadow-sm);
+    color: var(--us-blue) !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Sidebar Styling */
+[data-testid="stSidebar"] {
+    background-color: #0F172A;
+    background-image: linear-gradient(180deg, #0F172A 0%, #1E293B 100%);
+    border-right: 1px solid #1E293B;
+}
+
+[data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
+    color: #F1F5F9 !important;
+}
+
+[data-testid="stSidebar"] .stRadio label {
+    color: #CBD5E1 !important;
+    font-weight: 500;
 }
 
 /* ============================================
@@ -870,6 +782,9 @@ class AdvancedSimulationEngine:
         strategies = list(population.keys())
         total_pop = sum(population.values())
         
+        # Cache for pairwise simulation results to improve performance
+        match_cache = {}
+
         for strat in strategies:
             if population[strat] == 0:
                 fitness[strat] = 0
@@ -884,8 +799,26 @@ class AdvancedSimulationEngine:
                 
                 # Weight by opponent frequency
                 weight = population[opp_strat] / total_pop
-                payoffs = self._simulate_match(strat, opp_strat, 10)
-                total_payoff += payoffs[0] * weight
+                
+                # Check cache
+                cache_key = tuple(sorted((strat.value, opp_strat.value)))
+                if cache_key in match_cache:
+                    # Need to handle asymmetry if strategies are different
+                    res = match_cache[cache_key]
+                    if strat.value == res['s1']:
+                        payoff = res['p1']
+                    else:
+                        payoff = res['p2']
+                else:
+                    # Run simulation
+                    payoffs = self._simulate_match(strat, opp_strat, 10)
+                    match_cache[cache_key] = {
+                        's1': strat.value, 's2': opp_strat.value,
+                        'p1': payoffs[0], 'p2': payoffs[1]
+                    }
+                    payoff = payoffs[0]
+                
+                total_payoff += payoff * weight
                 interactions += 1
             
             fitness[strat] = total_payoff / interactions if interactions > 0 else 0
@@ -1209,10 +1142,12 @@ class AdvancedVisualizationEngine:
         payoff_matrix = np.zeros((n, n))
         for i, s1 in enumerate(strategies):
             for j, s2 in enumerate(strategies):
-                mask = (tournament_results['Strategy_1'] == s1) & \
-                       (tournament_results['Strategy_2'] == s2)
+                mask = ((tournament_results['Strategy_1'] == s1) & 
+                       (tournament_results['Strategy_2'] == s2))
                 if mask.any():
                     payoff_matrix[i, j] = tournament_results.loc[mask, 'Payoff_1'].values[0]
+                else:
+                    payoff_matrix[i, j] = np.nan
         
         fig = go.Figure(data=go.Heatmap(
             z=payoff_matrix,
@@ -1394,7 +1329,7 @@ class AdvancedVisualizationEngine:
         ), row=1, col=2)
         
         # Cooperation rates (rolling average)
-        window = min(10, len(learning_results) // 5)
+        window = max(1, min(10, len(learning_results) // 5))
         us_coop_rate = pd.Series(us_actions).rolling(window=window, min_periods=1).mean()
         china_coop_rate = pd.Series(china_actions).rolling(window=window, min_periods=1).mean()
         
@@ -1623,7 +1558,7 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
         
         # Initialize Session State for Tournament
         if "tournament_results" not in st.session_state:
-            st.session_state.tournament_results = None
+            st.session_state['tournament_results'] = None
 
         # Presets
         preset_config = render_simulation_presets()
@@ -1654,20 +1589,24 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
                 st.error("Please select at least 2 strategies.")
             else:
                 with st.spinner("Running tournament..."):
-                    config = AdvancedSimulationConfig(noise_probability=noise_prob)
-                    sim_engine = AdvancedSimulationEngine(matrix, config)
-                    strategies = [StrategyType(s) for s in selected_strategies]
+                    # Prepare params for cacheable function
+                    matrix_params = {
+                        'cc': matrix.cc, 'cd': matrix.cd, 
+                        'dc': matrix.dc, 'dd': matrix.dd
+                    }
                     
                     # Store results in session state using safe wrapper
-                    st.session_state.tournament_results = safe_simulation_wrapper(
-                        sim_engine.run_tournament,
-                        strategies,
-                        rounds_per_match
+                    st.session_state['tournament_results'] = safe_simulation_wrapper(
+                        cached_tournament_simulation,
+                        matrix_params,
+                        selected_strategies,
+                        rounds_per_match,
+                        noise_prob
                     )
 
         # Render Results from Session State
-        if st.session_state.tournament_results is not None:
-            results = st.session_state.tournament_results
+        if st.session_state['tournament_results'] is not None:
+            results = st.session_state['tournament_results']
             
             col1, col2 = st.columns(2)
             
@@ -1703,7 +1642,7 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
         
         # Initialize Session State for Evolution
         if "evo_results" not in st.session_state:
-            st.session_state.evo_results = None
+            st.session_state['evo_results'] = None
 
         col1, col2 = st.columns(2)
         
@@ -1742,11 +1681,11 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
                 }
                 
                 # Store results
-                st.session_state.evo_results = sim_engine.run_evolutionary_simulation(initial_pop, generations)
+                st.session_state['evo_results'] = sim_engine.run_evolutionary_simulation(initial_pop, generations)
         
         # Render Results
-        if st.session_state.evo_results is not None:
-            results = st.session_state.evo_results
+        if st.session_state['evo_results'] is not None:
+            results = st.session_state['evo_results']
             
             fig = AdvancedVisualizationEngine.create_evolutionary_dynamics_chart(results)
             st.plotly_chart(fig, width='stretch')
@@ -1782,7 +1721,7 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
         
         # Initialize Session State
         if "learning_results" not in st.session_state:
-            st.session_state.learning_results = None
+            st.session_state['learning_results'] = None
         
         col1, col2 = st.columns(2)
         
@@ -1812,13 +1751,13 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
                 sim_engine = AdvancedSimulationEngine(matrix, config)
                 
                 # Store results
-                st.session_state.learning_results = sim_engine.run_learning_simulation(
+                st.session_state['learning_results'] = sim_engine.run_learning_simulation(
                     algorithm_map[algorithm], rounds
                 )
         
         # Render Results
-        if st.session_state.learning_results is not None:
-            results = st.session_state.learning_results
+        if st.session_state['learning_results'] is not None:
+            results = st.session_state['learning_results']
             fig = AdvancedVisualizationEngine.create_learning_dynamics_chart(
                 results, algorithm_map[algorithm]
             )
@@ -1848,7 +1787,7 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
         st.markdown('<h3 class="section-header">🎲 Stochastic Games</h3>', unsafe_allow_html=True)
         
         if "stochastic_results" not in st.session_state:
-            st.session_state.stochastic_results = None
+            st.session_state['stochastic_results'] = None
 
         col1, col2 = st.columns(2)
         
@@ -1871,10 +1810,10 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
                 
                 config = AdvancedSimulationConfig(rounds=rounds)
                 sim_engine = AdvancedSimulationEngine(matrix, config)
-                st.session_state.stochastic_results = sim_engine.run_stochastic_game(transition_matrix, rounds)
+                st.session_state['stochastic_results'] = sim_engine.run_stochastic_game(transition_matrix, rounds)
         
-        if st.session_state.stochastic_results is not None:
-            results = st.session_state.stochastic_results
+        if st.session_state['stochastic_results'] is not None:
+            results = st.session_state['stochastic_results']
             fig = AdvancedVisualizationEngine.create_stochastic_game_chart(results)
             st.plotly_chart(fig, width='stretch')
             
@@ -1895,9 +1834,9 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
         st.markdown('<h3 class="section-header">⚡ Quick Strategy Comparison</h3>', unsafe_allow_html=True)
         
         if "quick_results" not in st.session_state:
-            st.session_state.quick_results = None
+            st.session_state['quick_results'] = None
         if "quick_results_strategies" not in st.session_state:
-            st.session_state.quick_results_strategies = None
+            st.session_state['quick_results_strategies'] = None
 
         col1, col2 = st.columns(2)
         with col1:
@@ -1914,12 +1853,12 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
             sim_engine = AdvancedSimulationEngine(matrix, config)
             s1 = StrategyType(strategy1)
             s2 = StrategyType(strategy2)
-            st.session_state.quick_results = sim_engine._simulate_match(s1, s2, rounds)
-            st.session_state.quick_results_strategies = (strategy1, strategy2)
+            st.session_state['quick_results'] = sim_engine._simulate_match(s1, s2, rounds)
+            st.session_state['quick_results_strategies'] = (strategy1, strategy2)
             
-        if st.session_state.quick_results is not None:
-            payoffs = st.session_state.quick_results
-            s1_name, s2_name = st.session_state.quick_results_strategies
+        if st.session_state['quick_results'] is not None:
+            payoffs = st.session_state['quick_results']
+            s1_name, s2_name = st.session_state['quick_results_strategies']
             
             col1, col2 = st.columns(2)
             with col1:
@@ -2090,7 +2029,13 @@ def render_interactive_parameter_explorer(harmony_matrix: PayoffMatrix, pd_matri
     
     fig.add_trace(go.Scatter(x=param_range, y=deltas_T, mode='lines',
                             line=dict(color='#3B82F6', width=2)), row=1, col=1)
-    fig.add_vline(x=T, line_dash="dash", line_color="red", row=1, col=1)
+    fig.add_shape(
+        type="line",
+        x0=T, x1=T, y0=0, y1=1,
+        xref="x1", yref="paper",
+        line=dict(dash="dash", color="red"),
+        row=1, col=1
+    )
     
     # Vary R
     deltas_R = []
@@ -2102,7 +2047,13 @@ def render_interactive_parameter_explorer(harmony_matrix: PayoffMatrix, pd_matri
     
     fig.add_trace(go.Scatter(x=param_range, y=deltas_R, mode='lines',
                             line=dict(color='#10B981', width=2)), row=1, col=2)
-    fig.add_vline(x=R, line_dash="dash", line_color="red", row=1, col=2)
+    fig.add_shape(
+        type="line",
+        x0=R, x1=R, y0=0, y1=1,
+        xref="x2", yref="paper",
+        line=dict(dash="dash", color="red"),
+        row=1, col=2
+    )
     
     # Vary P
     deltas_P = []
@@ -2114,12 +2065,24 @@ def render_interactive_parameter_explorer(harmony_matrix: PayoffMatrix, pd_matri
     
     fig.add_trace(go.Scatter(x=param_range, y=deltas_P, mode='lines',
                             line=dict(color='#F59E0B', width=2)), row=2, col=1)
-    fig.add_vline(x=P, line_dash="dash", line_color="red", row=2, col=1)
+    fig.add_shape(
+        type="line",
+        x0=P, x1=P, y0=0, y1=1,
+        xref="x3", yref="paper",
+        line=dict(dash="dash", color="red"),
+        row=2, col=1
+    )
     
     # S doesn't affect critical delta directly in standard formula
     fig.add_trace(go.Scatter(x=param_range, y=[critical_delta]*len(param_range), mode='lines',
                             line=dict(color='#8B5CF6', width=2)), row=2, col=2)
-    fig.add_vline(x=S, line_dash="dash", line_color="red", row=2, col=2)
+    fig.add_shape(
+        type="line",
+        x0=S, x1=S, y0=0, y1=1,
+        xref="x4", yref="paper",
+        line=dict(dash="dash", color="red"),
+        row=2, col=2
+    )
     
     fig.update_layout(
         height=600,
@@ -2169,16 +2132,7 @@ class IGameTheoryEngine(ABC):
         pass
 
 
-class IVisualizationEngine(ABC):
-    """Abstract interface for visualization generation."""
-    
-    @abstractmethod
-    def create_payoff_matrix_heatmap(self, matrix: PayoffMatrix) -> go.Figure:
-        pass
-    
-    @abstractmethod
-    def create_cooperation_margin_chart(self, engine: IGameTheoryEngine) -> go.Figure:
-        pass
+
 
 
 # =============================================================================
@@ -2525,9 +2479,7 @@ class GameTheoryEngine(IGameTheoryEngine):
         R, T, P = self.params['R'], self.params['T'], self.params['P']
         return (R - P) / ((1 - delta) ** 2)
     
-    def copy(self):
-        """Create a deep copy of the engine."""
-        return GameTheoryEngine(self.matrix)
+
     
     def add_noise(self, noise_level: float):
         """Add random noise to payoffs and return new engine."""
@@ -2568,7 +2520,7 @@ class GameTheoryEngine(IGameTheoryEngine):
         us_payoffs = []
         china_payoffs = []
         
-        np.random.seed(42)  # For reproducibility
+        # np.random.seed(42)  # Controlled by external config
         
         for r in range(rounds):
             # Determine actions based on strategy
@@ -3410,7 +3362,7 @@ class EnhancedStatisticalEngine:
             
             # Calculate metrics
             margin = modified_engine.calculate_cooperation_margin(fixed_delta)
-            critical_delta = modified_engine.calculate_critical_delta()
+            critical_delta = modified_engine.calculate_critical_discount_factor()
             
             results.append({
                 'parameter': parameter,
@@ -4956,7 +4908,7 @@ def render_waterfall_chart(categories: list, values: list, title: str):
 # VISUALIZATION ENGINE (Enhanced)
 # =============================================================================
 
-class VisualizationEngine(IVisualizationEngine):
+class VisualizationEngine:
     """
     Creates publication-quality interactive visualizations using Plotly.
     
@@ -4966,14 +4918,14 @@ class VisualizationEngine(IVisualizationEngine):
     
     # Color schemes using U.S. and China Flag Colors
     COLORS = {
-        'us': '#3C3B6E',           # U.S. Old Glory Blue
-        'china': '#DE2910',        # China Red
-        'us_alt': '#B22234',       # U.S. Old Glory Red
-        'china_alt': '#FFDE00',    # China Gold
-        'cooperation': '#16A34A',  # Green (positive)
-        'defection': '#B22234',    # U.S. Red (negative)
-        'neutral': '#52525B',      # Zinc Gray
-        'highlight': '#FFDE00'     # China Gold (accent)
+        'us': '#0A2472',           # Deep Royal Blue
+        'china': '#D62828',        # Vibrant Red
+        'us_alt': '#1E40AF',       # Bright Blue
+        'china_alt': '#F77F00',    # Orange Gold
+        'cooperation': '#10B981',  # Emerald Green
+        'defection': '#EF4444',    # Red
+        'neutral': '#64748B',      # Slate
+        'highlight': '#FFD700'     # Gold
     }
     
     PERIOD_COLORS = {
@@ -5983,7 +5935,14 @@ class VisualizationEngine(IVisualizationEngine):
         )
         
         # Add vertical line at zero
-        fig.add_vline(x=0, line_dash="dash", line_color="red", row=1, col=1)
+        # Add vertical line at zero using shape for subplot compatibility
+        fig.add_shape(
+            type="line",
+            x0=0, x1=0, y0=0, y1=1,
+            xref="x1", yref="paper",
+            line=dict(dash="dash", color="red"),
+            row=1, col=1
+        )
         
         # Scatter plot of sustainability
         sustainable = mc_results[mc_results['sustainable']]
@@ -6013,8 +5972,14 @@ class VisualizationEngine(IVisualizationEngine):
             row=1, col=2
         )
         
-        # Add zero line
-        fig.add_hline(y=0, line_dash="dash", line_color="gray", row=1, col=2)
+        # Add zero line using shape for subplot compatibility
+        fig.add_shape(
+            type="line",
+            x0=0, x1=1, y0=0, y1=0,
+            xref="x2", yref="y2",
+            line=dict(dash="dash", color="gray"),
+            row=1, col=2
+        )
         
         # Calculate sustainability rate
         sustainability_rate = mc_results['sustainable'].mean() * 100
@@ -6066,7 +6031,10 @@ def main():
     # Header
     # Hero Image Integration (Nao Banana Pro Enhancement)
     if os.path.exists("assets/hero.png"):
-        st.image("assets/hero.png", use_container_width=True)
+        with st.container():
+            col1, col2, col3 = st.columns([1, 6, 1])
+            with col2:
+                st.image("assets/hero.png", use_container_width=True)
     
     if os.path.exists("assets/abstract.png"):
         st.sidebar.image("assets/abstract.png", use_container_width=True, caption="Game Theory Analytics")
@@ -7874,11 +7842,19 @@ def render_pareto_inefficiency_proof(show_citations: bool):
         suboptimal outcomes.
         """)
 
-    st.markdown("""
+    st.markdown(r"""
     <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
                 border-radius: 5px; margin: 1rem 0;">
     <strong>💡 The Tragedy of the Commons:</strong><br>
     This theorem proves that rational behavior can lead to irrational outcomes. Both countries are acting "smart" individually, but the result is a trade war where everyone loses money, global growth slows, and consumer prices rise. It is an "inefficient" equilibrium that leaves trillions of dollars of potential value realized.
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown(r"""
+    <div style="background-color: #f0fff4; padding: 1.5rem; border-left: 4px solid #48bb78; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 The "Game Change" Moment:</strong><br>
+    The code below programmatically proves that the U.S.-China relationship changed its fundamental nature. It didn't just get "worse"; the payoff ordering flipped. We moved from a world where everyone wins ($R > T$) to a world where I only win if you lose ($T > R$). This structural shift is why the trade war has been so hard to resolve—we are literally playing a different game now.
     </div>
     """, unsafe_allow_html=True)
     
@@ -8074,7 +8050,7 @@ def render_folk_theorem_proof(show_citations: bool):
         </div>
         """)
     
-    st.markdown("""
+    st.markdown(r"""
     <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
                 border-radius: 5px; margin: 1rem 0;">
     <strong>💡 Why this matters:</strong><br>
@@ -8245,7 +8221,7 @@ def render_tit_for_tat_sustainability(show_citations: bool):
         $$\\boxed{\\delta \\geq 0.40} \\quad \\blacksquare$$
         """)
 
-    st.markdown("""
+    st.markdown(r"""
     <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
                 border-radius: 5px; margin: 1rem 0;">
     <strong>💡 Why "Tit-for-Tat" explains 2018-2025:</strong><br>
@@ -8307,7 +8283,7 @@ def render_discount_factor_derivation(show_citations: bool):
         $$\\boxed{\\delta^* = \\frac{T - R}{T - P}} \\quad \\blacksquare$$
         """)
 
-    st.markdown("""
+    st.markdown(r"""
     <div style="background-color: #e6fffa; padding: 1.5rem; border-left: 4px solid #319795; 
                 border-radius: 5px; margin: 1rem 0;">
     <strong>💡 The "Patience Threshold":</strong><br>
@@ -8404,7 +8380,7 @@ def render_discount_factor_comparison(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 5.3: Discount Factor Comparative Analysis
     
-    <div style="background-color: #fffaf0; padding: 1 4px solid #d.5rem; border-left:d6b20; 
+    <div style="background-color: #fffaf0; padding: 1.5rem; border-left: 4px solid #dd6b20; 
                 border-radius: 5px; margin: 1rem 0;">
     <strong>📋 Statement:</strong> The critical discount factor $\\delta^*$ is inversely 
     related to cooperation stability.
@@ -8436,7 +8412,7 @@ def render_discount_factor_comparison(show_citations: bool):
            For $T > R$: Harsher punishment → Lower threshold → Easier cooperation
         """)
 
-    st.markdown("""
+    st.markdown(r"""
     <div style="background-color: #fffaf0; padding: 1.5rem; border-left: 4px solid #dd6b20; 
                 border-radius: 5px; margin: 1rem 0;">
     <strong>💡 Structural Sensitivity:</strong><br>
@@ -9032,7 +9008,7 @@ def render_discount_decline_rate(show_citations: bool):
         $$\\boxed{\\text{Discount factor declined 58.8\\% over 24 years}} \\quad \\blacksquare$$
         """)
 
-    st.markdown("""
+    st.markdown(r"""
     <div style="background-color: #fffaf0; padding: 1.5rem; border-left: 4px solid #dd6b20; 
                 border-radius: 5px; margin: 1rem 0;">
     <strong>💡 The "Short-Termism" Virus:</strong><br>
@@ -10070,7 +10046,9 @@ def render_citation_box(citation: str, url: Optional[str] = None):
 def render_methodology_page():
     """Render enhanced Methodology & Citations page with complete APA references."""
     
-    st.markdown('<h2 class="sub-header">📖 Methodology & Citations</h2>', unsafe_allow_html=True)
+    add_methodology_styling()
+    
+    st.markdown('<h2 class="sub-header">📚 References & Methodology</h2>', unsafe_allow_html=True)
     
     # Primary Data Sources Section
     st.markdown("""<div class="citation-box">
@@ -10360,12 +10338,18 @@ def render_research_documents_page():
             tab1, tab2 = st.tabs(["📄 Google Viewer", "🔧 Alternative Viewer"])
             
             with tab1:
-                st.markdown(f'<iframe src="{viewer_url}" width="100%" height="800" style="border: none;"></iframe>', 
-                           unsafe_allow_html=True)
+                try:
+                    st.markdown(f'<iframe src="{viewer_url}" width="100%" height="800" style="border: none;"></iframe>', 
+                               unsafe_allow_html=True)
+                except Exception as e:
+                    st.error(f"Failed to load Google Viewer: {e}")
             
             with tab2:
-                st.markdown(f'<iframe src="{pdfjs_url}" width="100%" height="800" style="border: none;"></iframe>', 
-                           unsafe_allow_html=True)
+                try:
+                    st.markdown(f'<iframe src="{pdfjs_url}" width="100%" height="800" style="border: none;"></iframe>', 
+                               unsafe_allow_html=True)
+                except Exception as e:
+                    st.error(f"Failed to load PDF.js Viewer: {e}")
             
             # Fallback link
             st.markdown(f"[📥 Download / View on GitHub]({GITHUB_BASE_URL + pdf_mapping[selected_file]})")
@@ -11179,26 +11163,54 @@ def render_simulation_presets():
 def toggle_dark_mode():
     """Toggle between light and dark themes."""
     if 'dark_mode' not in st.session_state:
-        st.session_state.dark_mode = False
+        st.session_state['dark_mode'] = False
     
-    if st.sidebar.button("🌙 Toggle Dark Mode"):
-        st.session_state.dark_mode = not st.session_state.dark_mode
+    # Toggle button in sidebar
+    if st.sidebar.button("🌓 Toggle Theme"):
+        st.session_state['dark_mode'] = not st.session_state['dark_mode']
         st.rerun()
     
-    if st.session_state.dark_mode:
+    # Apply theme
+    if st.session_state['dark_mode']:
         st.markdown("""
         <style>
         .stApp {
             background-color: #0F172A;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(239, 68, 68, 0.1) 0px, transparent 50%);
             color: #F8FAFC;
         }
+        
         h1, h2, h3, h4, h5, h6, p, li, span, div {
             color: #F8FAFC !important;
         }
-        .metric-card, .info-box, .success-box, .warning-box, .error-box, .citation-box {
-            background-color: #1E293B !important;
-            color: #F8FAFC !important;
-            border: 1px solid #334155 !important;
+        
+        .metric-card {
+            background: rgba(30, 41, 59, 0.7) !important;
+            backdrop-filter: blur(12px) !important;
+            border: 1px solid rgba(148, 163, 184, 0.2) !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
+        }
+        
+        .info-box {
+            background: rgba(30, 58, 138, 0.2) !important;
+            border-left-color: #60A5FA !important;
+            border: 1px solid rgba(96, 165, 250, 0.1) !important;
+        }
+        
+        .metric-value {
+            background: linear-gradient(90deg, #60A5FA, #F87171) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+        }
+        
+        /* Make graphs blend in */
+        .js-plotly-plot .plotly .bg {
+            fill: transparent !important;
+        }
+        .js-plotly-plot .plotly .main-svg {
+            background: transparent !important;
         }
         </style>
         """, unsafe_allow_html=True)
