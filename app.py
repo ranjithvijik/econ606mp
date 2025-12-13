@@ -162,6 +162,7 @@ st.markdown("""
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
         border: 1px solid #E2E8F0;
         transition: all 0.3s ease;
+        color: #1E293B;
     }
     
     .metric-card:hover {
@@ -8659,7 +8660,94 @@ def render_proof_visuals(proof_type: str):
              legend=dict(x=0.02, y=0.02)
          )
          st.plotly_chart(fig)
+
+    elif "Correlation" in proof_type:
+         st.markdown("#### 📊 Statistical Evidence")
          
+         tab1, tab2 = st.tabs(["Tariff Correlation (Tit-for-Tat)", "Trade vs. FX (Vendor Finance)"])
+         
+         with tab1:
+             # Data from Theorem 9.2
+             periods = ['2018 Q1', '2018 Q3', '2019 Q2', '2020 Q1', '2021 Q4', '2023 Q2', '2025 Q1']
+             us_tariff = [2.5, 10.0, 15.0, 18.5, 19.3, 20.1, 25.0]
+             cn_tariff = [3.0, 8.5, 13.0, 16.0, 17.5, 18.8, 22.5]
+             
+             fig = go.Figure()
+             
+             # Scatter plot
+             fig.add_trace(go.Scatter(
+                 x=us_tariff, y=cn_tariff,
+                 mode='markers+text',
+                 text=periods,
+                 textposition='top left',
+                 marker=dict(size=12, color='#EF4444'),
+                 name='Tariff Rates'
+             ))
+             
+             # Trendline (Manual linear fit for display)
+             x_trend = np.linspace(0, 30, 10)
+             y_trend = 0.89 * x_trend + 1.2
+             
+             fig.add_trace(go.Scatter(
+                 x=x_trend, y=y_trend,
+                 mode='lines',
+                 line=dict(color='rgba(239, 68, 68, 0.5)', dash='dash'),
+                 name='Correlation (r=0.89)'
+             ))
+             
+             fig.update_layout(
+                 title="Tariff Rates: U.S. vs China (2018-2025)",
+                 xaxis_title="U.S. Tariff Rate (%)",
+                 yaxis_title="China Tariff Rate (%)",
+                 font_family="Inter",
+                 plot_bgcolor='white',
+                 xaxis_gridcolor='#F1F5F9',
+                 yaxis_gridcolor='#F1F5F9',
+                 legend=dict(x=0.02, y=0.98),
+                 height=450
+             )
+             st.plotly_chart(fig, use_container_width=True)
+             
+         with tab2:
+             # Data from Theorem 9.3
+             periods_fx = ['2001-2007', '2008-2012', '2013-2017', '2018-2025']
+             deficits = [150, 280, 350, 380] # Billions
+             reserves = [600, 2500, 3200, 3100] # Billions
+             
+             fig = go.Figure()
+             
+             fig.add_trace(go.Scatter(
+                 x=deficits, y=reserves,
+                 mode='markers+text',
+                 text=periods_fx,
+                 textposition='bottom right',
+                 marker=dict(size=15, color='#3B82F6'),
+                 name='Validation Data'
+             ))
+             
+             # Trendline
+             x_trend = np.linspace(100, 450, 10)
+             y_trend = 11 * x_trend - 1000 # Approx
+             
+             fig.add_trace(go.Scatter(
+                 x=x_trend, y=y_trend,
+                 mode='lines',
+                 line=dict(color='rgba(59, 130, 246, 0.5)', dash='dash'),
+                 name='Correlation (r=0.92)'
+             ))
+             
+             fig.update_layout(
+                 title="Vendor Finance: U.S. Deficit vs China FX Reserves",
+                 xaxis_title="Avg U.S. Trade Deficit ($B)",
+                 yaxis_title="Avg China FX Reserves ($B)",
+                 font_family="Inter",
+                 plot_bgcolor='white',
+                 xaxis_gridcolor='#F1F5F9',
+                 yaxis_gridcolor='#F1F5F9',
+                 legend=dict(x=0.02, y=0.98),
+                 height=450
+             )
+             st.plotly_chart(fig, use_container_width=True)
     else:
         st.info("🖼️ **Visual Generation:** Select a specific theorem to view visualization.")
 
