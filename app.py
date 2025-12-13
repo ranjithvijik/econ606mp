@@ -2539,6 +2539,16 @@ class GameTheoryEngine(IGameTheoryEngine):
             cooperation_rate_us=coop_rate_us,
             cooperation_rate_china=coop_rate_china
         )
+
+    def simulate_tit_for_tat(self, rounds: int, defection_round: Optional[int] = None) -> pd.DataFrame:
+        """Simulate Tit-for-Tat strategy (Compatibility wrapper)."""
+        result = self.simulate_strategy(StrategyType.TIT_FOR_TAT, rounds, defection_round)
+        return result.actions_df
+
+    def simulate_grim_trigger(self, rounds: int, defection_round: Optional[int] = None) -> pd.DataFrame:
+        """Simulate Grim Trigger strategy (Compatibility wrapper)."""
+        result = self.simulate_strategy(StrategyType.GRIM_TRIGGER, rounds, defection_round)
+        return result.actions_df
     
     def _tit_for_tat_action(self, round_num: int, us_actions: List[str],
                            china_actions: List[str], 
@@ -4453,7 +4463,8 @@ class VisualizationEngine(IVisualizationEngine):
             yaxis_title="<b>Average Tariff Rate (%)</b>",
             legend=dict(x=0.02, y=0.98),
             height=500,
-            hovermode='x unified'
+            hovermode='x unified',
+            margin=dict(l=40, r=20, t=60, b=40)
         )
         
         return fig
@@ -5348,16 +5359,53 @@ def main():
     # Contextual Sidebar Help
     st.sidebar.markdown("---")
     with st.sidebar.expander("ℹ️ About this Section", expanded=True):
-        if nav_category == "📊 Overview & Documents":
-            st.info("High-level findings, data sources, and original research papers underlying this project.")
-        elif nav_category == "♟️ Theoretical Frameworks":
-            st.info("Foundational game-theoretic models applied to US-China relations, covering strict dominance and folk theorems.")
-        elif nav_category == "🧪 Simulation Laboratory":
-            st.info("Interactive agent-based models to test strategy evolution, learning, and stability under noise.")
-        elif nav_category == "📈 Empirical Analysis":
-            st.info("Validation of theoretical predictions against real-world economic data (2001-2025).")
-        elif nav_category == "📐 Mathematical Tools":
-            st.info("Rigorous derivations of critical thresholds and interactive sensitivity analysis tools.")
+        if page == "🏠 Executive Summary":
+            st.info("High-level dashboard summarizing the transition from **Harmony** to **Conflict**. Features live 'Metric Cards' for Trade Deficit and 10Y Yields, along with the core thesis statement.")
+        
+        elif page == "📖 Methodology & Citations":
+            st.info("Comprehensive transparency report listing all **Data Sources** (Census, FRED, SAFE), game-theoretic assumptions, and rigorous academic citations (Nash, Axelrod, Friedman).")
+            
+        elif page == "📑 Research Documents":
+            st.info("Digital library allowing you to view the full **PDF User Guide** and original research papers directly within the application.")
+
+        elif page == "🎯 Nash Equilibrium Analysis":
+            st.info("Interactive **2x2 Normal-Form Game** engine. Visualize how the Payoff Matrix evolves year-by-year and solve for the **Nash Equilibrium** in real-time.")
+
+        elif page == "📈 Pareto Efficiency":
+            st.info("Visual analysis of the efficiency gap. Compare the suboptimal **'Trade War'** equilibrium against the Pareto-optimal **'Free Trade'** outcome.")
+
+        elif page == "🔄 Repeated Games & Folk Theorem":
+            st.info("Exploration of dynamic game theory. Demonstrates how the **'Shadow of the Future'** (Discount Factor) sustains cooperation via **'Grim Trigger'** strategies.")
+
+        elif page == "🎮 Strategy Simulator":
+            st.info("Hands-on simulation tool. Manually test **Tit-for-Tat** vs. **Always Defect** strategies over 5-50 rounds to observe payoff accumulation.")
+
+        elif page == "🔬 Advanced Simulations":
+            st.info("The central hub for agent-based modeling. Access the **Tournament Arena** and **Evolutionary Lab** for large-scale strategy analysis.")
+
+        elif page == "🏆 Tournament Arena":
+            st.info("**Axelrod-style** round-robin competition. Pit multiple strategies against each other to determine which is most robust in a mixed environment.")
+
+        elif page == "🧬 Evolutionary Lab":
+            st.info("Population dynamics simulator using **Replicator Dynamics**. Watch how the population share of Cooperative vs. Defective strategies evolves over generations.")
+
+        elif page == "🧠 Learning Dynamics":
+            st.info("**Reinforcement Learning** model. Observe how agents adapt their probabilities of cooperation based on past payoffs (Roth-Erev algorithm).")
+
+        elif page == "📊 Empirical Validation":
+            st.info("Data validation engine. Correlates game-theoretic predictions with **actual economic data**, such as the link between Tariff Hikes and Trade Deficits.")
+
+        elif page == "📈 Advanced Analytics":
+            st.info("**Custom Data Workbench**. Perform your own correlation analysis between variables like U.S. Federal Debt and China's FX Reserves.")
+
+        elif page == "📚 Mathematical Proofs":
+            st.info("Formal logic explorer. View **step-by-step derivations** for 20+ theorems, linking abstract math to real-world economic events.")
+
+        elif page == "🔧 Parameter Explorer":
+            st.info("**Sensitivity Analysis** tool. Adjust critical variables like 'Temptation Payoff' and 'Discount Factor' to see how they alter the game's stability regions.")
+
+        else:
+            st.info("Interactive tool for analyzing U.S.-China economic relations using game theory.")
     
     # ==========================================================================
     # INITIALIZE COMPONENTS
@@ -9059,10 +9107,6 @@ def render_proof_navigator():
                     st.session_state['selected_category'] = category_key
                     st.session_state['selected_proof'] = proof_full_name
                     
-                    # Force update the widget states
-                    st.session_state['main_category_select'] = category_key
-                    st.session_state['main_proof_select'] = proof_full_name
-                    
                     st.toast(f"✅ Selected Theorem {proof_id}", icon="📐")
                     st.rerun()
 
@@ -9378,22 +9422,28 @@ def render_research_documents_page():
     </div>
     """, unsafe_allow_html=True)
     
-    # Get files
-    try:
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-    except NameError:
-        current_dir = os.getcwd()
-        
-    # Filter only PDF files as requested
-    files = [f for f in os.listdir(current_dir) if f.lower().endswith('.pdf')]
-    files.sort()
+    # GitHub Base URL
+    GITHUB_BASE_URL = "https://github.com/ranjithvijik/econ606mp/blob/main/"
+
+    # Map mapping local filenames to their GitHub URL
+    # Note: Using 'raw' parameter for embedding might be better, but user provided blob URLs
+    # We will convert blob to raw for embedding if needed, or use Google Docs viewer for stability
+    pdf_mapping = {
+        "ECON 606 Mini Project Presentation.pdf": "ECON%20606%20Mini%20Project%20Presentation.pdf",
+        "ECON 606 Mini Project Report.pdf": "ECON%20606%20Mini%20Project%20Report.pdf",
+        "Game Theory Analysis.pdf": "Game%20Theory%20Analysis.pdf",
+        "User Guide.pdf": "User%20Guide.pdf"
+    }
+
+    # Get files that match our known mapping and exist locally (or just use the mapping keys)
+    # We'll stick to the mapping keys to ensure we have the correct URLs
+    files = sorted(list(pdf_mapping.keys()))
     
     if not files:
-        st.warning("No .pdf files found in the application directory. Please add PDF research documents to the directory.")
+        st.warning("No PDF documents configured.")
         return
 
     # File selection layout
-    # Use a wider column for the viewer
     col1, col2 = st.columns([1, 3])
     
     with col1:
@@ -9401,37 +9451,35 @@ def render_research_documents_page():
         selected_file = st.radio("Available Documents:", files, key="doc_selector")
         
         if selected_file:
-            file_path = os.path.join(current_dir, selected_file)
-            try:
-                file_stats = os.stat(file_path)
-                file_size_mb = file_stats.st_size / (1024 * 1024)  # MB
-                
-                st.info(f"""
+             st.info(f"""
                 **File Details:**
                 - Type: PDF Document
-                - Size: {file_size_mb:.2f} MB
+                - Source: GitHub Repository
                 """)
-            except Exception:
-                pass
         
-        if st.button("🔄 Refresh List"):
+        if st.button("🔄 Refresh"):
             st.rerun()
 
     with col2:
         if selected_file:
-            file_path = os.path.join(current_dir, selected_file)
             st.markdown(f"### 📄 {selected_file}")
             
-            try:
-                with open(file_path, "rb") as f:
-                    base64_pdf = base64.b64encode(f.read()).decode('utf-8')
-                
-                # Embed PDF using iframe
-                pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}#toolbar=0" width="100%" height="800" type="application/pdf"></iframe>'
-                st.markdown(pdf_display, unsafe_allow_html=True)
-                
-            except Exception as e:
-                st.error(f"Error displaying PDF: {str(e)}")
+            # Construct GitHub Raw URL
+            # Note: We must use the 'raw' version or 'githubusercontent' optimized link for the viewer
+            # GITHUB_BASE_URL was blob, we need raw
+            raw_base_url = "https://raw.githubusercontent.com/ranjithvijik/econ606mp/main/"
+            pdf_url = raw_base_url + pdf_mapping[selected_file]
+            
+            # Use Google Docs Viewer for robust embedding
+            # This is often more reliable than data URI if the file is hosted online
+            viewer_url = f"https://docs.google.com/viewer?url={pdf_url}&embedded=true"
+            
+            pdf_display = f'<iframe src="{viewer_url}" width="100%" height="800" style="border: none;"></iframe>'
+            st.markdown(pdf_display, unsafe_allow_html=True)
+            
+            # Fallback link
+            st.markdown(f"[📥 Download / View on GitHub]({GITHUB_BASE_URL + pdf_mapping[selected_file]})")
+
 
 
 # CSS styling for enhanced visual presentation
