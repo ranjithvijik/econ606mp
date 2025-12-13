@@ -44,6 +44,15 @@ import logging
 from datetime import datetime
 import hashlib
 import json
+import os
+try:
+    import PyPDF2
+except ImportError:
+    PyPDF2 = None
+try:
+    import docx
+except ImportError:
+    docx = None
 
 warnings.filterwarnings('ignore')
 
@@ -92,41 +101,46 @@ st.markdown("""
 <style>
     /* Main Theme */
     :root {
-        --primary-color: #1E3A8A;
-        --secondary-color: #3B82F6;
-        --success-color: #10B981;
-        --warning-color: #F59E0B;
-        --danger-color: #EF4444;
-        --background-dark: #1F2937;
-        --background-light: #F9FAFB;
-        --text-primary: #111827;
-        --text-secondary: #6B7280;
+        /* Modern US-China Palette */
+        --primary-color: #0F172A; /* Deep Navy (US/Background) */
+        --secondary-color: #B91C1C; /* Deep Red (China/US) */
+        --accent-color: #D97706; /* Muted Gold (China Stars) */
+        --success-color: #059669; /* Modern Green */
+        --warning-color: #D97706; /* Gold/Amber */
+        --danger-color: #DC2626; /* Vibrant Red */
+        --background-dark: #0F172A; /* Midnight Blue */
+        --background-light: #F8FAFC; /* Slate White */
+        --text-primary: #1E293B; /* Slate 900 */
+        --text-secondary: #475569; /* Slate 600 */
     }
     
     /* Headers */
     .main-header {
-        font-size: 2.8rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 3rem;
         font-weight: 800;
-        background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 50%, #8B5CF6 100%);
+        background: linear-gradient(135deg, #0F172A 0%, #B91C1C 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         text-align: center;
-        margin-bottom: 0.5rem;
-        padding: 1.5rem;
-        letter-spacing: -0.02em;
+        margin-bottom: 1rem;
+        padding: 2rem;
+        letter-spacing: -0.03em;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
     .sub-header {
-        font-size: 1.6rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 1.8rem;
         font-weight: 700;
-        color: #E5E7EB;
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-        border-bottom: 3px solid #3B82F6;
-        padding-bottom: 0.75rem;
+        color: #1E293B;
+        margin-top: 2.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 4px solid #B91C1C;
+        padding-bottom: 0.5rem;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.75rem;
     }
     
     .section-header {
@@ -141,18 +155,19 @@ st.markdown("""
     
     /* Cards and Boxes */
     .metric-card {
-        background: linear-gradient(135deg, #1F2937 0%, #374151 100%);
-        border-radius: 12px;
-        padding: 1.25rem;
-        margin: 0.5rem 0;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        border: 1px solid #374151;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin: 0.75rem 0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        border: 1px solid #E2E8F0;
+        transition: all 0.3s ease;
     }
     
     .metric-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border-color: #B91C1C;
     }
     
     .nash-equilibrium {
@@ -192,18 +207,18 @@ st.markdown("""
     
     /* Information Boxes */
     .info-box {
-        background: linear-gradient(135deg, #172554 0%, #1E3A8A 100%);
-        color: #DBEAFE;
-        border-left: 5px solid #60A5FA;
-        padding: 1.25rem;
-        margin: 1.25rem 0;
-        border-radius: 0 10px 10px 0;
-        box-shadow: 0 4px 6px rgba(59, 130, 246, 0.15);
+        background: linear-gradient(135deg, #1E3A8A 0%, #172554 100%); /* US Navy */
+        color: #FFFFFF;
+        border-left: 6px solid #B91C1C; /* US/China Red Accent */
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        border-radius: 8px;
+        box-shadow: 0 10px 15px -3px rgba(30, 58, 138, 0.15);
     }
     
     .warning-box {
         background: linear-gradient(135deg, #451A03 0%, #78350F 100%);
-        color: #FEF3C7;
+        color: #FFFFFF;
         border-left: 5px solid #FBBF24;
         padding: 1.25rem;
         margin: 1.25rem 0;
@@ -213,7 +228,7 @@ st.markdown("""
     
     .success-box {
         background: linear-gradient(135deg, #064E3B 0%, #065F46 100%);
-        color: #D1FAE5;
+        color: #FFFFFF;
         border-left: 5px solid #34D399;
         padding: 1.25rem;
         margin: 1.25rem 0;
@@ -223,7 +238,7 @@ st.markdown("""
     
     .error-box {
         background: linear-gradient(135deg, #7F1D1D 0%, #991B1B 100%);
-        color: #FEE2E2;
+        color: #FFFFFF;
         border-left: 5px solid #F87171;
         padding: 1.25rem;
         margin: 1.25rem 0;
@@ -239,12 +254,12 @@ st.markdown("""
         padding: 1rem 1.25rem;
         margin: 1rem 0;
         font-size: 0.9rem;
-        color: #374151;
+        color: #000000;
         box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
     }
     
     .citation-box strong {
-        color: #1F2937;
+        color: #000000;
     }
     
     /* Academic Citation */
@@ -256,13 +271,13 @@ st.markdown("""
         margin: 0.75rem 0;
         font-family: 'Times New Roman', serif;
         font-size: 0.95rem;
-        color: #78350F;
+        color: #451A03;
     }
     
     /* Methodology Box */
     .methodology-box {
         background: linear-gradient(135deg, #1E1B4B 0%, #312E81 100%);
-        color: #E0E7FF;
+        color: #FFFFFF;
         border: 1px solid #6366F1;
         border-radius: 10px;
         padding: 1.5rem;
@@ -294,7 +309,7 @@ st.markdown("""
         border-radius: 8px;
         padding: 1.25rem;
         margin: 1rem 0;
-        color: #713F12;
+        color: #000000;
     }
     
     /* Data Table Styling */
@@ -329,20 +344,21 @@ st.markdown("""
     }
     
     .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
-        color: white;
+        background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+        color: #F8FAFC;
+        border-bottom: 3px solid #B91C1C;
     }
     
     /* Button Styling */
     .stButton > button {
-        background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+        background: linear-gradient(135deg, #0F172A 0%, #334155 100%);
         color: white;
         border: none;
         border-radius: 8px;
         padding: 0.75rem 1.5rem;
         font-weight: 600;
-        transition: all 0.2s ease;
-        box-shadow: 0 4px 6px rgba(59, 130, 246, 0.25);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(15, 23, 42, 0.2);
     }
     
     .stButton > button:hover {
@@ -396,7 +412,7 @@ st.markdown("""
         padding: 1rem;
         margin: 0.75rem 0;
         font-size: 0.9rem;
-        color: #065F46;
+        color: #064E3B;
     }
     
     /* Assumption Box */
@@ -406,7 +422,7 @@ st.markdown("""
         border-radius: 8px;
         padding: 1rem;
         margin: 0.75rem 0;
-        color: #92400E;
+        color: #78350F;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -482,15 +498,15 @@ class PayoffMatrix:
     def to_dataframe(self) -> pd.DataFrame:
         """Convert payoff matrix to DataFrame for display."""
         return pd.DataFrame({
-            'China: Cooperate': [
+            '🇨🇳 China: Cooperate': [
                 f"({self.cc[0]}, {self.cc[1]})", 
                 f"({self.dc[0]}, {self.dc[1]})"
             ],
-            'China: Defect': [
+            '🇨🇳 China: Defect': [
                 f"({self.cd[0]}, {self.cd[1]})", 
                 f"({self.dd[0]}, {self.dd[1]})"
             ]
-        }, index=['U.S.: Cooperate', 'U.S.: Defect'])
+        }, index=['🇺🇸 U.S.: Cooperate', '🇺🇸 U.S.: Defect'])
     
     def to_numpy(self) -> Tuple[np.ndarray, np.ndarray]:
         """Convert to numpy arrays for each player."""
@@ -1156,10 +1172,10 @@ class AdvancedVisualizationEngine:
             z=payoff_matrix,
             x=strategies,
             y=strategies,
-            colorscale='Viridis',
+            colorscale='Blues',
             text=np.round(payoff_matrix, 1),
             texttemplate='%{text}',
-            textfont={"size": 12},
+            textfont={"size": 14, "color": "white"},
             colorbar=dict(title="Payoff"),
             hovertemplate="Row: %{y}<br>Col: %{x}<br>Payoff: %{z:.1f}<extra></extra>"
         ))
@@ -1168,11 +1184,14 @@ class AdvancedVisualizationEngine:
             title=dict(
                 text="<b>Tournament Results: Strategy Payoff Matrix</b>",
                 x=0.5,
-                font=dict(size=18)
+                font=dict(size=22, family="Inter, sans-serif", color="#1E293B")
             ),
             xaxis_title="<b>Opponent Strategy</b>",
             yaxis_title="<b>Player Strategy</b>",
-            height=550
+            height=550,
+            font=dict(family="Inter, sans-serif"),
+            paper_bgcolor='white',
+            plot_bgcolor='white'
         )
         
         return fig
@@ -1183,8 +1202,9 @@ class AdvancedVisualizationEngine:
         # Calculate total payoffs per strategy
         rankings = tournament_results.groupby('Strategy_1')['Payoff_1'].sum().sort_values(ascending=True)
         
-        colors = ['#EF4444' if i < len(rankings)//3 else '#F59E0B' if i < 2*len(rankings)//3 
-                  else '#10B981' for i in range(len(rankings))]
+        # Rankings colors
+        # Top 3 get Gold/Green, Lower get Red
+        colors = ['#059669' if i < 1 else '#10B981' if i < len(rankings)//2 else '#B91C1C' for i in range(len(rankings))]
         
         fig = go.Figure(data=go.Bar(
             x=rankings.values,
@@ -1192,18 +1212,22 @@ class AdvancedVisualizationEngine:
             orientation='h',
             marker_color=colors,
             text=[f'{v:.0f}' for v in rankings.values],
-            textposition='outside'
+            textposition='outside',
+            textfont=dict(size=12, family="Inter, sans-serif")
         ))
         
         fig.update_layout(
             title=dict(
                 text="<b>Tournament Rankings by Total Payoff</b>",
                 x=0.5,
-                font=dict(size=18)
+                font=dict(size=22, family="Inter, sans-serif", color="#1E293B")
             ),
             xaxis_title="<b>Total Payoff</b>",
             yaxis_title="<b>Strategy</b>",
-            height=400
+            height=400,
+            font=dict(family="Inter, sans-serif"),
+            paper_bgcolor='white',
+            plot_bgcolor='white'
         )
         
         return fig
@@ -1216,31 +1240,53 @@ class AdvancedVisualizationEngine:
         
         fig = go.Figure()
         
-        colors = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899']
+        # Consistent modern palette
+        colors = [
+            '#0F172A', # Navy
+            '#B91C1C', # Red
+            '#059669', # Green
+            '#D97706', # Gold
+            '#475569', # Slate
+            '#7C3AED'  # Violet
+        ]
         
         for i, col in enumerate(share_cols):
             strategy_name = col.replace('_Share', '')
+            color = colors[i % len(colors)]
+            
+            # Create rgba for fill
+            if color.startswith('#'):
+                r = int(color[1:3], 16)
+                g = int(color[3:5], 16)
+                b = int(color[5:7], 16)
+                rgba = f'rgba({r},{g},{b},0.1)'
+            else:
+                rgba = 'rgba(200,200,200,0.1)'
+                
             fig.add_trace(go.Scatter(
                 x=evo_results['Generation'],
                 y=evo_results[col] * 100,
                 mode='lines',
                 name=strategy_name,
-                line=dict(color=colors[i % len(colors)], width=3),
+                line=dict(color=color, width=3),
                 fill='tozeroy',
-                fillcolor=f'rgba{tuple(list(int(colors[i % len(colors)][j:j+2], 16) for j in (1, 3, 5)) + [0.1])}'
+                fillcolor=rgba
             ))
         
         fig.update_layout(
             title=dict(
                 text="<b>Evolutionary Dynamics: Strategy Population Shares</b>",
                 x=0.5,
-                font=dict(size=18)
+                font=dict(size=22, family="Inter, sans-serif", color="#1E293B")
             ),
             xaxis_title="<b>Generation</b>",
             yaxis_title="<b>Population Share (%)</b>",
             height=500,
             hovermode='x unified',
-            legend=dict(x=0.02, y=0.98)
+            legend=dict(x=0.02, y=0.98, bgcolor='rgba(255,255,255,0.8)'),
+            font=dict(family="Inter, sans-serif"),
+            paper_bgcolor='white',
+            plot_bgcolor='white'
         )
         
         return fig
@@ -1772,6 +1818,8 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
         
         if "quick_results" not in st.session_state:
             st.session_state.quick_results = None
+        if "quick_results_strategies" not in st.session_state:
+            st.session_state.quick_results_strategies = None
 
         col1, col2 = st.columns(2)
         with col1:
@@ -3292,11 +3340,12 @@ class EnhancedVisualizationEngine:
     """Enhanced visualization engine with advanced Monte Carlo charts."""
     
     COLORS = {
-        'cooperation': '#48bb78',
-        'defection': '#e53e3e',
-        'highlight': '#667eea',
-        'china': '#f6ad55',
-        'neutral': '#a0aec0'
+        'cooperation': '#059669',  # Modern Green
+        'defection': '#DC2626',    # Vibrant Red
+        'highlight': '#1E3A8A',    # Navy
+        'china': '#B91C1C',        # Red
+        'neutral': '#64748B',      # Slate
+        'shock': '#D97706'         # Gold
     }
     
     @staticmethod
@@ -3543,31 +3592,41 @@ class EnhancedVisualizationEngine:
                      f"<sup>n = {len(mc_results):,} simulations | " +
                      f"Sustainability Rate: {sustainability_rate:.1f}%</sup>",
                 x=0.5,
-                font=dict(size=20)
+                font=dict(size=24, family="Inter, sans-serif", color="#1E293B")
             ),
-            height=1200,
+            height=1400,
             showlegend=True,
-            legend=dict(x=1.02, y=0.5)
+            legend=dict(x=1.02, y=0.5, bgcolor='rgba(255,255,255,0.8)'),
+            font=dict(family="Inter, sans-serif"),
+            paper_bgcolor='white',
+            plot_bgcolor='white',
+            margin=dict(t=120, b=50, l=50, r=50)
         )
         
-        # Update axes labels
-        fig.update_xaxes(title_text='Cooperation Margin', row=1, col=1)
-        fig.update_xaxes(title_text='Discount Factor (δ)', row=1, col=2)
-        fig.update_xaxes(title_text='Cooperation Margin', row=1, col=3)
-        fig.update_xaxes(title_text='V_coop', row=2, col=1)
-        fig.update_xaxes(title_text='Sharpe Ratio', row=2, col=2)
-        fig.update_xaxes(title_text='Discount Factor (δ)', row=2, col=3)
-        fig.update_xaxes(title_text='Delta Category', row=3, col=1)
+        # Update axes labels with better formatting
+        fig.update_xaxes(title_text='<b>Cooperation Margin (M)</b>', row=1, col=1)
+        fig.update_xaxes(title_text='<b>Discount Factor (δ)</b>', row=1, col=2)
+        fig.update_xaxes(title_text='<b>Cooperation Margin (M)</b>', row=1, col=3)
+        fig.update_xaxes(title_text='<b>Value of Cooperating (V_coop)</b>', row=2, col=1)
+        fig.update_xaxes(title_text='<b>Sharpe Ratio (Return/Risk)</b>', row=2, col=2)
+        fig.update_xaxes(title_text='<b>Discount Factor (δ)</b>', row=2, col=3)
+        fig.update_xaxes(title_text='<b>Delta Category</b>', row=3, col=1)
+        fig.update_xaxes(title_text='<b>Values</b>', row=3, col=2)
+        fig.update_xaxes(title_text='<b>Scenario Condition</b>', row=3, col=3)
         
-        fig.update_yaxes(title_text='Frequency', row=1, col=1)
-        fig.update_yaxes(title_text='Cooperation Margin', row=1, col=2)
-        fig.update_yaxes(title_text='Cumulative Probability', row=1, col=3)
-        fig.update_yaxes(title_text='V_defect', row=2, col=1)
-        fig.update_yaxes(title_text='Frequency', row=2, col=2)
-        fig.update_yaxes(title_text='Cooperation Margin', row=2, col=3)
-        fig.update_yaxes(title_text='Count', row=3, col=1)
-        fig.update_yaxes(title_text='Cooperation Margin', row=3, col=2)
-        fig.update_yaxes(title_text='Average Margin', row=3, col=3)
+        fig.update_yaxes(title_text='<b>Frequency</b>', row=1, col=1)
+        fig.update_yaxes(title_text='<b>Cooperation Margin</b>', row=1, col=2)
+        fig.update_yaxes(title_text='<b>Cumulative Probability</b>', row=1, col=3)
+        fig.update_yaxes(title_text='<b>Value of Defecting (V_defect)</b>', row=2, col=1)
+        fig.update_yaxes(title_text='<b>Frequency</b>', row=2, col=2)
+        fig.update_yaxes(title_text='<b>Cooperation Margin</b>', row=2, col=3)
+        fig.update_yaxes(title_text='<b>Count</b>', row=3, col=1)
+        fig.update_yaxes(title_text='<b>Margin Distribution</b>', row=3, col=2)
+        fig.update_yaxes(title_text='<b>Average Margin</b>', row=3, col=3)
+        
+        # Add slight grid lines for readability
+        fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='#F1F5F9')
+        fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='#F1F5F9')
         
         return fig
     
@@ -3652,13 +3711,17 @@ def categorize_delta(delta: float) -> str:
         return 'High (≥ 0.75)'
 
 
-def render_advanced_analytics_page(
+def render_monte_carlo_dashboard(
     macro_data: pd.DataFrame,
     coop_data: pd.DataFrame,
+    tariff_data: pd.DataFrame,
+    treasury_data: pd.DataFrame,
+    debt_data: pd.DataFrame,
+    yield_data: pd.DataFrame,
     harmony_matrix: 'PayoffMatrix',
     pd_matrix: 'PayoffMatrix'
 ):
-    """Enhanced Advanced Analytics page with comprehensive Monte Carlo functionality."""
+    """Monte Carlo Simulation Dashboard (Sub-module)."""
     
     st.markdown('<h2 class="sub-header">📈 Advanced Analytics & Monte Carlo Simulation</h2>', 
                 unsafe_allow_html=True)
@@ -3794,7 +3857,7 @@ def render_advanced_analytics_page(
         with col3:
             st.metric(
                 "Critical δ*",
-                f"{engine.calculate_critical_delta():.3f}",
+                f"{engine.calculate_critical_discount_factor():.3f}",
                 delta="Theoretical threshold"
             )
         
@@ -3926,6 +3989,177 @@ def render_advanced_analytics_page(
                 
                 st.dataframe(sensitivity_results, width='stretch')
 
+
+def render_custom_analysis_workbench(
+    macro_data: pd.DataFrame, 
+    tariff_data: pd.DataFrame, 
+    treasury_data: pd.DataFrame, 
+    debt_data: pd.DataFrame,
+    yield_data: pd.DataFrame
+):
+    """Render Custom Data Analysis Workbench."""
+    st.markdown("### 🛠️ Custom Data Workbench")
+    
+    st.markdown("""
+    <div class="info-box">
+    <strong>Data Explorer:</strong> Select datasets, filter time ranges, and perform custom correlation 
+    analysis. Export your findings for external research.
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 1. Dataset Selection
+    st.markdown("#### 1. Select Data Source")
+    dataset_options = {
+        "Macroeconomic Indicators": macro_data,
+        "Tariff Data": tariff_data,
+        "Treasury Holdings": treasury_data,
+        "Federal Debt": debt_data,
+        "Yield Suppression": yield_data
+    }
+    
+    selected_dataset_name = st.selectbox("Choose Dataset:", list(dataset_options.keys()))
+    df = dataset_options[selected_dataset_name].copy()
+    
+    # Ensure Date column is accessible or index
+    if isinstance(df.index, pd.DatetimeIndex):
+        df = df.reset_index()
+    
+    # 2. Time Filter
+    st.markdown("#### 2. Filter Time Range")
+    
+    # Identify date column (usually 'Year' or 'Date')
+    date_col = next((col for col in df.columns if 'year' in col.lower() or 'date' in col.lower()), None)
+    
+    if date_col:
+        # Check if column is datetime or numeric
+        if pd.api.types.is_numeric_dtype(df[date_col]):
+            min_date = int(df[date_col].min())
+            max_date = int(df[date_col].max())
+            
+            start_year, end_year = st.slider(
+                "Select Year Range:",
+                min_value=min_date,
+                max_value=max_date,
+                value=(min_date, max_date)
+            )
+            df = df[(df[date_col] >= start_year) & (df[date_col] <= end_year)]
+            
+        elif pd.api.types.is_datetime64_any_dtype(df[date_col]):
+            min_year = df[date_col].min().year
+            max_year = df[date_col].max().year
+            
+            start_year, end_year = st.slider(
+                "Select Year Range:",
+                min_value=int(min_year),
+                max_value=int(max_year),
+                value=(int(min_year), int(max_year))
+            )
+            df = df[(df[date_col].dt.year >= start_year) & (df[date_col].dt.year <= end_year)]
+    
+    # 3. Column Selection
+    st.markdown("#### 3. Select Variables")
+    numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+    
+    # Remove year/date from analyzable columns if possible to avoid correlation with time unless desired
+    numeric_cols = [c for c in numeric_cols if c != date_col]
+    
+    if not numeric_cols:
+         st.warning("No numeric variables found for analysis.")
+         return
+
+    selected_cols = st.multiselect("Select Variables to Analyze:", numeric_cols, default=numeric_cols[:2] if len(numeric_cols) >= 2 else numeric_cols)
+    
+    if not selected_cols:
+        st.warning("Please select at least one variable.")
+        return
+        
+    analysis_df = df[selected_cols]
+    
+    # 4. Display & Analysis
+    st.markdown("#### 4. Analysis Results")
+    
+    tab1, tab2, tab3 = st.tabs(["📊 Data View", "🔥 Correlation Matrix", "📈 Trend Plot"])
+    
+    with tab1:
+        st.dataframe(analysis_df, width='stretch')
+        
+    with tab2:
+        if len(selected_cols) > 1:
+            corr_matrix = analysis_df.corr()
+            fig = px.imshow(
+                corr_matrix, 
+                text_auto=True,
+                aspect="auto",
+                color_continuous_scale="RdBu_r",
+                title="Correlation Matrix"
+            )
+            st.plotly_chart(fig, width='stretch')
+        else:
+            st.info("Select at least two variables for correlation analysis.")
+            
+    with tab3:
+        if date_col:
+            # Re-merge date col for plotting
+            plot_df = analysis_df.copy()
+            plot_df[date_col] = df[date_col]
+            
+            fig = px.line(plot_df, x=date_col, y=selected_cols, title="Variable Trends Over Time")
+            st.plotly_chart(fig, width='stretch')
+        else:
+            st.info("No timeline column detected for trend plotting.")
+
+    # 5. Export
+    st.markdown("#### 5. Export Results")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        csv = analysis_df.to_csv(index=False)
+        st.download_button(
+            label="📥 Download Data (Excel/CSV)",
+            data=csv,
+            file_name=f"custom_analysis_{selected_dataset_name.replace(' ', '_').lower()}.csv",
+            mime="text/csv"
+        )
+        
+    with col2:
+        # Generate a simple text report
+        report_text = f"CUSTOM ANALYSIS REPORT\\n======================\\nDataset: {selected_dataset_name}\\nVariables: {', '.join(selected_cols)}\\n\\nDescriptive Statistics:\\n-----------------------\\n{analysis_df.describe().to_string()}\\n\\nCorrelation Matrix:\\n-------------------\\n{analysis_df.corr().to_string()}\\n\\nGenerated by U.S.-China Game Theory Analysis Tool"
+        
+        st.download_button(
+            label="📄 Download Analysis Report (PDF/Text)",
+            data=report_text,
+            file_name=f"analysis_report_{selected_dataset_name.replace(' ', '_').lower()}.txt",
+            mime="text/plain",
+            help="Downloads a formatted text report. Print this file to PDF if needed."
+        )
+
+
+def render_advanced_analytics_page(
+    macro_data: pd.DataFrame,
+    coop_data: pd.DataFrame,
+    tariff_data: pd.DataFrame,
+    treasury_data: pd.DataFrame,
+    debt_data: pd.DataFrame,
+    yield_data: pd.DataFrame,
+    harmony_matrix: 'PayoffMatrix',
+    pd_matrix: 'PayoffMatrix'
+):
+    """Wrapper for Advanced Analytics Module."""
+    st.markdown('<h2 class="sub-header">📈 Advanced Analytics Hub</h2>', unsafe_allow_html=True)
+    
+    tab1, tab2 = st.tabs(["🎰 Monte Carlo Simulation", "🛠️ Custom Data Workbench"])
+    
+    with tab1:
+        render_monte_carlo_dashboard(
+            macro_data, coop_data, tariff_data, treasury_data, debt_data, yield_data,
+            harmony_matrix, pd_matrix
+        )
+        
+    with tab2:
+        render_custom_analysis_workbench(
+            macro_data, tariff_data, treasury_data, debt_data, yield_data
+        )
+
 # =============================================================================
 # VISUALIZATION ENGINE (Enhanced)
 # =============================================================================
@@ -3939,20 +4173,21 @@ class VisualizationEngine(IVisualizationEngine):
     """
     
     # Color schemes
+    # Color schemes (Updated for U.S.-China Modern Palette)
     COLORS = {
-        'us': '#3B82F6',      # Blue
-        'china': '#EF4444',   # Red
-        'cooperation': '#10B981',  # Green
-        'defection': '#F59E0B',    # Amber
-        'neutral': '#6B7280',      # Gray
-        'highlight': '#8B5CF6'     # Purple
+        'us': '#1E3A8A',      # Deep Navy
+        'china': '#B91C1C',   # Deep Red
+        'cooperation': '#059669',  # Modern Green
+        'defection': '#DC2626',    # Vibrant Red
+        'neutral': '#64748B',      # Slate Gray
+        'highlight': '#D97706'     # Muted Gold
     }
     
     PERIOD_COLORS = {
-        'Harmony': 'rgba(16, 185, 129, 0.2)',
-        'Transition': 'rgba(251, 191, 36, 0.2)',
-        'Escalation': 'rgba(249, 115, 22, 0.2)',
-        'Conflict': 'rgba(239, 68, 68, 0.2)'
+        'Harmony': 'rgba(5, 150, 105, 0.2)',
+        'Transition': 'rgba(217, 119, 6, 0.2)',
+        'Escalation': 'rgba(234, 88, 12, 0.2)',
+        'Conflict': 'rgba(220, 38, 38, 0.2)'
     }
     
     @staticmethod
@@ -4019,12 +4254,14 @@ class VisualizationEngine(IVisualizationEngine):
             title=dict(
                 text=f"<b>{title}</b>",
                 x=0.5,
-                font=dict(size=20)
+                font=dict(size=22, family="Inter, sans-serif", color="#1E293B")
             ),
             height=450,
-            font=dict(family="Arial, sans-serif"),
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)'
+            font=dict(family="Inter, sans-serif"),
+            paper_bgcolor='white',
+            plot_bgcolor='white',
+            xaxis=dict(title_text="China's Strategy", title_font=dict(size=14, weight='bold')),
+            yaxis=dict(title_text="U.S. Strategy", title_font=dict(size=14, weight='bold'))
         )
         
         return fig
@@ -4062,7 +4299,7 @@ class VisualizationEngine(IVisualizationEngine):
         fig.add_trace(go.Scatter(
             x=deltas, y=v_defects,
             mode='lines',
-            name='V<sub>defection</sub>',
+            name='V<sub>defection</sub> (Deviation)',
             line=dict(color=VisualizationEngine.COLORS['defection'], width=3),
             hovertemplate="δ = %{x:.2f}<br>V_defect = %{y:.2f}<extra></extra>"
         ))
@@ -4071,7 +4308,7 @@ class VisualizationEngine(IVisualizationEngine):
         fig.add_trace(go.Scatter(
             x=deltas, y=margins,
             mode='lines',
-            name='Cooperation Margin',
+            name='Cooperation Margin (M)',
             line=dict(color=VisualizationEngine.COLORS['highlight'], width=4, dash='dash'),
             hovertemplate="δ = %{x:.2f}<br>Margin = %{y:.2f}<extra></extra>"
         ))
@@ -4087,9 +4324,9 @@ class VisualizationEngine(IVisualizationEngine):
                 line_dash="dot",
                 line_color="orange",
                 line_width=2,
-                annotation_text=f"<b>δ* = {critical_delta:.3f}</b>",
+                annotation_text=f"<b>Critical δ* = {critical_delta:.3f}</b>",
                 annotation_position="top",
-                annotation_font=dict(size=12, color="orange")
+                annotation_font=dict(size=14, color="#D97706", family="Inter, sans-serif")
             )
             
             # Shade sustainable region
@@ -5017,7 +5254,11 @@ def main():
     
     # Header
     st.markdown(
-        '<h1 class="main-header">🎓 U.S.-China Game Theory Analysis</h1>',
+        '<h1 class="main-header">'
+        '<span style="-webkit-text-fill-color: initial;">🎓 🇺🇸</span> '
+        'U.S.-China '
+        '<span style="-webkit-text-fill-color: initial;">🇨🇳</span> '
+        'Game Theory Analysis</h1>',
         unsafe_allow_html=True
     )
     
@@ -5037,28 +5278,85 @@ def main():
     # ==========================================================================
     # SIDEBAR NAVIGATION
     # ==========================================================================
-    st.sidebar.markdown("## 📊 Menu")
-    st.sidebar.markdown("---")
+    st.sidebar.markdown("## 🧭 Research Navigator")
     
-    page = st.sidebar.radio(
-        "Select Analysis Module:",
+    # Hierarchical Navigation
+    nav_category = st.sidebar.selectbox(
+        "Select Research Area:",
         [
-            "🏠 Executive Summary",
-            "🎯 Nash Equilibrium Analysis",
-            "📈 Pareto Efficiency",
-            "🔄 Repeated Games & Folk Theorem",
-            "📊 Empirical Validation",
-            "🎮 Strategy Simulator",
-            "🔬 Advanced Simulations",
-            "🏆 Tournament Arena",
-            "🧬 Evolutionary Lab",
-            "🧠 Learning Dynamics",
-            "🔧 Parameter Explorer",
-            "📚 Mathematical Proofs",
-            "📈 Advanced Analytics",
-            "📖 Methodology & Citations"
+            "📊 Overview & Documents",
+            "♟️ Theoretical Frameworks",
+            "🧪 Simulation Laboratory",
+            "📈 Empirical Analysis",
+            "📐 Mathematical Tools"
         ]
     )
+    
+    st.sidebar.markdown("---")
+    
+    if nav_category == "📊 Overview & Documents":
+        page = st.sidebar.radio(
+            "Go to Module:",
+            [
+                "🏠 Executive Summary",
+                "📖 Methodology & Citations",
+                "📑 Research Documents"
+            ]
+        )
+    
+    elif nav_category == "♟️ Theoretical Frameworks":
+        page = st.sidebar.radio(
+            "Go to Module:",
+            [
+                "🎯 Nash Equilibrium Analysis",
+                "📈 Pareto Efficiency",
+                "🔄 Repeated Games & Folk Theorem"
+            ]
+        )
+        
+    elif nav_category == "🧪 Simulation Laboratory":
+        page = st.sidebar.radio(
+            "Go to Module:",
+            [
+                "🎮 Strategy Simulator",
+                "🔬 Advanced Simulations",
+                "🏆 Tournament Arena",
+                "🧬 Evolutionary Lab",
+                "🧠 Learning Dynamics"
+            ]
+        )
+        
+    elif nav_category == "📈 Empirical Analysis":
+        page = st.sidebar.radio(
+            "Go to Module:",
+            [
+                "📊 Empirical Validation",
+                "📈 Advanced Analytics"
+            ]
+        )
+        
+    elif nav_category == "📐 Mathematical Tools":
+        page = st.sidebar.radio(
+            "Go to Module:",
+            [
+                "📚 Mathematical Proofs",
+                "🔧 Parameter Explorer"
+            ]
+        )
+        
+    # Contextual Sidebar Help
+    st.sidebar.markdown("---")
+    with st.sidebar.expander("ℹ️ About this Section", expanded=True):
+        if nav_category == "📊 Overview & Documents":
+            st.info("High-level findings, data sources, and original research papers underlying this project.")
+        elif nav_category == "♟️ Theoretical Frameworks":
+            st.info("Foundational game-theoretic models applied to US-China relations, covering strict dominance and folk theorems.")
+        elif nav_category == "🧪 Simulation Laboratory":
+            st.info("Interactive agent-based models to test strategy evolution, learning, and stability under noise.")
+        elif nav_category == "📈 Empirical Analysis":
+            st.info("Validation of theoretical predictions against real-world economic data (2001-2025).")
+        elif nav_category == "📐 Mathematical Tools":
+            st.info("Rigorous derivations of critical thresholds and interactive sensitivity analysis tools.")
     
     # ==========================================================================
     # INITIALIZE COMPONENTS
@@ -5126,14 +5424,21 @@ def main():
     
     elif page == "📈 Advanced Analytics":
         render_advanced_analytics_page(
-        macro_data=macro_data,
-        coop_data=coop_data,
-        harmony_matrix=harmony_matrix,
-        pd_matrix=pd_matrix
+            macro_data=macro_data,
+            coop_data=coop_data,
+            tariff_data=tariff_data,
+            treasury_data=treasury_data,
+            debt_data=debt_data,
+            yield_data=yield_data,
+            harmony_matrix=harmony_matrix,
+            pd_matrix=pd_matrix
         )
     
     elif page == "📖 Methodology & Citations":
         render_methodology_page()
+
+    elif page == "📑 Research Documents":
+        render_research_documents_page()
     
 # =============================================================================
 # PAGE RENDERERS FOR ADVANCED SIMULATIONS
@@ -5741,6 +6046,14 @@ def render_empirical_data_page(macro_data: pd.DataFrame, tariff_data: pd.DataFra
         
         st.plotly_chart(fig, width='stretch')
 
+        st.markdown("""
+        <div class="info-box">
+        <strong>💡 Interpretation: The "Vendor Finance" Mechanism (2001-2007)</strong><br>
+        The near-perfect correlation (r = 0.96) between the U.S. Trade Deficit and China's FX Reserves confirms the "Vendor Finance" hypothesis.
+        As the U.S. ran larger deficits (buying Chinese goods), China recycled these dollars back into U.S. Treasuries, suppressing yields (r = -0.92) and keeping U.S. borrowing costs artificially low.
+        This created a "Harmonious" equilibrium where both parties benefited in the short term, despite long-term imbalances.
+        </div>
+        """, unsafe_allow_html=True)
 def render_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_matrix: PayoffMatrix):
     """Render strategy simulator page."""
     
@@ -6131,6 +6444,8 @@ def render_nash_existence_proof(show_citations: bool):
                 border-radius: 5px; margin: 1rem 0;">
     <strong>📋 Statement:</strong> The U.S.-China Vendor Financing Game 
     $\\Gamma = \\langle N, S, u \\rangle$ possesses at least one Nash Equilibrium.
+    <br><br>
+    <em><strong>Real-World Interpretation:</strong> In plain English, this proves that there exists a stable state (or states) where neither the U.S. nor China can unilaterally improve their economic outcome by changing their strategy. This mathematical certainty explains why the trade imbalance persisted for so long—it was a locked-in equilibrium, not just a random occurrence.</em>
     </div>
     """, unsafe_allow_html=True)
     
@@ -6249,6 +6564,14 @@ def render_nash_uniqueness_harmony(show_citations: bool):
         
         $$\\boxed{(C, C) \\text{ is the unique pure strategy Nash Equilibrium}} \\quad \\blacksquare$$
         """)
+
+    st.markdown("""
+    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 Real-World Interpretation:</strong><br>
+    The math confirms that during 2001-2007, both the U.S. and China were "trapped" in cooperation because it was simply too profitable to stop. The U.S. got cheap goods and low interest rates; China got massive export growth. Neither side had any rational reason to rock the boat, creating a stable "Harmony" phase.
+    </div>
+    """, unsafe_allow_html=True)
     
     if show_citations:
         render_citation_box(
@@ -6314,6 +6637,14 @@ def render_nash_prisoners_dilemma(show_citations: bool):
         
         $$\\boxed{(D, D) \\text{ is the unique pure strategy Nash Equilibrium}} \\quad \\blacksquare$$
         """)
+
+    st.markdown("""
+    <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 Real-World Interpretation:</strong><br>
+    This proof explains the current trade war. Even though both countries would be better off cooperating (Equation 3.2), the fear that the other side will cheat makes "Defect" the only rational choice. The U.S. fears job losses, China fears containment—so both choose tariffs and restrictions, locking themselves into a suboptimal "Prisoner's Dilemma."
+    </div>
+    """, unsafe_allow_html=True)
     
     if show_citations:
         render_citation_box(
@@ -6388,6 +6719,14 @@ def render_dominant_strategy_harmony(show_citations: bool):
         **Conclusion:**
         $$\\boxed{\\text{Cooperate is strictly dominant for China}}$$
         """)
+
+    st.markdown("""
+    <div style="background-color: #e6fffa; padding: 1.5rem; border-left: 4px solid #319795; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 Key Insight:</strong><br>
+    A "Dominant Strategy" means you don't even need to guess what your opponent is doing. For China in the 2000s, buying U.S. debt was the best move <em>regardless</em> of U.S. policy. For the U.S., outsourcing to China was the best move <em>regardless</em> of China's policy. This powerful alignment fueled the rapid globalization of that era.
+    </div>
+    """, unsafe_allow_html=True)
     
     st.markdown("""
     ---
@@ -6469,6 +6808,14 @@ def render_dominant_strategy_prisoners(show_citations: bool):
         **Conclusion:**
         $$\\boxed{\\text{Defect is strictly dominant for China}}$$
         """)
+
+    st.markdown("""
+    <div style="background-color: #fffaf0; padding: 1.5rem; border-left: 4px solid #dd6b20; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 Key Insight:</strong><br>
+    Today, "Defecting" (tariffs/sanctions) is the dominant strategy. This means that even if a U.S. president <em>wanted</em> to be cooperative, the risk of China taking advantage of that openness is too high. The math dictates aggression as the safest policy, which is why trade tensions persist across different administrations.
+    </div>
+    """, unsafe_allow_html=True)
     
     st.markdown("""
     ---
@@ -6545,6 +6892,14 @@ def render_pareto_efficiency_proof(show_citations: bool):
         
         $$\\boxed{(C, C) \\text{ is Pareto efficient}} \\quad \\blacksquare$$
         """)
+
+    st.markdown("""
+    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 Economic Meaning:</strong><br>
+    "Pareto Efficient" implies that you cannot make one country better off without hurting the other. In the 2000s, the U.S.-China arrangement was running at maximum efficiency—China was growing as fast as possible, and U.S. consumers were saving as much as possible. There was no "wasted" value on the table.
+    </div>
+    """, unsafe_allow_html=True)
     
     if show_citations:
         render_citation_box(
@@ -6586,6 +6941,14 @@ def render_pareto_inefficiency_proof(show_citations: bool):
         **Prisoner's Dilemma tragedy**: rational individual behavior leads to collectively 
         suboptimal outcomes.
         """)
+
+    st.markdown("""
+    <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 The Tragedy of the Commons:</strong><br>
+    This theorem proves that rational behavior can lead to irrational outcomes. Both countries are acting "smart" individually, but the result is a trade war where everyone loses money, global growth slows, and consumer prices rise. It is an "inefficient" equilibrium that leaves trillions of dollars of potential value realized.
+    </div>
+    """, unsafe_allow_html=True)
     
     if show_citations:
         render_citation_box(
@@ -6779,6 +7142,14 @@ def render_folk_theorem_proof(show_citations: bool):
         </div>
         """)
     
+    st.markdown("""
+    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 Why this matters:</strong><br>
+    This result ($\delta^* < 0$) is mathematically bizarre but economically profound. It means the "Shadow of the Future" wasn't even needed in the 2000s. The immediate benefits of cooperation were so massive (Vendor Finance) that the U.S. and China would have cooperated even if they expected the world to end tomorrow.
+    </div>
+    """, unsafe_allow_html=True)
+    
     # Comparison Table
     st.markdown("#### 📊 Comparison: Harmony Game vs. Prisoner's Dilemma")
     comparison_df = pd.DataFrame({
@@ -6860,7 +7231,15 @@ def render_grim_trigger_proof(show_citations: bool):
         **Key Insight:** While both strategies have the same theoretical threshold, 
         TFT is more commonly observed in practice due to its forgiving nature.
         """)
-    
+
+    st.markdown("""
+    <div style="background-color: #fffaf0; padding: 1.5rem; border-left: 4px solid #dd6b20; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 The "Nuclear Option" of Economics:</strong><br>
+    "Grim Trigger" is the economic equivalent of Mutually Assured Destruction (MAD). It basically says, "If you impose one tariff on me (defect), I will impose maximum tariffs on you <em>forever</em> (permanent punishment)." While effective in theory, it's rarely used because it leaves no room for mistakes or negotiations—once the trade war starts, it never ends.
+    </div>
+    """, unsafe_allow_html=True)
+
     if show_citations:
         render_citation_box(
             "Axelrod, R. (1984). *The evolution of cooperation*. Basic Books.",
@@ -6930,9 +7309,17 @@ def render_tit_for_tat_sustainability(show_citations: bool):
         
         $$\\delta \\in \\left[\\frac{2}{3}, 1\\right] \\text{ or } \\delta \\in \\left[\\frac{1}{3}, \\frac{2}{3}\\right]$$
         
-        **Simplified condition:**
+        **simplified condition:**
         $$\\boxed{\\delta \\geq 0.40} \\quad \\blacksquare$$
         """)
+
+    st.markdown("""
+    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 Why "Tit-for-Tat" explains 2018-2025:</strong><br>
+    The Trump-Biden tariff strategy is pure "Tit-for-Tat." When China imposes a tariff (defects), the U.S. immediately responds with a matching tariff (retaliation). If China were to lower tariffs (cooperate), the strategy suggests the U.S. would eventually follow suit. The math shows this strategy works to deter cheating, <em>but only if</em> countries care enough about the future ($\delta \geq 0.40$).
+    </div>
+    """, unsafe_allow_html=True)
     
     if show_citations:
         render_citation_box(
@@ -6987,24 +7374,14 @@ def render_discount_factor_derivation(show_citations: bool):
         
         $$\\boxed{\\delta^* = \\frac{T - R}{T - P}} \\quad \\blacksquare$$
         """)
-    
-    # Numerical Examples
-    st.markdown("#### 📊 Numerical Examples")
-    
-    examples_df = pd.DataFrame({
-        'Game Type': ['Harmony Game', "Prisoner's Dilemma", 'Stag Hunt'],
-        'T': [5, 8, 7],
-        'R': [8, 6, 9],
-        'P': [1, 3, 5],
-        'δ*': ['-0.75', '0.40', '0.50'],
-        'Interpretation': [
-            'Always cooperate',
-            'Moderate patience required',
-            'High patience required'
-        ]
-    })
-    
-    st.dataframe(examples_df, width='stretch')
+
+    st.markdown("""
+    <div style="background-color: #e6fffa; padding: 1.5rem; border-left: 4px solid #319795; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 The "Patience Threshold":</strong><br>
+    This formula calculates exactly <em>how patient</em> a country needs to be to resist the temptation of cheating. If $\delta^*$ is low (like in the 2000s), cooperation is easy. If $\delta^*$ is high (like today), you need extreme farsightedness to keep the peace. The rise in $\delta^*$ quantitatively explains the collapse of U.S.-China relations.
+    </div>
+    """, unsafe_allow_html=True)
     
     if show_citations:
         render_citation_box(
@@ -7062,6 +7439,14 @@ def render_cooperation_margin_proof(show_citations: bool):
         **Margin Erosion:**
         $$\\frac{42.67 - 6.77}{42.67} \\times 100\\% = 84.1\\% \\quad \\blacksquare$$
         """)
+
+    st.markdown("""
+    <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 The "Incentive to Be Good":</strong><br>
+    Think of the "Cooperation Margin" as the glue holding the relationship together. In 2005, this glue was super strong ($M=42.67$)—breaking up was unthinkable. By 2024, the glue has almost dried up ($M=6.77$). When the margin is this thin, even a small shock (like a spy balloon or a tariff hike) can break the bond entirely.
+    </div>
+    """, unsafe_allow_html=True)
     
     # Cooperation Margin Table
     st.markdown("#### 📊 Cooperation Margin by Discount Factor")
@@ -7118,6 +7503,14 @@ def render_discount_factor_comparison(show_citations: bool):
            
            For $T > R$: Harsher punishment → Lower threshold → Easier cooperation
         """)
+
+    st.markdown("""
+    <div style="background-color: #fffaf0; padding: 1.5rem; border-left: 4px solid #dd6b20; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 Structural Sensitivity:</strong><br>
+    This analysis reveals why the U.S.-China relationship is so fragile. A "Stag Hunt" (like climate change) requires only moderate trust ($\delta^*=0.50$). But a trade war is a "Prisoner's Dilemma," where the temptation to cheat ($T$) is huge. The math shows that moving from climate talks to trade talks effectively raises the difficulty level of cooperation from "Hard" to "Expert."
+    </div>
+    """, unsafe_allow_html=True)
     
     # Comparative Table
     st.markdown("#### 📊 Game Type Comparison")
@@ -7176,6 +7569,14 @@ def render_yield_suppression_coefficient(show_citations: bool):
         For every \\$100 billion increase in foreign official Treasury purchases, 
         the 10-year yield decreases by **2.4 basis points**.
         """)
+
+    st.markdown("""
+    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 The "Greenspan Conundrum":</strong><br>
+    In 2005, Alan Greenspan was puzzled why U.S. bond yields stayed low despite the Fed raising rates. This coefficient explains it: China was pressing down on the long end of the curve ($ -2.4$ bp per $100B) just as hard as the Fed was pushing up the short end. It’s the mathematical proof of how foreign influence neutralized U.S. monetary policy.
+    </div>
+    """, unsafe_allow_html=True)
     
     with st.expander("📊 **Empirical Estimation**", expanded=True):
         st.markdown("""
@@ -7240,34 +7641,20 @@ def render_total_yield_suppression(show_citations: bool):
         **Note:** The actual suppression reflects additional custodial flows not 
         captured in direct TIC reporting.
         """)
-    
-    # Suppression Estimates Table
-    st.markdown("#### 📊 Yield Suppression Estimates")
-    
-    suppression_df = pd.DataFrame({
-        'Estimate Type': [
-            'Direct Holdings Only',
-            'Including Belgium Custodial',
-            'Including All Custodial',
-            'Peak Estimate (2013)'
-        ],
-        'Holdings ($B)': [1300, 1800, 2500, 3000],
-        'Suppression (bp)': [31, 43, 60, 100],
-        'Source': [
-            'Direct calculation',
-            'Adjusted for Belgium',
-            'Full custodial adjustment',
-            'Dallas Fed estimate'
-        ]
-    })
-    
-    st.dataframe(suppression_df, width='stretch')
+
+    st.markdown("""
+    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 The "Cheap Money" Era:</strong><br>
+    This calculation confirms that China's buying spree effectively lowered U.S. mortgage rates and government borrowing costs by ~1.00%. This was a massive subsidy to the U.S. economy, fueling the housing boom (and arguably the bubble) of the mid-2000s. It illustrates the sheer scale of the financial interdependence.
+    </div>
+    """, unsafe_allow_html=True)
     
     if show_citations:
         render_citation_box(
-            "ECON 606 Mini Project Report; Dallas Federal Reserve (2025); "
-            "U.S. Department of the Treasury (2024).",
-            None
+            "Warnock, F. E., & Warnock, V. C. (2009). International capital flows and "
+            "U.S. interest rates. *Journal of International Money and Finance*, 28(6), 903-919.",
+            "https://doi.org/10.1016/j.jimonfin.2009.03.002"
         )
 
 
@@ -7311,6 +7698,14 @@ def render_counterfactual_yield(show_citations: bool):
         
         $$\\boxed{Y_{counterfactual} = Y_{observed} + |\\Delta Y_{total}|} \\quad \\blacksquare$$
         """)
+
+    st.markdown("""
+    <div style="background-color: #fffaf0; padding: 1.5rem; border-left: 4px solid #dd6b20; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 The "What If" Scenario:</strong><br>
+    If China hadn't bought all that debt, U.S. interest rates in 2013 would have been 3.35% instead of 2.35%. That 1% difference translates to hundreds of billions in extra interest payments for U.S. taxpayers and higher mortgage payments for American homeowners. This counterfactual highlights the tangible financial value of the previous "Harmony" phase.
+    </div>
+    """, unsafe_allow_html=True)
     
     # Counterfactual Timeline
     st.markdown("#### 📊 Counterfactual Yield Timeline")
@@ -7378,6 +7773,14 @@ def render_payoff_normalization(show_citations: bool):
         
         $$\\boxed{\\text{Normalization preserves ordinal rankings}} \\quad \\blacksquare$$
         """)
+
+    st.markdown("""
+    <div style="background-color: #e6fffa; padding: 1.5rem; border-left: 4px solid #319795; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 Comparing Apples to Oranges:</strong><br>
+    In the real world, "payoffs" are messy—GDP growth, political polls, national security. Normalization allows us to strip away the units ($ or %) and compare pure strategic incentives. It proves that whether you're fighting over 10 dollars or 10 billion dollars, the *strategic logic* (Game Theory) remains exactly the same.
+    </div>
+    """, unsafe_allow_html=True)
     
     # Example Normalization
     st.markdown("#### 📊 Example: Harmony Game Normalization")
@@ -7439,6 +7842,14 @@ def render_harmony_classification(show_citations: bool):
         
         $$\\boxed{\\text{Confirmed: Harmony Game}} \\quad \\blacksquare$$
         """)
+
+    st.markdown("""
+    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 "Chimerica" Identified:</strong><br>
+    This classification mathematically formalized the term "Chimerica." It wasn't just a catchy phrase; it was a distinctive game structure where incentives were perfectly aligned ($R > T$). Recognizing this structure is key to understanding why the sudden shift to conflict in 2008 felt so jarring—it wasn't a graduation, it was a structural rupture.
+    </div>
+    """, unsafe_allow_html=True)
     
     if show_citations:
         render_citation_box(
@@ -7489,6 +7900,14 @@ def render_prisoners_classification(show_citations: bool):
         
         $$\\boxed{\\text{Confirmed: Prisoner's Dilemma}} \\quad \\blacksquare$$
         """)
+
+    st.markdown("""
+    <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 The "Thucydides Trap" Structure:</strong><br>
+    This payoff ordering ($T > R > P > S$) is the mathematical fingerprint of the "Thucydides Trap." It shows that the conflict is structural, not accidental. Even if leaders mean well, the incentive to strike first (or tariff first) to avoid being the "Sucker" ($S$) drives the system inevitably toward conflict ($P$).
+    </div>
+    """, unsafe_allow_html=True)
     
     if show_citations:
         render_citation_box(
@@ -7610,6 +8029,14 @@ def render_margin_erosion_rate(show_citations: bool):
         
         $$\\boxed{\\text{Cooperation margin eroded by 84.1\\%}} \\quad \\blacksquare$$
         """)
+
+    st.markdown("""
+    <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 Quantifying the Breakup:</strong><br>
+    An 84.1% erosion rate is catastrophic for any partnership. It means the economic "buffer" that absorbing political shocks has nearly vanished. In the 2000s, the relationship could survive a spy plane incident. Today, with less than 16% of the original goodwill (margin) remaining, even minor disputes escalate into major trade conflicts.
+    </div>
+    """, unsafe_allow_html=True)
     
     # Erosion Timeline
     st.markdown("#### 📊 Cooperation Margin Erosion Timeline")
@@ -7672,6 +8099,14 @@ def render_discount_decline_rate(show_citations: bool):
         
         $$\\boxed{\\text{Discount factor declined 58.8\\% over 24 years}} \\quad \\blacksquare$$
         """)
+
+    st.markdown("""
+    <div style="background-color: #fffaf0; padding: 1.5rem; border-left: 4px solid #dd6b20; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 The "Short-Termism" Virus:</strong><br>
+    The steep decline in the Discount Factor ($\delta$) means both nations have become drastically more short-term focused. In 2001, policymakers looked decades ahead. Today, election cycles and quarterly GDP targets dominate. This "myopia" makes maintaining long-term cooperation almost impossible, as no one is willing to pay a cost today for a benefit tomorrow.
+    </div>
+    """, unsafe_allow_html=True)
     
     if show_citations:
         render_citation_box(
@@ -7726,6 +8161,14 @@ def render_cooperation_stability(show_citations: bool):
         **Conclusion:** Even with 84% margin erosion, cooperation remains theoretically 
         sustainable in Harmony Game structure. $\\quad \\blacksquare$
         """)
+
+    st.markdown("""
+    <div style="background-color: #e6fffa; padding: 1.5rem; border-left: 4px solid #319795; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 Theoretical Resilience:</strong><br>
+    Interestingly, the math shows that <em>if</em> we were still in the Harmony Game structure (Vendor Finance), cooperation would still be stable despite the erosion. The problem is that the game <em>structure itself</em> has changed to a Prisoner's Dilemma. This proves that the conflict isn't just about "feelings" or "trust"—it's a fundamental shift in the economic payoff matrix.
+    </div>
+    """, unsafe_allow_html=True)
     
     if show_citations:
         render_citation_box(
@@ -7771,6 +8214,7 @@ def render_pearson_correlation(show_citations: bool):
            - $r = 1$: Perfect positive correlation
            - $r = -1$: Perfect negative correlation
            - $r = 0$: No linear correlation
+```
         
         3. **Strength Guidelines:**
            - $|r| > 0.9$: Very strong correlation
@@ -7778,6 +8222,14 @@ def render_pearson_correlation(show_citations: bool):
            - $0.5 < |r| < 0.7$: Moderate correlation
            - $|r| < 0.5$: Weak correlation
         """)
+
+    st.markdown("""
+    <div style="background-color: #e6fffa; padding: 1.5rem; border-left: 4px solid #319795; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 The Truth Detector:</strong><br>
+    Correlation ($r$) helps us separate political rhetoric from economic reality. Politicians may <em>say</em> relationships are improving, but if the data shows a strong negative correlation, we know the reality is different. It is our primary tool for empirical validation of the theoretical game models.
+    </div>
+    """, unsafe_allow_html=True)
     
     with st.expander("📊 **Statistical Significance Test**", expanded=True):
         st.markdown("""
@@ -7851,6 +8303,14 @@ def render_tariff_correlation_proof(show_citations: bool):
         **Interpretation:** Tariff actions by one country strongly predict retaliatory 
         tariffs by the other, consistent with tit-for-tat behavior.
         """)
+
+    st.markdown("""
+    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 Empirical Proof of "Tit-for-Tat":</strong><br>
+    The high correlation ($r=0.89$) isn't just a number; it's a smoking gun. It proves that U.S. and Chinese tariff policies are not independent—they are reactionary. When one moves, the other shadows it almost perfectly. This empirically validates the use of the "Tit-for-Tat" strategy model ($4.3$) to describe the current trade war.
+    </div>
+    """, unsafe_allow_html=True)
     
     # Correlation Visualization Data
     st.markdown("#### 📊 Tariff Correlation Data")
@@ -7918,6 +8378,14 @@ def render_trade_fx_correlation(show_citations: bool):
         FX reserves) is directly linked to U.S. trade deficits, confirming the vendor 
         financing mechanism.
         """)
+        
+    st.markdown("""
+    <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
+                border-radius: 5px; margin: 1rem 0;">
+    <strong>💡 The "Vendor Finance" Loop:</strong><br>
+    This correlation ($r=0.92$) is the heartbeat of Vendor Finance. It shows a mechanical link: U.S. buys Chinese goods -> China gets Dollars -> China buys U.S. Debt. The fact that this correlation has remained strong suggests that despite the "decoupling" talk, the financial plumbing of the two economies is still deeply connected, albeit under more strain.
+    </div>
+    """, unsafe_allow_html=True)
     
     # Correlation Timeline
     st.markdown("#### 📊 Trade Deficit-FX Reserve Correlation Timeline")
@@ -7949,70 +8417,251 @@ def render_trade_fx_correlation(show_citations: bool):
 # ============================================================================
 
 def render_proof_visuals(proof_type: str):
-    """Generate and display visuals for proofs using Google 2.5 Flash Image."""
+    """Generate and display visuals for proofs using Plotly."""
     
     st.markdown("### 🎨 Visual Representations")
     
-    # Placeholder for visual generation
-    # In production, this would call Google 2.5 Flash Image model
-    
     if "Nash Equilibrium" in proof_type:
-        st.info("🖼️ **Visual Generation:** Nash Equilibrium payoff matrix with best response arrows")
-        st.markdown("""
-        *Visual would show:*
-        - 2×2 payoff matrix
-        - Best response arrows for each player
-        - Nash Equilibrium highlighted
-        """)
-    
+        # Create a 2x2 Payoff Matrix Visualization
+        if "Harmony" in proof_type:
+            # Payoff data for Harmony Game
+            u_us = [[8, 5], [2, 1]] # C, D rows
+            u_cn = [[8, 2], [5, 1]] # C, D cols
+            strategies = ["Cooperate", "Defect"]
+            title = "Harmony Game Payoff Matrix"
+        else: # Default to Prisoner's Dilemma
+            u_us = [[6, 2], [8, 3]]
+            u_cn = [[6, 8], [2, 3]]
+            strategies = ["Cooperate", "Defect"]
+            title = "Prisoner's Dilemma Payoff Matrix"
+
+        fig = go.Figure()
+        
+        # Draw matrix grid
+        for i in range(2):
+            for j in range(2):
+                us_pay = u_us[i][j]
+                # In the dataframe representation earlier, rows were US strategies, cols were China strategies.
+                # u_us[row][col] -> row is US strategy index, col is China strategy index
+                cn_pay = u_cn[i][j] # Access by same indices if definition matches
+                # Wait, let's verify indices. 
+                # Row 0 (Cooperate): (8,8) if Col 0 (Cooperate), (5,2) if Col 1 (Defect)
+                # Row 1 (Defect): (2,5) if Col 0 (Cooperate), (1,1) if Col 1 (Defect)
+                # My u_us definition above:
+                # Row 0: [8, 5] -> US gets 8 if C-C, 5 if C-D. Correct.
+                # My u_cn definition above:
+                # Row 0: [8, 2] -> CN gets 8 if C-C, 2 if C-D. Correct.
+                
+                # Check if Nash
+                is_nash = False
+                if "Harmony" in proof_type and i==0 and j==0: is_nash = True
+                if "Prisoner" in proof_type and i==1 and j==1: is_nash = True
+                
+                bg_color = "#e6fffa" if is_nash else "#ffffff"
+                border_color = "#319795" if is_nash else "#e2e8f0"
+                line_width = 4 if is_nash else 1
+                
+                # Plotly definition: x is column, y is row (reversed usually)
+                # Let's map j to x (0,1) and i to y (1,0) so top row is y=1
+                
+                fig.add_shape(type="rect",
+                    x0=j, y0=1-i, x1=j+1, y1=2-i,
+                    line=dict(color=border_color, width=line_width),
+                    fillcolor=bg_color,
+                )
+                
+                fig.add_annotation(
+                    x=j+0.5, y=1.5-i,
+                    text=f"<b>({us_pay}, {cn_pay})</b>",
+                    showarrow=False,
+                    font=dict(size=24, color="black")
+                )
+                
+                # Add Best Response Arrows (Logic simplified for these specific games)
+                # Harmony: Reponse arrows point to (C,C)
+                # PD: Arrows point to (D,D)
+                # We can just annotate the cell type
+                
+        fig.update_xaxes(showgrid=False, range=[0, 2], showticklabels=False, title="<b>China's Strategy</b>")
+        fig.update_yaxes(showgrid=False, range=[0, 2], showticklabels=False, title="<b>U.S. Strategy</b>")
+        
+        # Labels
+        fig.add_annotation(x=0.5, y=-0.05, text="Cooperate", showarrow=False, xref="x", yref="paper", font=dict(size=14))
+        fig.add_annotation(x=1.5, y=-0.05, text="Defect", showarrow=False, xref="x", yref="paper", font=dict(size=14))
+        
+        fig.add_annotation(x=-0.05, y=0.75, text="Cooperate", showarrow=False, xref="paper", yref="y", textangle=-90, font=dict(size=14))
+        fig.add_annotation(x=-0.05, y=0.25, text="Defect", showarrow=False, xref="paper", yref="y", textangle=-90, font=dict(size=14))
+
+        fig.update_layout(
+            title=dict(text=title, x=0.5),
+            width=500, height=500,
+            margin=dict(l=80, r=50, t=80, b=50),
+            plot_bgcolor='white'
+        )
+        st.plotly_chart(fig)
+
     elif "Dominant Strategy" in proof_type:
-        st.info("🖼️ **Visual Generation:** Dominant strategy comparison chart")
-        st.markdown("""
-        *Visual would show:*
-        - Payoff comparison bars
-        - Dominance relationships
-        - Strategy rankings
-        """)
-    
+        # Bar chart comparing payoffs
+        if "Harmony" in proof_type:
+             data = [
+                 {"Scenario": "Opponent Cooperates", "Strategy": "Cooperate", "Payoff": 8, "Color": "#319795"},
+                 {"Scenario": "Opponent Cooperates", "Strategy": "Defect", "Payoff": 5, "Color": "#e53e3e"},
+                 {"Scenario": "Opponent Defects", "Strategy": "Cooperate", "Payoff": 2, "Color": "#319795"},
+                 {"Scenario": "Opponent Defects", "Strategy": "Defect", "Payoff": 1, "Color": "#e53e3e"},
+             ]
+             title = "Harmony Game: Cooperation Always Pays More"
+        else:
+             data = [
+                 {"Scenario": "Opponent Cooperates", "Strategy": "Cooperate", "Payoff": 6, "Color": "#319795"},
+                 {"Scenario": "Opponent Cooperates", "Strategy": "Defect", "Payoff": 8, "Color": "#e53e3e"},
+                 {"Scenario": "Opponent Defects", "Strategy": "Cooperate", "Payoff": 2, "Color": "#319795"},
+                 {"Scenario": "Opponent Defects", "Strategy": "Defect", "Payoff": 3, "Color": "#e53e3e"},
+             ]
+             title = "Prisoner's Dilemma: Defection Always Pays More"
+        
+        df_dom = pd.DataFrame(data)
+        fig = px.bar(df_dom, x="Scenario", y="Payoff", color="Strategy", barmode="group",
+                     color_discrete_map={"Cooperate": "#319795", "Defect": "#e53e3e"},
+                     title=title, height=400)
+        fig.update_layout(font_family="Inter", plot_bgcolor='white', yaxis_gridcolor='#F1F5F9')
+        st.plotly_chart(fig)
+
     elif "Pareto" in proof_type:
-        st.info("🖼️ **Visual Generation:** Pareto frontier diagram")
-        st.markdown("""
-        *Visual would show:*
-        - Payoff space with all outcomes
-        - Pareto frontier curve
-        - Dominated vs. efficient outcomes
-        """)
-    
-    elif "Folk Theorem" in proof_type or "Discount Factor" in proof_type:
-        st.info("🖼️ **Visual Generation:** Discount factor threshold graph")
-        st.markdown("""
-        *Visual would show:*
-        - Cooperation margin vs. discount factor
-        - Critical threshold line
-        - Cooperation/defection regions
-        """)
-    
+        # Scatter plot of outcome space
+        if "Harmony" in proof_type:
+            outcomes = [
+                {"Out": "(C,C)", "US": 8, "CN": 8, "Type": "Nash & Pareto Efficient", "Color": "#319795"},
+                {"Out": "(C,D)", "US": 2, "CN": 5, "Type": "Dominated", "Color": "gray"},
+                {"Out": "(D,C)", "US": 5, "CN": 2, "Type": "Dominated", "Color": "gray"},
+                {"Out": "(D,D)", "US": 1, "CN": 1, "Type": "Dominated", "Color": "gray"},
+            ]
+            title = "Pareto Frontier (Harmony Game)"
+        else: # PD
+            outcomes = [
+                {"Out": "(C,C)", "US": 6, "CN": 6, "Type": "Pareto Efficient", "Color": "#319795"},
+                {"Out": "(C,D)", "US": 2, "CN": 8, "Type": "Dominated", "Color": "gray"},
+                {"Out": "(D,C)", "US": 8, "CN": 2, "Type": "Dominated", "Color": "gray"},
+                {"Out": "(D,D)", "US": 3, "CN": 3, "Type": "Nash Eq (Inefficient)", "Color": "#e53e3e"},
+            ]
+            title = "Pareto Frontier (Prisoner's Dilemma)"
+        
+        df_par = pd.DataFrame(outcomes)
+        fig = px.scatter(df_par, x="US", y="CN", text="Out", color="Type", 
+                         size=[20,15,15,20],
+                         color_discrete_map={"Pareto Efficient": "#319795", 
+                                           "Nash Structure": "#e53e3e",
+                                           "Nash Eq (Inefficient)": "#e53e3e",
+                                           "Nash & Pareto Efficient": "#319795",
+                                           "Dominated": "lightgray"},
+                         title=title)
+        
+        fig.update_traces(textposition='top center', textfont_size=12)
+        fig.update_layout(
+            font_family="Inter", 
+            plot_bgcolor='white', 
+            xaxis_title="U.S. Payoff", 
+            yaxis_title="China Payoff",
+            xaxis=dict(showgrid=True, gridcolor='#F1F5F9', zeroline=False),
+            yaxis=dict(showgrid=True, gridcolor='#F1F5F9', zeroline=False),
+            height=450
+        )
+        # Draw arrow to Pareto frontier
+        st.plotly_chart(fig)
+        
+    elif "Discount Factor" in proof_type or "Folk" in proof_type:
+        # Cooperation Margin Analysis
+        deltas = np.linspace(0, 1, 100)
+        # PD Params: R=6, T=8, P=3
+        # M(d) = (6 - 8 + d(8-3)) / (1-d) = (-2 + 5d) / (1-d)
+        
+        # Calculate Margin
+        # Handle division by zero at d=1 by clipping
+        safe_deltas = deltas.copy()
+        
+        numerator = -2 + 5 * safe_deltas
+        denominator = 1 - safe_deltas + 1e-9
+        margin = numerator / denominator
+        
+        # Clip for visualization
+        margin = np.clip(margin, -10, 20)
+        
+        fig = go.Figure()
+        
+        # Add Margin Line
+        fig.add_trace(go.Scatter(
+            x=deltas, y=margin, 
+            mode='lines', 
+            name='Cooperation Margin',
+            line=dict(color='#319795', width=3)
+        ))
+        
+        # Add Critical Threshold Line
+        fig.add_vline(x=0.4, line_dash="dash", line_color="#e53e3e", 
+                      annotation_text="Critical δ* = 0.40", annotation_position="top right")
+        
+        # Add Regions
+        fig.add_annotation(x=0.2, y=5, text="Defection Zone", showarrow=False, font=dict(color="#e53e3e", size=14))
+        fig.add_annotation(x=0.7, y=5, text="Cooperation Zone", showarrow=False, font=dict(color="#319795", size=14))
+        
+        fig.add_hline(y=0, line_color="black", line_width=1)
+        
+        fig.update_layout(
+            title="Cooperation Stability vs. Discount Factor",
+            xaxis_title="Discount Factor (δ)",
+            yaxis_title="Net Incentive to Cooperate",
+            font_family="Inter",
+            plot_bgcolor='white',
+            xaxis_gridcolor='#F1F5F9',
+            yaxis_gridcolor='#F1F5F9'
+        )
+        st.plotly_chart(fig)
+
     elif "Yield Suppression" in proof_type:
-        st.info("🖼️ **Visual Generation:** Yield suppression timeline")
-        st.markdown("""
-        *Visual would show:*
-        - Observed vs. counterfactual yields
-        - Foreign inflow volumes
-        - Suppression magnitude over time
-        """)
-    
-    elif "Correlation" in proof_type:
-        st.info("🖼️ **Visual Generation:** Scatter plot with regression line")
-        st.markdown("""
-        *Visual would show:*
-        - Data points
-        - Best-fit regression line
-        - Correlation coefficient
-        - Confidence intervals
-        """)
-    
+         years = [2005, 2008, 2011, 2013, 2016, 2020, 2024]
+         actual = [4.29, 3.66, 2.78, 2.35, 1.84, 0.89, 4.20]
+         # Estimated suppression roughly 80-100bps in peak, fading later
+         # Simplified model logic
+         suppression = [0.60, 0.80, 0.90, 1.00, 0.80, 0.50, 0.30]
+         counter = [a + s for a, s in zip(actual, suppression)]
+         
+         fig = go.Figure()
+         fig.add_trace(go.Scatter(
+             x=years, y=actual, 
+             name="Observed Yield", 
+             line=dict(color='#1E3A8A', width=3)
+         ))
+         fig.add_trace(go.Scatter(
+             x=years, y=counter, 
+             name="Counterfactual (No China Buys)", 
+             line=dict(color='#F59E0B', dash='dash', width=2)
+         ))
+         
+         # Shade the suppression area
+         fig.add_trace(go.Scatter(
+            x=years + years[::-1],
+            y=counter + actual[::-1],
+            fill='toself',
+            fillcolor='rgba(245, 158, 11, 0.2)',
+            line=dict(color='rgba(255,255,255,0)'),
+            hoverinfo="skip",
+            showlegend=False,
+            name="Suppression Gap"
+        ))
+
+         fig.update_layout(
+             title="Impact of Chinese Buying on U.S. 10Y Yields",
+             xaxis_title="Year", 
+             yaxis_title="Yield (%)",
+             font_family="Inter",
+             plot_bgcolor='white',
+             xaxis_gridcolor='#F1F5F9',
+             yaxis_gridcolor='#F1F5F9',
+             legend=dict(x=0.02, y=0.02)
+         )
+         st.plotly_chart(fig)
+         
     else:
-        st.info("🖼️ **Visual Generation:** Custom diagram for selected proof")
+        st.info("🖼️ **Visual Generation:** Select a specific theorem to view visualization.")
 
 
 def render_intuitive_explanation(proof_type: str):
@@ -8312,20 +8961,22 @@ def render_proof_navigator():
     for category_key, category_info in proof_data.items():
         with st.expander(f"📂 {category_info['display']}"):
             for proof_id, proof_full_name in category_info['proofs']:
-                col1, col2 = st.columns([1, 4])
-                with col1:
-                    if st.button(
-                        f"📐 {proof_id}",
-                        key=f"quick_nav_btn_{proof_id}",
-                        use_container_width=True
-                    ):
-                        # Store in session state
-                        st.session_state['selected_category'] = category_key
-                        st.session_state['selected_proof'] = proof_full_name
-                        st.toast(f"✅ Selected Theorem {proof_id}", icon="📐")
-                        st.rerun()
-                with col2:
-                    st.caption(proof_full_name)
+                # Use a single button with the full name for better UX
+                if st.button(
+                    f"📐 {proof_full_name}",
+                    key=f"quick_nav_btn_{proof_id}",
+                    use_container_width=True
+                ):
+                    # Store in session state
+                    st.session_state['selected_category'] = category_key
+                    st.session_state['selected_proof'] = proof_full_name
+                    
+                    # Force update the widget states
+                    st.session_state['main_category_select'] = category_key
+                    st.session_state['main_proof_select'] = proof_full_name
+                    
+                    st.toast(f"✅ Selected Theorem {proof_id}", icon="📐")
+                    st.rerun()
 
 def render_related_concepts(proof_type: str):
     """Render related concepts and applications."""
@@ -8695,6 +9346,88 @@ def render_methodology_page():
     please contact the course instructor or refer to the ECON 606 Mini Project Report.</em></p>
     </div>
     """, unsafe_allow_html=True)
+
+
+def render_research_documents_page():
+    """Render page for viewing research documents."""
+    st.markdown('<h2 class="sub-header">📑 Research Documents</h2>', unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="info-box">
+    <strong>📄 Document Viewer</strong><br>
+    Access the full text of research papers and reports used in this analysis. 
+    Select a document from the sidebar to view its contents.
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Get files
+    try:
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+    except NameError:
+        current_dir = os.getcwd()
+        
+    files = [f for f in os.listdir(current_dir) if f.lower().endswith(('.pdf', '.docx'))]
+    files.sort()
+    
+    if not files:
+        st.warning("No .pdf or .docx files found in the application directory.")
+        return
+
+    # File selection
+    col1, col2 = st.columns([1, 2])
+    
+    with col1:
+        st.markdown("### 📂 Select File")
+        selected_file = st.radio("Available Documents:", files, key="doc_selector")
+        
+        if selected_file:
+            file_path = os.path.join(current_dir, selected_file)
+            file_stats = os.stat(file_path)
+            file_size_mb = file_stats.st_size / (1024 * 1024)  # MB
+            
+            st.info(f"""
+            **File Details:**
+            - Type: {selected_file.split('.')[-1].upper()}
+            - Size: {file_size_mb:.2f} MB
+            """)
+        
+        if st.button("🔄 Refresh List"):
+            st.rerun()
+
+    with col2:
+        if selected_file:
+            file_path = os.path.join(current_dir, selected_file)
+            st.markdown(f"### 📄 {selected_file}")
+            
+            with st.spinner("Extracting text..."):
+                try:
+                    text_content = ""
+                    ext = os.path.splitext(selected_file)[1].lower()
+                    
+                    if ext == '.pdf':
+                        if PyPDF2:
+                            with open(file_path, 'rb') as f:
+                                reader = PyPDF2.PdfReader(f)
+                                for i, page in enumerate(reader.pages):
+                                    text_content += f"--- Page {i+1} ---\n\n"
+                                    text_content += page.extract_text() + "\n\n"
+                        else:
+                            st.error("PyPDF2 library is missing. Please install it to view PDF files.")
+                            text_content = "Error: Library missing."
+
+                    elif ext == '.docx':
+                        if docx:
+                            doc = docx.Document(file_path)
+                            text_content = "\\n".join([para.text for para in doc.paragraphs])
+                        else:
+                            st.error("python-docx library is missing. Please install it to view DOCX files.")
+                            text_content = "Error: Library missing."
+                    
+                    # Display text in a scrollable area
+                    st.text_area("Extended Content:", value=text_content, height=600)
+                    
+                except Exception as e:
+                    st.error(f"Error reading file: {str(e)}")
 
 
 # CSS styling for enhanced visual presentation
