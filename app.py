@@ -8501,8 +8501,7 @@ def render_nash_prisoners_dilemma(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 1.3: Nash Equilibrium (Prisoner's Dilemma)
     
-    <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box danger">
     <strong>📋 Statement:</strong> In the Prisoner's Dilemma (2008-2025), $(D, D)$ is the 
     unique Nash Equilibrium in pure strategies.
     </div>
@@ -8554,8 +8553,7 @@ def render_nash_prisoners_dilemma(show_citations: bool):
         """)
 
     st.markdown("""
-    <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box danger">
     <strong>💡 Real-World Interpretation:</strong><br>
     This proof explains the current trade war. Even though both countries would be better off cooperating (Equation 3.2), the fear that the other side will cheat makes "Defect" the only rational choice. The U.S. fears job losses, China fears containment—so both choose tariffs and restrictions, locking themselves into a suboptimal "Prisoner's Dilemma."
     </div>
@@ -8578,8 +8576,7 @@ def render_dominant_strategy_harmony(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 2.1: Cooperation as Dominant Strategy (Harmony Game)
     
-    <div style="background-color: #f0fff4; padding: 1.5rem; border-left: 4px solid #48bb78; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box">
     <strong>📋 Statement:</strong> In the Harmony Game payoff structure (2001-2007), 
     <em>Cooperate</em> is a strictly dominant strategy for both players.
     </div>
@@ -8636,8 +8633,7 @@ def render_dominant_strategy_harmony(show_citations: bool):
         """)
 
     st.markdown("""
-    <div style="background-color: #e6fffa; padding: 1.5rem; border-left: 4px solid #319795; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box info">
     <strong>💡 Key Insight:</strong><br>
     A "Dominant Strategy" means you don't even need to guess what your opponent is doing. For China in the 2000s, buying U.S. debt was the best move <em>regardless</em> of U.S. policy. For the U.S., outsourcing to China was the best move <em>regardless</em> of China's policy. This powerful alignment fueled the rapid globalization of that era.
     </div>
@@ -8648,8 +8644,7 @@ def render_dominant_strategy_harmony(show_citations: bool):
     
     ### 🎓 Theorem Conclusion
     
-    <div style="background-color: #fef5e7; padding: 1.5rem; border-left: 4px solid #f39c12; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box warning">
     Since <strong>Cooperate</strong> is strictly dominant for both players:
     
     $$\\boxed{(C, C) \\text{ is the unique dominant strategy equilibrium}} \\quad \\blacksquare$$
@@ -8672,8 +8667,7 @@ def render_dominant_strategy_prisoners(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 2.2: Defection as Dominant Strategy (Prisoner's Dilemma)
     
-    <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box danger">
     <strong>📋 Statement:</strong> In the Prisoner's Dilemma (2008-2025), 
     <em>Defect</em> is a strictly dominant strategy for both players.
     </div>
@@ -8725,8 +8719,7 @@ def render_dominant_strategy_prisoners(show_citations: bool):
         """)
 
     st.markdown("""
-    <div style="background-color: #fffaf0; padding: 1.5rem; border-left: 4px solid #dd6b20; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box warning">
     <strong>💡 Key Insight:</strong><br>
     Today, "Defecting" (tariffs/sanctions) is the dominant strategy. This means that even if a U.S. president <em>wanted</em> to be cooperative, the risk of China taking advantage of that openness is too high. The math dictates aggression as the safest policy, which is why trade tensions persist across different administrations.
     </div>
@@ -8737,8 +8730,7 @@ def render_dominant_strategy_prisoners(show_citations: bool):
     
     ### 🎓 Theorem Conclusion
     
-    <div style="background-color: #fef5e7; padding: 1.5rem; border-left: 4px solid #f39c12; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box warning">
     Since <strong>Defect</strong> is strictly dominant for both players:
     
     $$\\boxed{(D, D) \\text{ is the unique dominant strategy equilibrium}} \\quad \\blacksquare$$
@@ -8765,8 +8757,7 @@ def render_pareto_efficiency_proof(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 3.1: Pareto Efficiency of $(C, C)$
     
-    <div style="background-color: #f0fff4; padding: 1.5rem; border-left: 4px solid #48bb78; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box">
     <strong>📋 Statement:</strong> In the Harmony Game, the outcome $(C, C)$ is Pareto efficient.
     </div>
     """, unsafe_allow_html=True)
@@ -8809,8 +8800,7 @@ def render_pareto_efficiency_proof(show_citations: bool):
         """)
 
     st.markdown("""
-    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box info">
     <strong>💡 Economic Meaning:</strong><br>
     "Pareto Efficient" implies that you cannot make one country better off without hurting the other. In the 2000s, the U.S.-China arrangement was running at maximum efficiency—China was growing as fast as possible, and U.S. consumers were saving as much as possible. There was no "wasted" value on the table.
     </div>
@@ -8829,8 +8819,7 @@ def render_pareto_inefficiency_proof(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 3.2: Pareto Inefficiency of $(D, D)$
     
-    <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box danger">
     <strong>📋 Statement:</strong> In the Prisoner's Dilemma, the Nash Equilibrium 
     $(D, D)$ is Pareto inefficient.
     </div>
@@ -8858,16 +8847,14 @@ def render_pareto_inefficiency_proof(show_citations: bool):
         """)
 
     st.markdown(r"""
-    <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box danger">
     <strong>💡 The Tragedy of the Commons:</strong><br>
     This theorem proves that rational behavior can lead to irrational outcomes. Both countries are acting "smart" individually, but the result is a trade war where everyone loses money, global growth slows, and consumer prices rise. It is an "inefficient" equilibrium that leaves trillions of dollars of potential value realized.
     </div>
     """, unsafe_allow_html=True)
 
     st.markdown(r"""
-    <div style="background-color: #f0fff4; padding: 1.5rem; border-left: 4px solid #48bb78; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box">
     <strong>💡 The "Game Change" Moment:</strong><br>
     The code below programmatically proves that the U.S.-China relationship changed its fundamental nature. It didn't just get "worse"; the payoff ordering flipped. We moved from a world where everyone wins ($R > T$) to a world where I only win if you lose ($T > R$). This structural shift is why the trade war has been so hard to resolve—we are literally playing a different game now.
     </div>
@@ -8886,8 +8873,7 @@ def render_nash_pareto_alignment(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 3.3: Nash-Pareto Alignment (Harmony Game)
     
-    <div style="background-color: #f0fff4; padding: 1.5rem; border-left: 4px solid #48bb78; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box">
     <strong>📋 Statement:</strong> In the Harmony Game, the Nash Equilibrium coincides 
     with the Pareto efficient outcome.
     </div>
@@ -8927,8 +8913,7 @@ def render_nash_pareto_divergence(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 3.4: Nash-Pareto Divergence (Prisoner's Dilemma)
     
-    <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box danger">
     <strong>📋 Statement:</strong> In the Prisoner's Dilemma, the Nash Equilibrium 
     diverges from the Pareto efficient outcome.
     </div>
@@ -8984,8 +8969,7 @@ def render_folk_theorem_proof(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 4.1: Folk Theorem Application to U.S.-China Game
     
-    <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box danger">
     <strong>📋 Folk Theorem (Friedman, 1971):</strong> In an infinitely repeated game with 
     discount factor $\\delta$, any feasible payoff vector that strictly Pareto-dominates 
     the stage-game Nash equilibrium payoffs can be sustained as a Subgame Perfect Equilibrium 
@@ -9053,8 +9037,7 @@ def render_folk_theorem_proof(show_citations: bool):
         
         ### 🌟 Critical Finding
         
-        <div style="background-color: #e6fffa; padding: 1.5rem; border-left: 4px solid #319795; 
-                    border-radius: 5px; margin: 1rem 0;">
+        <div class="theorem-box info">
         Since $\\delta > 0$ by definition, and $\\delta^* = -0.75 < 0$:
         
         $$\\boxed{\\text{Cooperation is sustainable for ANY positive discount factor!}}$$
@@ -9066,8 +9049,7 @@ def render_folk_theorem_proof(show_citations: bool):
         """)
     
     st.markdown(r"""
-    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box info">
     <strong>💡 Why this matters:</strong><br>
     This result ($\delta^* < 0$) is mathematically bizarre but economically profound. It means the "Shadow of the Future" wasn't even needed in the 2000s. The immediate benefits of cooperation were so massive (Vendor Finance) that the U.S. and China would have cooperated even if they expected the world to end tomorrow.
     </div>
@@ -9099,8 +9081,7 @@ def render_grim_trigger_proof(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 4.2: Grim Trigger Strategy Analysis
     
-    <div style="background-color: #fffaf0; padding: 1.5rem; border-left: 4px solid #dd6b20; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box warning">
     <strong>📋 Statement:</strong> Grim Trigger sustains cooperation under the same 
     conditions as Tit-for-Tat.
     </div>
@@ -9156,8 +9137,7 @@ def render_grim_trigger_proof(show_citations: bool):
         """)
 
     st.markdown("""
-    <div style="background-color: #fffaf0; padding: 1.5rem; border-left: 4px solid #dd6b20; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box warning">
     <strong>💡 The "Nuclear Option" of Economics:</strong><br>
     "Grim Trigger" is the economic equivalent of Mutually Assured Destruction (MAD). It basically says, "If you impose one tariff on me (defect), I will impose maximum tariffs on you <em>forever</em> (permanent punishment)." While effective in theory, it's rarely used because it leaves no room for mistakes or negotiations—once the trade war starts, it never ends.
     </div>
@@ -9176,8 +9156,7 @@ def render_tit_for_tat_sustainability(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 4.3: Tit-for-Tat Sustainability
     
-    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box info">
     <strong>📋 Statement:</strong> Tit-for-Tat sustains cooperation in the Prisoner's 
     Dilemma if and only if $\\delta \\geq \\delta^* = 0.40$.
     </div>
@@ -9237,8 +9216,7 @@ def render_tit_for_tat_sustainability(show_citations: bool):
         """)
 
     st.markdown(r"""
-    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box info">
     <strong>💡 Why "Tit-for-Tat" explains 2018-2025:</strong><br>
     The Trump-Biden tariff strategy is pure "Tit-for-Tat." When China imposes a tariff (defects), the U.S. immediately responds with a matching tariff (retaliation). If China were to lower tariffs (cooperate), the strategy suggests the U.S. would eventually follow suit. The math shows this strategy works to deter cheating, <em>but only if</em> countries care enough about the future ($\delta \geq 0.40$).
     </div>
@@ -9261,8 +9239,7 @@ def render_discount_factor_derivation(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 5.1: Critical Discount Factor Formula
     
-    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box info">
     <strong>📋 Statement:</strong> For a symmetric 2×2 game with payoffs $T > R > P > S$, 
     the critical discount factor is:
     
@@ -9299,8 +9276,7 @@ def render_discount_factor_derivation(show_citations: bool):
         """)
 
     st.markdown(r"""
-    <div style="background-color: #e6fffa; padding: 1.5rem; border-left: 4px solid #319795; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box info">
     <strong>💡 The "Patience Threshold":</strong><br>
     This formula calculates exactly <em>how patient</em> a country needs to be to resist the temptation of cheating. If $\delta^*$ is low (like in the 2000s), cooperation is easy. If $\delta^*$ is high (like today), you need extreme farsightedness to keep the peace. The rise in $\delta^*$ quantitatively explains the collapse of U.S.-China relations.
     </div>
@@ -9320,8 +9296,7 @@ def render_cooperation_margin_proof(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 5.2: Cooperation Margin Derivation
     
-    <div style="background-color: #f0fff4; padding: 1.5rem; border-left: 4px solid #48bb78; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box">
     <strong>📋 Definition:</strong> The cooperation margin $M(\\delta)$ measures the 
     incentive strength to maintain cooperation.
     </div>
@@ -9364,8 +9339,7 @@ def render_cooperation_margin_proof(show_citations: bool):
         """)
 
     st.markdown("""
-    <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box danger">
     <strong>💡 The "Incentive to Be Good":</strong><br>
     Think of the "Cooperation Margin" as the glue holding the relationship together. In 2005, this glue was super strong ($M=42.67$)—breaking up was unthinkable. By 2024, the glue has almost dried up ($M=6.77$). When the margin is this thin, even a small shock (like a spy balloon or a tariff hike) can break the bond entirely.
     </div>
@@ -9395,8 +9369,7 @@ def render_discount_factor_comparison(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 5.3: Discount Factor Comparative Analysis
     
-    <div style="background-color: #fffaf0; padding: 1.5rem; border-left: 4px solid #dd6b20; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box warning">
     <strong>📋 Statement:</strong> The critical discount factor $\\delta^*$ is inversely 
     related to cooperation stability.
     </div>
@@ -9428,8 +9401,7 @@ def render_discount_factor_comparison(show_citations: bool):
         """)
 
     st.markdown(r"""
-    <div style="background-color: #fffaf0; padding: 1.5rem; border-left: 4px solid #dd6b20; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box warning">
     <strong>💡 Structural Sensitivity:</strong><br>
     This analysis reveals why the U.S.-China relationship is so fragile. A "Stag Hunt" (like climate change) requires only moderate trust ($\delta^*=0.50$). But a trade war is a "Prisoner's Dilemma," where the temptation to cheat ($T$) is huge. The math shows that moving from climate talks to trade talks effectively raises the difficulty level of cooperation from "Hard" to "Expert."
     </div>
@@ -9468,8 +9440,7 @@ def render_yield_suppression_coefficient(show_citations: bool):
     st.markdown("""
     ### 🎯 Section 6.1: Yield Suppression Coefficient
     
-    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box info">
     <strong>📋 Model:</strong> Based on Warnock and Warnock (2009) and Dallas Federal 
     Reserve (2025), the yield suppression model is:
     
@@ -9494,8 +9465,7 @@ def render_yield_suppression_coefficient(show_citations: bool):
         """)
 
     st.markdown("""
-    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box info">
     <strong>💡 The "Greenspan Conundrum":</strong><br>
     In 2005, Alan Greenspan was puzzled why U.S. bond yields stayed low despite the Fed raising rates. This coefficient explains it: China was pressing down on the long end of the curve ($ -2.4$ bp per $100B) just as hard as the Fed was pushing up the short end. It’s the mathematical proof of how foreign influence neutralized U.S. monetary policy.
     </div>
@@ -9532,8 +9502,7 @@ def render_total_yield_suppression(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 6.1: Total Yield Suppression Calculation
     
-    <div style="background-color: #f0fff4; padding: 1.5rem; border-left: 4px solid #48bb78; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box">
     <strong>📋 Statement:</strong> Given cumulative foreign inflows of $F$ billion, 
     the total yield suppression is:
     
@@ -9566,8 +9535,7 @@ def render_total_yield_suppression(show_citations: bool):
         """)
 
     st.markdown("""
-    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box info">
     <strong>💡 The "Cheap Money" Era:</strong><br>
     This calculation confirms that China's buying spree effectively lowered U.S. mortgage rates and government borrowing costs by ~1.00%. This was a massive subsidy to the U.S. economy, fueling the housing boom (and arguably the bubble) of the mid-2000s. It illustrates the sheer scale of the financial interdependence.
     </div>
@@ -9587,8 +9555,7 @@ def render_counterfactual_yield(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 6.2: Counterfactual Yield Derivation
     
-    <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box danger">
     <strong>📋 Statement:</strong> The counterfactual yield (without foreign inflows) is:
     
     $$Y_{counterfactual} = Y_{observed} - \\Delta Y_{total}$$
@@ -9623,8 +9590,7 @@ def render_counterfactual_yield(show_citations: bool):
         """)
 
     st.markdown("""
-    <div style="background-color: #fffaf0; padding: 1.5rem; border-left: 4px solid #dd6b20; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box warning">
     <strong>💡 The "What If" Scenario:</strong><br>
     If China hadn't bought all that debt, U.S. interest rates in 2013 would have been 3.35% instead of 2.35%. That 1% difference translates to hundreds of billions in extra interest payments for U.S. taxpayers and higher mortgage payments for American homeowners. This counterfactual highlights the tangible financial value of the previous "Harmony" phase.
     </div>
@@ -9659,8 +9625,7 @@ def render_payoff_normalization(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 7.1: Payoff Normalization
     
-    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box info">
     <strong>📋 Statement:</strong> Payoffs can be normalized to a 0-10 scale using:
     
     $$u_i^{norm} = \\frac{u_i - u_i^{min}}{u_i^{max} - u_i^{min}} \\times 10$$
@@ -9698,8 +9663,7 @@ def render_payoff_normalization(show_citations: bool):
         """)
 
     st.markdown("""
-    <div style="background-color: #e6fffa; padding: 1.5rem; border-left: 4px solid #319795; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box info">
     <strong>💡 Comparing Apples to Oranges:</strong><br>
     In the real world, "payoffs" are messy—GDP growth, political polls, national security. Normalization allows us to strip away the units ($ or %) and compare pure strategic incentives. It proves that whether you're fighting over 10 dollars or 10 billion dollars, the *strategic logic* (Game Theory) remains exactly the same.
     </div>
@@ -9729,8 +9693,7 @@ def render_harmony_classification(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 7.2: Harmony Game Classification
     
-    <div style="background-color: #f0fff4; padding: 1.5rem; border-left: 4px solid #48bb78; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box">
     <strong>📋 Statement:</strong> A 2×2 symmetric game is a Harmony Game if and only if:
     
     $$R > T > S > P$$
@@ -9767,8 +9730,7 @@ def render_harmony_classification(show_citations: bool):
         """)
 
     st.markdown("""
-    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box info">
     <strong>💡 "Chimerica" Identified:</strong><br>
     This classification mathematically formalized the term "Chimerica." It wasn't just a catchy phrase; it was a distinctive game structure where incentives were perfectly aligned ($R > T$). Recognizing this structure is key to understanding why the sudden shift to conflict in 2008 felt so jarring—it wasn't a graduation, it was a structural rupture.
     </div>
@@ -9787,8 +9749,7 @@ def render_prisoners_classification(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 7.3: Prisoner's Dilemma Classification
     
-    <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box danger">
     <strong>📋 Statement:</strong> A 2×2 symmetric game is a Prisoner's Dilemma if and only if:
     
     $$T > R > P > S$$
@@ -9825,8 +9786,7 @@ def render_prisoners_classification(show_citations: bool):
         """)
 
     st.markdown("""
-    <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box danger">
     <strong>💡 The "Thucydides Trap" Structure:</strong><br>
     This payoff ordering ($T > R > P > S$) is the mathematical fingerprint of the "Thucydides Trap." It shows that the conflict is structural, not accidental. Even if leaders mean well, the incentive to strike first (or tariff first) to avoid being the "Sucker" ($S$) drives the system inevitably toward conflict ($P$).
     </div>
@@ -9845,8 +9805,7 @@ def render_game_identification_criteria(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 7.4: Game Type Identification Criteria
     
-    <div style="background-color: #fffaf0; padding: 1.5rem; border-left: 4px solid #dd6b20; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box warning">
     <strong>📋 Statement:</strong> 2×2 symmetric games can be classified by payoff orderings.
     </div>
     """, unsafe_allow_html=True)
@@ -9926,8 +9885,7 @@ def render_margin_erosion_rate(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 8.1: Cooperation Margin Erosion Rate
     
-    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box info">
     <strong>📋 Definition:</strong> The erosion rate as discount factor decreases from 
     $\\delta_1$ to $\\delta_2$ is:
     
@@ -9954,8 +9912,7 @@ def render_margin_erosion_rate(show_citations: bool):
         """)
 
     st.markdown("""
-    <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box danger">
     <strong>💡 Quantifying the Breakup:</strong><br>
     An 84.1% erosion rate is catastrophic for any partnership. It means the economic "buffer" that absorbing political shocks has nearly vanished. In the 2000s, the relationship could survive a spy plane incident. Today, with less than 16% of the original goodwill (margin) remaining, even minor disputes escalate into major trade conflicts.
     </div>
@@ -9993,8 +9950,7 @@ def render_discount_decline_rate(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 8.2: Discount Factor Decline Rate
     
-    <div style="background-color: #f0fff4; padding: 1.5rem; border-left: 4px solid #48bb78; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box">
     <strong>📋 Statement:</strong> The annual decline rate of the discount factor is:
     
     $$r_{decline} = \\frac{\\delta_{t+1} - \\delta_t}{\\delta_t} \\times 100\\%$$
@@ -10024,8 +9980,7 @@ def render_discount_decline_rate(show_citations: bool):
         """)
 
     st.markdown(r"""
-    <div style="background-color: #fffaf0; padding: 1.5rem; border-left: 4px solid #dd6b20; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box warning">
     <strong>💡 The "Short-Termism" Virus:</strong><br>
     The steep decline in the Discount Factor ($\delta$) means both nations have become drastically more short-term focused. In 2001, policymakers looked decades ahead. Today, election cycles and quarterly GDP targets dominate. This "myopia" makes maintaining long-term cooperation almost impossible, as no one is willing to pay a cost today for a benefit tomorrow.
     </div>
@@ -10044,8 +9999,7 @@ def render_cooperation_stability(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 8.3: Cooperation Stability Analysis
     
-    <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box danger">
     <strong>📋 Statement:</strong> Cooperation stability is measured by the ratio of 
     cooperation margin to critical threshold.
     </div>
@@ -10086,8 +10040,7 @@ def render_cooperation_stability(show_citations: bool):
         """)
 
     st.markdown("""
-    <div style="background-color: #e6fffa; padding: 1.5rem; border-left: 4px solid #319795; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box info">
     <strong>💡 Theoretical Resilience:</strong><br>
     Interestingly, the math shows that <em>if</em> we were still in the Harmony Game structure (Vendor Finance), cooperation would still be stable despite the erosion. The problem is that the game <em>structure itself</em> has changed to a Prisoner's Dilemma. This proves that the conflict isn't just about "feelings" or "trust"—it's a fundamental shift in the economic payoff matrix.
     </div>
@@ -10110,8 +10063,7 @@ def render_pearson_correlation(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 9.1: Pearson Correlation Coefficient
     
-    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box info">
     <strong>📋 Formula:</strong>
     
     $$r = \\frac{\\sum_{i=1}^{n} (x_i - \\bar{x})(y_i - \\bar{y})}{\\sqrt{\\sum_{i=1}^{n} (x_i - \\bar{x})^2 \\sum_{i=1}^{n} (y_i - \\bar{y})^2}}$$
@@ -10147,8 +10099,7 @@ def render_pearson_correlation(show_citations: bool):
         """)
 
     st.markdown("""
-    <div style="background-color: #e6fffa; padding: 1.5rem; border-left: 4px solid #319795; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box info">
     <strong>💡 The Truth Detector:</strong><br>
     Correlation ($r$) helps us separate political rhetoric from economic reality. Politicians may <em>say</em> relationships are improving, but if the data shows a strong negative correlation, we know the reality is different. It is our primary tool for empirical validation of the theoretical game models.
     </div>
@@ -10187,8 +10138,7 @@ def render_tariff_correlation_proof(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 9.2: U.S.-China Tariff Correlation Analysis
     
-    <div style="background-color: #f0fff4; padding: 1.5rem; border-left: 4px solid #48bb78; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box">
     <strong>📋 Statement:</strong> U.S. and Chinese tariff rates exhibit strong positive 
     correlation during 2018-2025.
     </div>
@@ -10228,8 +10178,7 @@ def render_tariff_correlation_proof(show_citations: bool):
         """)
 
     st.markdown("""
-    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box info">
     <strong>💡 Empirical Proof of "Tit-for-Tat":</strong><br>
     The high correlation ($r=0.89$) isn't just a number; it's a smoking gun. It proves that U.S. and Chinese tariff policies are not independent—they are reactionary. When one moves, the other shadows it almost perfectly. This empirically validates the use of the "Tit-for-Tat" strategy model ($4.3$) to describe the current trade war.
     </div>
@@ -10261,8 +10210,7 @@ def render_trade_fx_correlation(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 9.3: Trade Deficit and Foreign Exchange Reserve Correlation
     
-    <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box danger">
     <strong>📋 Statement:</strong> U.S. trade deficit with China exhibits strong positive 
     correlation with Chinese foreign exchange reserves.
     </div>
@@ -10303,8 +10251,7 @@ def render_trade_fx_correlation(show_citations: bool):
         """)
         
     st.markdown("""
-    <div style="background-color: #fff5f5; padding: 1.5rem; border-left: 4px solid #e53e3e; 
-                border-radius: 5px; margin: 1rem 0;">
+    <div class="theorem-box danger">
     <strong>💡 The "Vendor Finance" Loop:</strong><br>
     This correlation ($r=0.92$) is the heartbeat of Vendor Finance. It shows a mechanical link: U.S. buys Chinese goods -> China gets Dollars -> China buys U.S. Debt. The fact that this correlation has remained strong suggests that despite the "decoupling" talk, the financial plumbing of the two economies is still deeply connected, albeit under more strain.
     </div>
