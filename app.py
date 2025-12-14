@@ -472,6 +472,282 @@ h1, h2, h3 {
     font-size: 1.1rem;
 }
 
+/* ============================================
+   MATHEMATICAL PROOFS STYLING
+   ============================================ */
+
+/* Theorem Statement Box */
+.theorem-box {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-left: 5px solid #16a34a;
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
+    margin: 1.5rem 0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.theorem-box.warning {
+    background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
+    border-left-color: #ca8a04;
+}
+
+.theorem-box.danger {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border-left-color: #dc2626;
+}
+
+.theorem-box.info {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border-left-color: #2563eb;
+}
+
+.theorem-title {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1e3a5f;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Definition Card */
+.definition-card {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin: 1rem 0;
+    position: relative;
+}
+
+.definition-card::before {
+    content: "Definition";
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: #3b82f6;
+    color: white;
+    padding: 2px 12px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Proof Steps Container */
+.proof-container {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.proof-step {
+    display: flex;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 8px;
+    border-left: 3px solid #6366f1;
+}
+
+.proof-step-number {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.proof-step-content {
+    flex: 1;
+}
+
+/* QED Box */
+.qed-box {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 2px solid #10b981;
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.qed-box::after {
+    content: " ∎";
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #059669;
+}
+
+/* LaTeX Equation Container */
+.equation-display {
+    background: #fefefe;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
+    margin: 1rem 0;
+    text-align: center;
+    overflow-x: auto;
+    position: relative;
+}
+
+.equation-display::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(to bottom, #6366f1, #8b5cf6);
+    border-radius: 4px 0 0 4px;
+}
+
+/* Key Result Highlight */
+.key-result {
+    background: linear-gradient(90deg, #fef3c7 0%, #fde68a 100%);
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+/* Assumption Box */
+.assumption-box {
+    background: #fefce8;
+    border: 1px dashed #ca8a04;
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    margin: 1rem 0;
+    font-style: italic;
+}
+
+.assumption-box::before {
+    content: "📌 Assumption: ";
+    font-weight: 700;
+    font-style: normal;
+}
+
+/* Lemma Box */
+.lemma-box {
+    background: #f0f9ff;
+    border-left: 4px solid #0ea5e9;
+    border-radius: 0 8px 8px 0;
+    padding: 1rem 1.5rem;
+    margin: 1rem 0;
+}
+
+/* Corollary Box */
+.corollary-box {
+    background: #faf5ff;
+    border-left: 4px solid #a855f7;
+    border-radius: 0 8px 8px 0;
+    padding: 1rem 1.5rem;
+    margin: 1rem 0;
+}
+
+/* Proof Navigation Tabs */
+.proof-nav {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.proof-nav-item {
+    background: #e0e7ff;
+    color: #4338ca;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.proof-nav-item:hover {
+    background: #4338ca;
+    color: white;
+}
+
+/* Math Notation Highlight */
+.math-highlight {
+    background: #dbeafe;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'Computer Modern', 'Georgia', serif;
+}
+
+/* Citation in Proofs */
+.proof-citation {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    margin: 1.5rem 0;
+    font-size: 0.95rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.proof-citation::before {
+    content: "📚";
+    font-size: 1.5rem;
+}
+
+/* Enhanced MathJax/LaTeX Styling */
+.MathJax, .MathJax_Display {
+    font-size: 1.15em !important;
+    margin: 0.75rem 0 !important;
+}
+
+/* Step-by-step derivation */
+.derivation-step {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px dotted #e5e7eb;
+}
+
+.derivation-step:last-child {
+    border-bottom: none;
+}
+
+.derivation-reason {
+    color: #6b7280;
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+/* Interactive proof sections */
+.stExpander[data-baseweb="accordion"] > div:first-child {
+    background: linear-gradient(90deg, #f8fafc, #f1f5f9) !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+}
+
+/* Proof header styling */
+h4 {
+    color: #1e40af !important;
+    font-family: 'Georgia', serif !important;
+    border-bottom: 2px solid #dbeafe;
+    padding-bottom: 0.5rem;
+    margin-top: 1.5rem !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -8026,64 +8302,96 @@ def render_nash_existence_proof(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 1.1: Nash Equilibrium Existence
     
-    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
-                border-radius: 5px; margin: 1rem 0;">
-    <strong>📋 Statement:</strong> The U.S.-China Vendor Financing Game 
-    $\\Gamma = \\langle N, S, u \\rangle$ possesses at least one Nash Equilibrium.
-    <br><br>
-    <em><strong>Real-World Interpretation:</strong> In plain English, this proves that there exists a stable state (or states) where neither the U.S. nor China can unilaterally improve their economic outcome by changing their strategy. This mathematical certainty explains why the trade imbalance persisted for so long—it was a locked-in equilibrium, not just a random occurrence.</em>
+    <div class="theorem-box info">
+        <div class="theorem-title">📋 Theorem Statement</div>
+        The U.S.-China Vendor Financing Game $\\Gamma = \\langle N, S, u \\rangle$ possesses 
+        <span class="key-result">at least one Nash Equilibrium</span>.
+        <br><br>
+        <em><strong>💡 Real-World Interpretation:</strong> This proves that there exists a stable state 
+        where neither the U.S. nor China can unilaterally improve their economic outcome by changing 
+        their strategy. This mathematical certainty explains why the trade imbalance persisted for 
+        so long—it was a locked-in equilibrium, not just a random occurrence.</em>
     </div>
     """, unsafe_allow_html=True)
     
     with st.expander("📖 **Formal Definition**", expanded=True):
         st.markdown("""
+        <div class="definition-card">
+        
         **Definition 1.1 (Nash Equilibrium):**
         
         A strategy profile $s^* = (s_U^*, s_C^*)$ is a Nash Equilibrium if and only if:
         
+        <div class="equation-display">
+        
         $$\\forall i \\in N, \\forall s_i \\in S_i: u_i(s_i^*, s_{-i}^*) \\geq u_i(s_i, s_{-i}^*)$$
         
-        Where:
-        - $N = \\{U, C\\}$ is the player set (United States, China)
-        - $S_i$ is the strategy set for player $i$
-        - $u_i: S \\to \\mathbb{R}$ is the payoff function for player $i$
-        - $s_{-i}^*$ denotes the strategies of all players except $i$
-        """)
+        </div>
+        
+        **Where:**
+        - $N = \\{U, C\\}$ — the player set (United States, China)
+        - $S_i$ — the strategy set for player $i$
+        - $u_i: S \\to \\mathbb{R}$ — the payoff function for player $i$
+        - $s_{-i}^*$ — the strategies of all players except $i$
+        
+        </div>
+        """, unsafe_allow_html=True)
     
     with st.expander("🔍 **Proof Steps**", expanded=True):
         st.markdown("""
-        #### Step 1: Verify Finite Game Conditions
+        <div class="proof-container">
         
-        The game $\\Gamma$ satisfies:
+        <div class="proof-step">
+            <div class="proof-step-number">1</div>
+            <div class="proof-step-content">
+                <strong>Verify Finite Game Conditions</strong>
+                <br><br>
+                The game $\\Gamma$ satisfies:
+                <br><br>
+                <strong>① Finite Player Set:</strong>
+                $$N = \\{U, C\\} \\text{ with } |N| = 2$$
+                
+                <strong>② Finite Strategy Sets:</strong>
+                $$S_U = S_C = \\{C, D\\} \\text{ with } |S_i| = 2 \\text{ for each } i$$
+                
+                <strong>③ Well-Defined Payoffs:</strong>
+                $$u: S_U \\times S_C \\to \\mathbb{R}^2 \\text{ is well-defined on finite space}$$
+            </div>
+        </div>
         
-        1. **Finite Player Set:**
-           $$N = \\{U, C\\} \\text{ with } |N| = 2$$
+        <div class="proof-step">
+            <div class="proof-step-number">2</div>
+            <div class="proof-step-content">
+                <strong>Apply Nash's Existence Theorem</strong>
+                <br><br>
+                <div class="lemma-box">
+                <strong>Nash's Theorem (1950):</strong> Every finite game has at least one Nash Equilibrium 
+                (possibly in mixed strategies).
+                </div>
+                
+                <strong>Formal Statement:</strong>
+                <div class="equation-display">
+                $$\\text{If } |N| < \\infty \\text{ and } |S_i| < \\infty \\text{ for all } i \\in N,$$
+                $$\\text{then } \\exists s^* \\in S \\text{ such that } s^* \\text{ is a Nash Equilibrium}$$
+                </div>
+            </div>
+        </div>
         
-        2. **Finite Strategy Sets:**
-           $$S_U = S_C = \\{C, D\\} \\text{ with } |S_i| = 2 \\text{ for each } i$$
+        <div class="proof-step">
+            <div class="proof-step-number">3</div>
+            <div class="proof-step-content">
+                <strong>Conclusion</strong>
+                <br><br>
+                Since $\\Gamma$ is finite (verified in Step 1), by Nash's Theorem:
+            </div>
+        </div>
         
-        3. **Well-Defined Payoffs:**
-           $$u: S_U \\times S_C \\to \\mathbb{R}^2 \\text{ is well-defined on finite space}$$
+        <div class="qed-box">
+            <strong>Therefore:</strong> $\\exists$ at least one Nash Equilibrium in $\\Gamma$
+        </div>
         
-        ---
-        
-        #### Step 2: Apply Nash's Existence Theorem
-        
-        **Nash's Theorem (1950):** Every finite game has at least one Nash Equilibrium 
-        (possibly in mixed strategies).
-        
-        **Formal Statement:**
-        $$\\text{If } |N| < \\infty \\text{ and } |S_i| < \\infty \\text{ for all } i \\in N,$$
-        $$\\text{then } \\exists s^* \\in S \\text{ such that } s^* \\text{ is a Nash Equilibrium}$$
-        
-        ---
-        
-        #### Step 3: Conclusion
-        
-        Since $\\Gamma$ is finite (verified in Step 1), by Nash's Theorem:
-        
-        $$\\therefore \\exists \\text{ at least one Nash Equilibrium in } \\Gamma \\quad \\blacksquare$$
-        """)
+        </div>
+        """, unsafe_allow_html=True)
     
     if show_citations:
         render_citation_box(
@@ -8099,10 +8407,10 @@ def render_nash_uniqueness_harmony(show_citations: bool):
     st.markdown("""
     ### 🎯 Theorem 1.2: Nash Equilibrium Uniqueness (Harmony Game)
     
-    <div style="background-color: #f0fff4; padding: 1.5rem; border-left: 4px solid #48bb78; 
-                border-radius: 5px; margin: 1rem 0;">
-    <strong>📋 Statement:</strong> In the Harmony Game (2001-2007), $(C, C)$ is the 
-    unique Nash Equilibrium in pure strategies.
+    <div class="theorem-box">
+        <div class="theorem-title">📋 Theorem Statement</div>
+        In the Harmony Game (2001-2007), <span class="key-result">$(C, C)$ is the unique Nash Equilibrium</span> 
+        in pure strategies.
     </div>
     """, unsafe_allow_html=True)
     
@@ -8116,46 +8424,67 @@ def render_nash_uniqueness_harmony(show_citations: bool):
     
     with st.expander("🔍 **Proof**", expanded=True):
         st.markdown("""
-        #### Step 1: Verify $(C, C)$ is a Nash Equilibrium
+        <div class="proof-container">
         
-        **For U.S.:**
-        $$u_U(C, C) = 8 > 5 = u_U(D, C)$$
-        $$\\therefore \\text{U.S. has no incentive to deviate from } C$$
+        <div class="proof-step">
+            <div class="proof-step-number">1</div>
+            <div class="proof-step-content">
+                <strong>Verify $(C, C)$ is a Nash Equilibrium</strong>
+                <br><br>
+                <strong>For U.S.:</strong>
+                <div class="equation-display">
+                $$u_U(C, C) = 8 > 5 = u_U(D, C)$$
+                $$\\therefore \\text{U.S. has no incentive to deviate from } C$$
+                </div>
+                
+                <strong>For China:</strong>
+                <div class="equation-display">
+                $$u_C(C, C) = 8 > 2 = u_C(C, D)$$
+                $$\\therefore \\text{China has no incentive to deviate from } C$$
+                </div>
+                
+                <div class="corollary-box">
+                ✅ $(C, C)$ is a Nash Equilibrium
+                </div>
+            </div>
+        </div>
         
-        **For China:**
-        $$u_C(C, C) = 8 > 2 = u_C(C, D)$$
-        $$\\therefore \\text{China has no incentive to deviate from } C$$
+        <div class="proof-step">
+            <div class="proof-step-number">2</div>
+            <div class="proof-step-content">
+                <strong>Verify No Other Pure Strategy Nash Equilibria</strong>
+                <br><br>
+                
+                <strong>Test $(C, D)$:</strong><br>
+                • China: $u_C(C, D) = 5 < 8 = u_C(C, C)$ → China wants to deviate to $C$<br>
+                <span style="color: #dc2626;">✗ $(C, D)$ is NOT a Nash Equilibrium</span>
+                <br><br>
+                
+                <strong>Test $(D, C)$:</strong><br>
+                • U.S.: $u_U(D, C) = 5 < 8 = u_U(C, C)$ → U.S. wants to deviate to $C$<br>
+                <span style="color: #dc2626;">✗ $(D, C)$ is NOT a Nash Equilibrium</span>
+                <br><br>
+                
+                <strong>Test $(D, D)$:</strong><br>
+                • U.S.: $u_U(D, D) = 1 < 2 = u_U(C, D)$ → U.S. wants to deviate to $C$<br>
+                <span style="color: #dc2626;">✗ $(D, D)$ is NOT a Nash Equilibrium</span>
+            </div>
+        </div>
         
-        $$\\therefore (C, C) \\text{ is a Nash Equilibrium}$$
+        <div class="qed-box">
+            <strong>Conclusion:</strong> $(C, C)$ is the unique pure strategy Nash Equilibrium
+        </div>
         
-        ---
-        
-        #### Step 2: Verify No Other Pure Strategy Nash Equilibria
-        
-        **Test $(C, D)$:**
-        - China: $u_C(C, D) = 5 < 8 = u_C(C, C)$ → China wants to deviate to $C$
-        - $(C, D)$ is NOT a Nash Equilibrium ✗
-        
-        **Test $(D, C)$:**
-        - U.S.: $u_U(D, C) = 5 < 8 = u_U(C, C)$ → U.S. wants to deviate to $C$
-        - $(D, C)$ is NOT a Nash Equilibrium ✗
-        
-        **Test $(D, D)$:**
-        - U.S.: $u_U(D, D) = 1 < 2 = u_U(C, D)$ → U.S. wants to deviate to $C$
-        - $(D, D)$ is NOT a Nash Equilibrium ✗
-        
-        ---
-        
-        #### Step 3: Conclusion
-        
-        $$\\boxed{(C, C) \\text{ is the unique pure strategy Nash Equilibrium}} \\quad \\blacksquare$$
-        """)
+        </div>
+        """, unsafe_allow_html=True)
 
     st.markdown("""
-    <div style="background-color: #f0f8ff; padding: 1.5rem; border-left: 4px solid #667eea; 
-                border-radius: 5px; margin: 1rem 0;">
-    <strong>💡 Real-World Interpretation:</strong><br>
-    The math confirms that during 2001-2007, both the U.S. and China were "trapped" in cooperation because it was simply too profitable to stop. The U.S. got cheap goods and low interest rates; China got massive export growth. Neither side had any rational reason to rock the boat, creating a stable "Harmony" phase.
+    <div class="theorem-box info">
+        <strong>💡 Real-World Interpretation:</strong><br>
+        The math confirms that during 2001-2007, both the U.S. and China were "trapped" in cooperation 
+        because it was simply too profitable to stop. The U.S. got cheap goods and low interest rates; 
+        China got massive export growth. Neither side had any rational reason to rock the boat, 
+        creating a stable "Harmony" phase.
     </div>
     """, unsafe_allow_html=True)
     
