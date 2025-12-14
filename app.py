@@ -1261,13 +1261,17 @@ class AdvancedSimulationEngine:
                 # Simulate match
                 payoffs = self._simulate_match(strat1, strat2, rounds_per_match)
                 
+                # FIX BUG-016: Include both total and per-round payoffs
                 results.append({
                     'Strategy_1': strat1.value,
                     'Strategy_2': strat2.value,
-                    'Payoff_1': payoffs[0],
-                    'Payoff_2': payoffs[1],
+                    'Payoff_1': payoffs[0],  # Total payoff
+                    'Payoff_2': payoffs[1],  # Total payoff
+                    'Avg_Payoff_Per_Round_1': payoffs[0] / rounds_per_match if rounds_per_match > 0 else 0,
+                    'Avg_Payoff_Per_Round_2': payoffs[1] / rounds_per_match if rounds_per_match > 0 else 0,
                     'Cooperation_Rate_1': payoffs[2],
-                    'Cooperation_Rate_2': payoffs[3]
+                    'Cooperation_Rate_2': payoffs[3],
+                    'Rounds': rounds_per_match
                 })
         
         return pd.DataFrame(results)
@@ -1350,6 +1354,12 @@ class AdvancedSimulationEngine:
             # Memory-1 Strategy defined by p_CC, p_CD, p_DC, p_DD
             # These probabilities define P(C | Outcome)
             # Default to TFT-like if not specified
+            
+            # FIX BUG-015: Note memory_length configuration (currently limited to 1)
+            if hasattr(self.config, 'memory_length') and self.config.memory_length > 1:
+                logger.warning(f"Custom strategy memory_length={self.config.memory_length} "
+                              "not yet implemented. Using memory_length=1 instead.")
+            
             params = self.config.custom_strategy_params or {'p_CC': 1.0, 'p_CD': 0.0, 'p_DC': 1.0, 'p_DD': 0.0}
             
             if round_num == 0:
