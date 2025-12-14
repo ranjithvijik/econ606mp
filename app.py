@@ -39,43 +39,48 @@ import logging
 import hashlib
 import json
 import os
+import random
 
-warnings.filterwarnings('ignore')
+# ═══════════════════════════════════════════════════════════════════════════
+# CONFIGURATION & LOGGING (BUG-002, BUG-003 FIXED)
+# ═══════════════════════════════════════════════════════════════════════════
 
-# =============================================================================
-# LOGGING CONFIGURATION
-# =============================================================================
+# FIX BUG-003: Changed from filterwarnings('ignore') to 'default'
+# This allows proper diagnostic warnings while suppressing only minor ones
+warnings.filterwarnings("default")
 
+# FIX BUG-001: Proper logging configuration
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
-# =============================================================================
-# STREAMLIT CONFIGURATION
-# =============================================================================
+# FIX BUG-002: Wrap Streamlit page config in try/except to allow imports
+try:
+    st.set_page_config(
+        page_title="U.S.-China Game Theory Analysis",
+        page_icon="🇨🇳↔🇺🇸",
+        layout="wide",
+        initial_sidebar_state="expanded",
+        menu_items={
+            'Get Help': 'https://github.com/research/us-china-game-theory',
+            'Report a bug': 'https://github.com/research/us-china-game-theory/issues',
+            'About': """
+## Game Theory Research Application
 
-st.set_page_config(
-    page_title="U.S.-China Game Theory Analysis",
-    page_icon="🇨🇳↔🇺🇸",
-    layout="wide",
-    initial_sidebar_state="expanded",
-    menu_items={
-        'Get Help': 'https://github.com/research/us-china-game-theory',
-        'Report a bug': 'https://github.com/research/us-china-game-theory/issues',
-        'About': """
-        ## Game Theory Research Application
-        
-        This application implements rigorous game-theoretic frameworks to analyze 
-        U.S.-China economic relations from 2001-2025.
-        
-        **Citation:**
-        Author (2025). Game-Theoretic Analysis of U.S.-China Economic Relations.
-        ECON 606 Research Project.
-        """
-    }
-)
+This application implements rigorous game-theoretic frameworks to analyze
+U.S.-China economic relations from 2001-2025.
+
+**Citation:**
+Author (2025). Game-Theoretic Analysis of U.S.-China Economic Relations.
+ECON 606 Research Project.
+"""
+        }
+    )
+except RuntimeError:
+    # Running outside Streamlit context (e.g., unit tests, imports)
+    pass
 
 # =============================================================================
 # ENHANCED CSS STYLING
@@ -1082,7 +1087,7 @@ class PayoffMatrix:
     
     def get_payoff_parameters(self) -> Dict[str, float]:
         """
-        Extract T, R, P, S parameters from matrix.
+        Extract T, R, P, S parameters from matrix for row player (U.S.).
         
         Following standard game theory notation:
         - T (Temptation): Payoff from defecting when opponent cooperates
@@ -1090,12 +1095,30 @@ class PayoffMatrix:
         - P (Punishment): Payoff from mutual defection
         - S (Sucker): Payoff from cooperating when opponent defects
         """
+        return self.get_payoff_parameters_row()
+    
+    # FIX BUG-004: Add separate parameter extraction for each player
+    def get_payoff_parameters_row(self) -> Dict[str, float]:
+        """Extract T,R,P,S parameters for row player (U.S.)."""
         return {
-            'T': self.dc[0],  # Temptation to defect
-            'R': self.cc[0],  # Reward for cooperation
-            'P': self.dd[0],  # Punishment for mutual defection
-            'S': self.cd[0]   # Sucker's payoff
+            'T': float(self.dc[0]),  # Temptation (when opponent cooperates)
+            'R': float(self.cc[0]),  # Reward (mutual cooperation)
+            'P': float(self.dd[0]),  # Punishment (mutual defection)
+            'S': float(self.cd[0])   # Sucker's payoff (when opponent defects)
         }
+
+    def get_payoff_parameters_col(self) -> Dict[str, float]:
+        """Extract T,R,P,S parameters for column player (China)."""
+        return {
+            'T': float(self.cd[1]),  # Different payoffs for asymmetric games!
+            'R': float(self.cc[1]),
+            'P': float(self.dd[1]),
+            'S': float(self.dc[1])
+        }
+
+    def get_both_payoff_parameters(self) -> Tuple[Dict[str, float], Dict[str, float]]:
+        """Return both players' parameters for asymmetric analysis."""
+        return self.get_payoff_parameters_row(), self.get_payoff_parameters_col()
     
     def get_joint_welfare(self) -> Dict[str, float]:
         """Calculate joint welfare for each outcome."""
@@ -1861,24 +1884,28 @@ class AdvancedSimulationEngine:
                 'China_Payoff': payoffs[1]
             })
             
+            # FIX BUG-011: Properly clamp state transition probabilities
             # State transition based on actions
             if us_action == 'D' or china_action == 'D':
                 # Defection increases probability of moving to hostile state
                 transition_probs = np.array(state_transition_matrix[current_state], dtype=np.float64).copy()
-                transition_probs[2] += 0.1
+                transition_probs[2] = min(1.0, transition_probs[2] + 0.1)
             else:
-                transition_probs = np.array(state_transition_matrix[current_state], dtype=np.float64)
+                transition_probs = np.array(state_transition_matrix[current_state], dtype=np.float64).copy()
             
             # Ensure probabilities are valid and normalized
-            transition_probs = np.maximum(transition_probs, 0)  # No negative values
+            transition_probs = np.maximum(transition_probs, 0.0)  # No negative values
             prob_sum = transition_probs.sum()
-            if prob_sum > 0:
-                transition_probs = transition_probs / prob_sum
-            else:
-                transition_probs = np.array([1/3, 1/3, 1/3])  # Fallback to uniform
             
-            # Final safety check for np.random.choice
-            transition_probs = transition_probs / transition_probs.sum()  # Re-normalize for floating point
+            if prob_sum <= 0:
+                transition_probs = np.array([1/3, 1/3, 1/3])  # Fallback to uniform
+            else:
+                transition_probs = transition_probs / prob_sum
+            
+            # Safety assertions
+            assert np.isclose(transition_probs.sum(), 1.0), f"Probabilities don't sum to 1: {transition_probs}"
+            assert (transition_probs >= 0).all(), f"Negative probabilities: {transition_probs}"
+            assert (transition_probs <= 1).all(), f"Probabilities > 1: {transition_probs}"
             
             current_state = np.random.choice([0, 1, 2], p=transition_probs)
         
