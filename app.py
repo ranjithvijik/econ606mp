@@ -1354,11 +1354,21 @@ class AdvancedSimulationEngine:
             # State transition based on actions
             if us_action == 'D' or china_action == 'D':
                 # Defection increases probability of moving to hostile state
-                transition_probs = state_transition_matrix[current_state].copy()
+                transition_probs = np.array(state_transition_matrix[current_state], dtype=np.float64).copy()
                 transition_probs[2] += 0.1
-                transition_probs = transition_probs / transition_probs.sum()
             else:
-                transition_probs = state_transition_matrix[current_state]
+                transition_probs = np.array(state_transition_matrix[current_state], dtype=np.float64)
+            
+            # Ensure probabilities are valid and normalized
+            transition_probs = np.maximum(transition_probs, 0)  # No negative values
+            prob_sum = transition_probs.sum()
+            if prob_sum > 0:
+                transition_probs = transition_probs / prob_sum
+            else:
+                transition_probs = np.array([1/3, 1/3, 1/3])  # Fallback to uniform
+            
+            # Final safety check for np.random.choice
+            transition_probs = transition_probs / transition_probs.sum()  # Re-normalize for floating point
             
             current_state = np.random.choice([0, 1, 2], p=transition_probs)
         
