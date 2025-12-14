@@ -34,7 +34,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from dataclasses import dataclass, field
-from typing import Dict, List, Tuple, Optional, Union, Callable
+from typing import Dict, List, Tuple, Optional, Union, Callable, Any
 from enum import Enum
 from abc import ABC, abstractmethod
 import warnings
@@ -168,14 +168,22 @@ st.markdown("""
     --china-gold: #F77F00;
     --accent: #FFD700;
     
+    /* Box Colors */
+    --box-blue-bg: #EFF6FF;
+    --box-blue-border: #3B82F6;
+    --box-red-bg: #FEF2F2;
+    --box-red-border: #EF4444;
+    --box-green-bg: #F0FDF4;
+    --box-green-border: #22C55E;
+    
     /* Neutral System */
     --bg-light: #F8FAFC;
     --bg-dark: #0F172A;
-    --text-primary: #1E293B;
-    --text-secondary: #475569;
+    --text-primary: #0F172A;
+    --text-secondary: #334155;
     
     /* Glassmorphism Tokens */
-    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-bg: rgba(255, 255, 255, 0.9);
     --glass-border: 1px solid rgba(255, 255, 255, 0.6);
     --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
     --backdrop-blur: blur(12px);
@@ -187,10 +195,10 @@ st.markdown("""
 
 /* Base Canvas Enhancement */
 .stApp {
-    background: radial-gradient(circle at 10% 20%, rgb(248, 250, 252) 0%, rgb(241, 245, 249) 90%);
+    background: radial-gradient(circle at 10% 20%, rgb(239, 246, 255) 0%, rgb(248, 250, 252) 100%);
     background-image: 
-        radial-gradient(at 0% 0%, rgba(10, 36, 114, 0.03) 0px, transparent 50%),
-        radial-gradient(at 100% 0%, rgba(214, 40, 40, 0.03) 0px, transparent 50%);
+        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(239, 68, 68, 0.05) 0px, transparent 50%);
     font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
@@ -278,16 +286,26 @@ h1, h2, h3 {
 }
 
 .info-box {
-    border-left: 5px solid var(--us-blue);
-    background: linear-gradient(to right, rgba(10, 36, 114, 0.02), rgba(255,255,255,0));
+    border-left: 5px solid var(--box-blue-border);
+    background: var(--box-blue-bg);
+    border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 .citation-box {
-    border-left: 5px solid var(--china-red);
+    border-left: 5px solid var(--box-red-border);
+    background: var(--box-red-bg);
+    border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
-.info-box:hover, .citation-box:hover {
+.methodology-box {
+    border-left: 5px solid var(--box-green-border);
+    background: var(--box-green-bg);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.info-box:hover, .citation-box:hover, .methodology-box:hover {
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
 }
 
 /* ============================================
@@ -355,7 +373,10 @@ h1, h2, h3 {
     width: 350px;
 }
 
-[data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
+[data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3, 
+[data-testid="stSidebar"] h4, [data-testid="stSidebar"] p, [data-testid="stSidebar"] span, 
+[data-testid="stSidebar"] label, [data-testid="stSidebar"] small, [data-testid="stSidebar"] caption,
+[data-testid="stSidebar"] li {
     color: #F1F5F9 !important;
 }
 
@@ -418,7 +439,9 @@ class StrategyType(Enum):
     ALWAYS_DEFECT = "Always Defect"
     PAVLOV = "Pavlov (Win-Stay, Lose-Shift)"
     RANDOM = "Random"
+
     GENEROUS_TFT = "Generous Tit-for-Tat"
+    CUSTOM = "Custom Agent"
 
 
 # =============================================================================
@@ -588,6 +611,9 @@ class AdvancedSimulationConfig:
     noise_probability: float = 0.0
     memory_length: int = 1
     learning_rate: float = 0.1
+    discount_factor: float = 0.95
+    # Memory-1 probabilities for Custom Agent: p_CC, p_CD, p_DC, p_DD
+    custom_strategy_params: Dict[str, float] = None
     population_size: int = 100
     mutation_rate: float = 0.01
     generations: int = 50
@@ -717,6 +743,31 @@ class AdvancedSimulationEngine:
         
         elif strategy == StrategyType.RANDOM:
             return 'C' if np.random.random() < 0.5 else 'D'
+            
+        elif strategy == StrategyType.CUSTOM:
+            # Memory-1 Strategy defined by p_CC, p_CD, p_DC, p_DD
+            # These probabilities define P(C | Outcome)
+            # Default to TFT-like if not specified
+            params = self.config.custom_strategy_params or {'p_CC': 1.0, 'p_CD': 0.0, 'p_DC': 1.0, 'p_DD': 0.0}
+            
+            if round_num == 0:
+                # Default initial move (usually Cooperate for nice strategies)
+                return 'C' if params.get('p_init', 1.0) > 0.5 else 'D'
+            
+            last_own = own_history[-1]
+            last_opp = opp_history[-1]
+            
+            prob = 0.5
+            if last_own == 'C' and last_opp == 'C':
+                prob = params.get('p_CC', 1.0)
+            elif last_own == 'C' and last_opp == 'D':
+                prob = params.get('p_CD', 0.0) # Sucker's response
+            elif last_own == 'D' and last_opp == 'C':
+                prob = params.get('p_DC', 1.0) # Exploiter's response
+            else: # D, D
+                prob = params.get('p_DD', 0.0) # Broken trust response
+                
+            return 'C' if np.random.random() < prob else 'D'
         
         return 'C'
     
@@ -767,15 +818,50 @@ class AdvancedSimulationEngine:
             history.append(record)
             
             # Calculate fitness for each strategy
-            fitness = self._calculate_population_fitness(population)
+            fitness = {}
+            for strat in population:
+                total_payoff = 0
+                for opponent, count in population.items():
+                    if count > 0:
+                        # Match payoff * number of opponents
+                        # Note: We assume "well-mixed" population (all play all)
+                        # Average payoff = (Payoff vs X * Prob X)
+                        payoff = self._simulate_match(strat, opponent, 10)[0]
+                        total_payoff += payoff * (count / total_pop)
+                
+                fitness[strat] = total_payoff
             
-            # Reproduce proportionally to fitness
-            population = self._reproduce(population, fitness)
+            # Reproduce (Replicator Dynamics)
+            avg_fitness = sum(fitness[s] * (population[s]/total_pop) for s in population)
             
-            # Apply mutation
-            if self.config.mutation_rate > 0:
-                population = self._mutate(population)
-        
+            new_population = {}
+            for strat, count in population.items():
+                if avg_fitness > 0:
+                    # Change proportional to fitness relative to average
+                    # delta = count * (fitness - avg) / avg * rate
+                    growth_rate = 0.1 # Speed of evolution
+                    relative_fitness = (fitness[strat] - avg_fitness) / avg_fitness
+                    change = int(count * relative_fitness * growth_rate)
+                    
+                    # Apply mutation
+                    mutation = 0
+                    if self.config.mutation_rate > 0:
+                        mutation = int(total_pop * self.config.mutation_rate / len(population))
+                        # Simple mutation: random flow in/out
+                        
+                    new_count = max(0, count + change + mutation)
+                    new_population[strat] = new_count
+                else:
+                    new_population[strat] = count
+            
+            # Rescale to constant population size
+            current_total = sum(new_population.values())
+            if current_total > 0:
+                scale = self.config.population_size / current_total
+                population = {s: int(c * scale) for s, c in new_population.items()}
+            else:
+                population = initial_population.copy() # Restart if extinction
+                
         return pd.DataFrame(history)
     
     def _calculate_population_fitness(self, population: Dict[StrategyType, int]) -> Dict[StrategyType, float]:
@@ -871,6 +957,86 @@ class AdvancedSimulationEngine:
                     new_population[target] += 1
         
         return new_population
+    
+    def run_spatial_simulation(self, grid_size: int, 
+                             initial_distribution: Dict[StrategyType, float], 
+                             generations: int) -> Tuple[List[np.ndarray], List[StrategyType]]:
+        """
+        Run spatial evolutionary simulation on a 2D grid.
+        
+        Cells play interactions with 8 neighbors (Moore neighborhood).
+        Strategies reproduce based on relative fitness (payoff).
+        
+        Args:
+            grid_size: Dimension of the grid (NxN)
+            initial_distribution: Probability dict for initial strategies
+            generations: Number of steps
+            
+        Returns:
+             Tuple (History of grids, List of Strategies mapped to indices)
+        """
+        # Initialize grid
+        strategies = list(initial_distribution.keys())
+        probs = list(initial_distribution.values())
+        # Normalize probs
+        probs = np.array(probs) / np.sum(probs)
+        
+        # Grid stores indices of strategies
+        grid = np.random.choice(len(strategies), size=(grid_size, grid_size), p=probs)
+        
+        history = [grid.copy()]
+        
+        # Neighbor offsets (Moore)
+        offsets = [
+            (-1, -1), (-1, 0), (-1, 1),
+            (0, -1),           (0, 1),
+            (1, -1),  (1, 0),  (1, 1)
+        ]
+        
+        # Pre-calculate pairwise payoffs (optimization)
+        # We assume average performance over 10 rounds for 'fitness'
+        rounds_per_match = 10
+        pairwise_payoffs = {} # (idx1, idx2) -> score1
+        
+        for i, s1 in enumerate(strategies):
+            for j, s2 in enumerate(strategies):
+                p1, _, _, _ = self._simulate_match(s1, s2, rounds_per_match)
+                pairwise_payoffs[(i, j)] = p1
+
+        for gen in range(generations):
+            current_grid = history[-1]
+            scores = np.zeros((grid_size, grid_size))
+            
+            # 1. Calculate fitness
+            for r in range(grid_size):
+                for c in range(grid_size):
+                    my_idx = current_grid[r, c]
+                    
+                    for dr, dc in offsets:
+                        nr, nc = (r + dr) % grid_size, (c + dc) % grid_size
+                        opp_idx = current_grid[nr, nc]
+                        scores[r, c] += pairwise_payoffs[(my_idx, opp_idx)]
+            
+            # 2. Evolution (Imitate Best Neighbor)
+            new_grid = current_grid.copy()
+            
+            for r in range(grid_size):
+                for c in range(grid_size):
+                    best_score = scores[r, c]
+                    best_idx = current_grid[r, c]
+                    
+                    # Competes with neighbors
+                    for dr, dc in offsets:
+                        nr, nc = (r + dr) % grid_size, (c + dc) % grid_size
+                        if scores[nr, nc] > best_score:
+                            best_score = scores[nr, nc]
+                            best_idx = current_grid[nr, nc]
+                            
+                    new_grid[r, c] = best_idx
+            
+            history.append(new_grid)
+            
+        return history, strategies
     
     def run_learning_simulation(self, learning_algorithm: str = 'fictitious_play',
                                rounds: int = None) -> pd.DataFrame:
@@ -1163,19 +1329,22 @@ class AdvancedVisualizationEngine:
             hovertemplate="Row: %{y}<br>Col: %{x}<br>Payoff: %{z:.1f}<extra></extra>"
         ))
         
-        fig.update_layout(
+        
+        # Use centralized professional layout
+        layout = get_professional_layout(height=700)
+        
+        layout.update(
             title=dict(
                 text="<b>Tournament Results: Strategy Payoff Matrix</b>",
                 x=0.5,
-                font=dict(size=22, family="Inter, sans-serif", color="#1E293B")
+                font=dict(size=22, family="Inter, sans-serif", color=layout['font']['color'])
             ),
             xaxis_title="<b>Opponent Strategy</b>",
             yaxis_title="<b>Player Strategy</b>",
-            height=650,
-            font=dict(family="Inter, sans-serif"),
-            paper_bgcolor='white',
-            plot_bgcolor='white'
+            margin=dict(l=150, r=50, t=100, b=100)
         )
+        
+        fig.update_layout(layout)
         
         return fig
     
@@ -1199,19 +1368,21 @@ class AdvancedVisualizationEngine:
             textfont=dict(size=12, family="Inter, sans-serif")
         ))
         
-        fig.update_layout(
+        
+        layout = get_professional_layout(height=600)
+        
+        layout.update(
             title=dict(
                 text="<b>Tournament Rankings by Total Payoff</b>",
                 x=0.5,
-                font=dict(size=22, family="Inter, sans-serif", color="#1E293B")
+                font=dict(size=22, family="Inter, sans-serif", color=layout['font']['color'])
             ),
             xaxis_title="<b>Total Payoff</b>",
             yaxis_title="<b>Strategy</b>",
-            height=500,
-            font=dict(family="Inter, sans-serif"),
-            paper_bgcolor='white',
-            plot_bgcolor='white'
+            margin=dict(l=20, r=100, t=80, b=50)
         )
+        
+        fig.update_layout(layout)
         
         return fig
     
@@ -1256,21 +1427,28 @@ class AdvancedVisualizationEngine:
                 fillcolor=rgba
             ))
         
-        fig.update_layout(
+        layout = get_professional_layout(height=700)
+        
+        layout.update(
             title=dict(
                 text="<b>Evolutionary Dynamics: Strategy Population Shares</b>",
                 x=0.5,
-                font=dict(size=22, family="Inter, sans-serif", color="#1E293B")
+                font=dict(size=22, family="Inter, sans-serif", color=layout['font']['color'])
             ),
             xaxis_title="<b>Generation</b>",
             yaxis_title="<b>Population Share (%)</b>",
-            height=600,
             hovermode='x unified',
-            legend=dict(x=0.02, y=0.98, bgcolor='rgba(255,255,255,0.8)'),
-            font=dict(family="Inter, sans-serif"),
-            paper_bgcolor='white',
-            plot_bgcolor='white'
+            legend=dict(
+                orientation="h", 
+                y=1.1, 
+                x=0.5, 
+                xanchor="center", 
+                bgcolor=layout['legend']['bgcolor']
+            ),
+            margin=dict(t=100)
         )
+        
+        fig.update_layout(layout)
         
         return fig
     
@@ -1417,33 +1595,33 @@ class AdvancedVisualizationEngine:
         fig.update_yaxes(title_text='Value', row=2, col=2)
         
         # Updated professional styling
-        fig.update_layout(
-            template="plotly_white",
+        # Updated professional styling
+        layout = get_professional_layout(height=900)
+        
+        layout.update(
             title=dict(
                 text=f"<b>Learning Dynamics: {algorithm.replace('_', ' ').title()}</b>",
                 x=0.5,
-                font=dict(size=18, family="Arial")
+                font=dict(size=18, family="Arial", color=layout['font']['color'])
             ),
-            font=dict(
-                family="Arial",
-                size=12,
-                color="#0F172A"
-            ),
-            plot_bgcolor="white",
-            height=800,
             showlegend=True,
             legend=dict(
                 orientation="h",
                 yanchor="bottom",
-                y=1.02,
-                xanchor="right",
-                x=1
-            )
+                y=1.05,
+                xanchor="center",
+                x=0.5,
+                bgcolor=layout['legend']['bgcolor']
+            ),
+            margin=dict(t=120)
         )
         
-        # Consistent grid styling
-        fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='#F1F5F9', zeroline=False)
-        fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='#F1F5F9', zeroline=False)
+        fig.update_layout(layout)
+        
+        # Consistent grid styling using layout properties
+        grid_color = layout['xaxis']['gridcolor']
+        fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor=grid_color, zeroline=False)
+        fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor=grid_color, zeroline=False)
 
         
         return fig
@@ -1491,22 +1669,112 @@ class AdvancedVisualizationEngine:
             line=dict(color='#EF4444', width=3)
         ), row=2, col=1)
         
-        fig.update_layout(
+        layout = get_professional_layout(height=700)
+        
+        layout.update(
             title=dict(
                 text="<b>Stochastic Game Simulation</b>",
                 x=0.5,
-                font=dict(size=18)
+                font=dict(size=18, family="Inter, sans-serif", color=layout['font']['color'])
             ),
-            height=600,
-            showlegend=True
+            showlegend=True,
+            legend=dict(orientation="h", y=1.1, x=0.5, xanchor="center", bgcolor=layout['legend']['bgcolor']),
+            margin=dict(t=100)
         )
         
+        fig.update_layout(layout)
+        
         return fig
+    
+    @staticmethod
+    def create_spatial_grid_animation(history: List[np.ndarray], 
+                                    strategies: List[StrategyType],
+                                    frame_index: int) -> go.Figure:
+        """
+        Create a heatmap for the spatial grid simulation at a specific frame.
+        """
+        grid = history[frame_index]
+        
+        # Create discrete colorscale map
+        strat_names = [s.value for s in strategies]
+        
+        # Enhanced Colors
+        colors = [
+            '#059669', # Green (success/coop)
+            '#DC2626', # Red (defect)
+            '#3B82F6', # Blue
+            '#F59E0B', # Amber
+            '#8B5CF6', # Purple
+            '#EC4899', # Pink
+            '#6366F1'  # Indigo
+        ]
+        
+        # Ensure we have enough colors
+        while len(colors) < len(strategies):
+            colors.append('#94A3B8') # Fallback gray
+            
+        z = grid
+        
+        # Create heatmap
+        fig = go.Figure(data=go.Heatmap(
+            z=z,
+            colorscale=[[i/(len(strategies)-1), c] for i, c in enumerate(colors[:len(strategies)])],
+            showscale=False,
+            hovertemplate="Row: %{y}<br>Col: %{x}<br>Strategy ID: %{z}<extra></extra>"
+        ))
+        
+        # Manual Legend using markers (since heatmap is discrete)
+        for i, name in enumerate(strat_names):
+            fig.add_trace(go.Scatter(
+                x=[None], y=[None],
+                mode='markers',
+                marker=dict(size=10, color=colors[i]),
+                name=name
+            ))
+            
+        # Layout
+        layout = get_professional_layout(height=650)
+        layout.update(
+            title=dict(
+                text=f"<b>Spatial Evolutionary Game - Generation {frame_index}</b>",
+                x=0.5,
+                font=dict(size=20, color=layout['font']['color'])
+            ),
+            xaxis=dict(showticklabels=False, showgrid=False, zeroline=False),
+            yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, autorange='reversed'),
+            legend=dict(orientation="h", y=-0.1, x=0.5, xanchor="center", bgcolor=layout['legend']['bgcolor']),
+            margin=dict(t=80, b=80, l=40, r=40)
+        )
+        fig.update_layout(layout)
+        
+        return fig
+
+@st.cache_data
+def cached_tournament_simulation(matrix_params: Dict[str, Tuple[float, float]],
+                                strategies: List[str],
+                                rounds: int,
+                                noise: float) -> pd.DataFrame:
+    """Cached wrapper for tournament simulation to improve performance."""
+    # Reconstruct matrix
+    matrix = PayoffMatrix(**matrix_params)
+    
+    # Configure simulation
+    config = AdvancedSimulationConfig(
+        noise_probability=noise,
+        rounds=rounds
+    )
+    
+    # Convert strategy strings back to enum
+    strat_enums = [StrategyType(s) for s in strategies]
+    
+    # Run simulation
+    sim_engine = AdvancedSimulationEngine(matrix, config)
+    return sim_engine.run_tournament(strat_enums, rounds)
 
 def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_matrix: PayoffMatrix):
     """Render enhanced strategy simulator page with advanced options and state persistence."""
     
-    st.markdown('<h2 class="sub-header">🎮 Advanced Strategy Simulator</h2>', unsafe_allow_html=True)
+    st.markdown('<h2 class="sub-header">🎮 Strategy Simulator</h2>', unsafe_allow_html=True)
     
     st.markdown("""
     <div class="info-box">
@@ -1524,7 +1792,9 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
             "🧬 Evolutionary Dynamics",
             "🧠 Learning Algorithms",
             "🎲 Stochastic Games",
-            "⚡ Quick Strategy Comparison"
+            "🧬 Spatial Evolutionary Game",
+            "⚡ Quick Strategy Comparison",
+            "🧬 Gene Lab (Custom Strategy Builder)"
         ],
         key="sim_type_select"
     )
@@ -1549,6 +1819,9 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
             matrix = PayoffMatrix(cc=(R, R), cd=(S, T), dc=(T, S), dd=(P, P))
         else:
             matrix = harmony_matrix if "Harmony" in game_type else pd_matrix
+        
+        # Save current parameters for reporting
+        st.session_state['current_game_params'] = matrix.get_payoff_parameters()
     
     st.markdown("---")
     
@@ -1830,7 +2103,163 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
                 st.metric("Hostile", f"{state_counts.get('Hostile', 0)*100:.1f}%")
 
     # =========================================================================
-    # QUICK COMPARISON
+    # SPATIAL SIMULATION
+    # =========================================================================
+    elif "Spatial" in sim_type:
+        st.markdown('<h3 class="section-header">🧬 Spatial Evolutionary Game</h3>', unsafe_allow_html=True)
+        
+        st.markdown("""
+        <div class="info-box">
+        <strong>Spatial Reciprocity:</strong> In this 2D grid simulation, agents only play against their 
+        8 neighbors. Successful strategies reproduce into neighboring cells ("imitate the best"). 
+        This often allows cooperators to survive by forming defensive clusters, even when Defection 
+        would win in a mixed population.
+        </div>
+        """, unsafe_allow_html=True)
+
+        if "spatial_results" not in st.session_state:
+            st.session_state['spatial_results'] = None
+            st.session_state['spatial_strategies'] = None
+
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            grid_size = st.slider("Grid Size (NxN):", 10, 50, 25, 5, key="sp_grid")
+            generations = st.slider("Generations:", 10, 100, 30, 5, key="sp_gen")
+            
+        with col2:
+            st.markdown("**Initial Density:**")
+            prob_coop = st.slider("Cooperators (TFT/Coop)", 0.0, 1.0, 0.5, 0.1, key="sp_coop")
+            st.caption(f"Defectors: {1.0 - prob_coop:.1f}")
+
+        if st.button("🧬 Run Spatial Simulation", type="primary"):
+            with st.spinner("Simulating cellular automata..."):
+                config = AdvancedSimulationConfig()
+                sim_engine = AdvancedSimulationEngine(matrix, config)
+                
+                # Setup simple contest: TFT vs ALLD or similar
+                # To make it interesting: Cooperators usually means TFT or Grim in spatial
+                # But simple C vs D works too if B/C ratio is right
+                
+                # Let's use user selected strategies?
+                # For simplicity, we default to TFT vs ALLD as the classic example
+                init_dist = {
+                    StrategyType.TIT_FOR_TAT: prob_coop,
+                    StrategyType.ALWAYS_DEFECT: 1.0 - prob_coop
+                }
+                
+                history, strats = sim_engine.run_spatial_simulation(grid_size, init_dist, generations)
+                st.session_state['spatial_results'] = history
+                st.session_state['spatial_strategies'] = strats
+        
+        if st.session_state['spatial_results'] is not None:
+            history = st.session_state['spatial_results']
+            strats = st.session_state['spatial_strategies']
+            
+            # Animation Slider
+            frame = st.slider("View Generation:", 0, len(history)-1, 0, key="sp_frame")
+            
+            fig = AdvancedVisualizationEngine.create_spatial_grid_animation(history, strats, frame)
+            st.plotly_chart(fig, width='stretch')
+            
+            # Play button (Manual loop implementation via st.empty if requested, but slider is safer)
+            st.caption("Use the slider to watch the evolution.")
+
+            # Play button (Manual loop implementation via st.empty if requested, but slider is safer)
+            st.caption("Use the slider to watch the evolution.")
+
+    # =========================================================================
+    # GENE LAB (CUSTOM STRATEGY BUILDER)
+    # =========================================================================
+    elif "Gene Lab" in sim_type:
+        st.markdown('<h3 class="section-header">🧬 Strategy Gene Lab</h3>', unsafe_allow_html=True)
+        
+        st.markdown("""
+        <div class="info-box">
+        <strong>Design Your Agent:</strong> Create a "Memory-1" strategy by defining how it reacts to the 
+        previous round's outcome. This allows you to recreate famous strategies or discover new ones.
+        </div>
+        """, unsafe_allow_html=True)
+        
+        col1, col2 = st.columns([1, 1])
+        
+        with col1:
+            st.markdown("#### Reaction Probabilities P(C|...)")
+            p_cc = st.slider("After Mutual Cooperation (CC):", 0.0, 1.0, 1.0, 0.05, 
+                             help="Probability of cooperating if both cooperated last round (Trust)")
+            p_cd = st.slider("After Sucker's Payoff (CD):", 0.0, 1.0, 0.0, 0.05,
+                             help="Probability of cooperating if you cooperated but opponent defected (Forgiveness)")
+            p_dc = st.slider("After Exploitation (DC):", 0.0, 1.0, 1.0, 0.05,
+                             help="Probability of cooperating if you defected but opponent cooperated (Repentance/Exploitation)")
+            p_dd = st.slider("After Mutual Defection (DD):", 0.0, 1.0, 0.0, 0.05,
+                             help="Probability of cooperating if both defected (Restoration)")
+            
+            custom_params = {'p_CC': p_cc, 'p_CD': p_cd, 'p_DC': p_dc, 'p_DD': p_dd, 'p_init': 1.0}
+            
+        with col2:
+            st.markdown("#### Strategy DNA Profile")
+            # Radar Chart
+            categories = ['Reciprocity (CC)', 'Forgiveness (CD)', 'Greed/Repent (DC)', 'Trust-Building (DD)']
+            values = [p_cc, p_cd, p_dc, p_dd]
+            
+            fig = go.Figure()
+            fig.add_trace(go.Scatterpolar(
+                r=values + [values[0]],
+                theta=categories + [categories[0]],
+                fill='toself',
+                name='Custom Agent',
+                line_color='#8B5CF6'
+            ))
+            
+            layout = get_professional_layout(height=400)
+            layout.update(
+                polar=dict(
+                    radialaxis=dict(visible=True, range=[0, 1]),
+                    bgcolor=layout['paper_bgcolor']
+                ),
+                margin=dict(t=20, b=20, l=40, r=40),
+                showlegend=False
+            )
+            fig.update_layout(layout)
+            st.plotly_chart(fig, width='stretch')
+            
+        st.markdown("### 🧪 Benchmark Test")
+        if st.button("Run Benchmark (vs Standard Bots)"):
+            with st.spinner("Benchmarking custom agent..."):
+                config = AdvancedSimulationConfig(custom_strategy_params=custom_params)
+                sim_engine = AdvancedSimulationEngine(matrix, config)
+                
+                # Run tournament against standard suite
+                opponents = [
+                    StrategyType.TIT_FOR_TAT, 
+                    StrategyType.ALWAYS_DEFECT, 
+                    StrategyType.ALWAYS_COOPERATE, 
+                    StrategyType.GRIM_TRIGGER,
+                    StrategyType.CUSTOM # Self-play
+                ]
+                
+                # We need to adapt run_tournament to handle One-vs-All or just run full round robin
+                results_df = sim_engine.run_tournament(opponents, rounds_per_match=100)
+                
+                # Filter for when CUSTOM is Player 1
+                my_results = results_df[results_df['Strategy_1'] == StrategyType.CUSTOM.value]
+                
+                # Calc average score
+                avg_score = my_results['Payoff_1'].mean()
+                
+                col_a, col_b = st.columns(2)
+                with col_a:
+                     st.metric("Benchmark Score (Avg)", f"{avg_score:.1f}")
+                
+                st.dataframe(my_results[['Strategy_2', 'Payoff_1', 'Payoff_2', 'Cooperation_Rate_1']].style.format({
+                    'Payoff_1': '{:.1f}',
+                    'Payoff_2': '{:.1f}',
+                    'Cooperation_Rate_1': '{:.1%}'
+                }))
+
+
+    # =========================================================================
+    # QUICK COMPARISON (Default Fallback)
     # =========================================================================
     else:
         st.markdown('<h3 class="section-header">⚡ Quick Strategy Comparison</h3>', unsafe_allow_html=True)
@@ -2086,15 +2515,22 @@ def render_interactive_parameter_explorer(harmony_matrix: PayoffMatrix, pd_matri
         row=2, col=2
     )
     
-    fig.update_layout(
-        height=600,
+    # Theme aware layout
+    layout = get_professional_layout(height=600)
+    layout.update(
         showlegend=False,
         title_text="<b>Comparative Statics: δ* Sensitivity</b>"
     )
+    fig.update_layout(layout)
     
+    # Grid settings
+    grid_color = layout['xaxis']['gridcolor']
+    text_color = layout['xaxis']['title_font']['color']
+
     for i in range(1, 3):
         for j in range(1, 3):
-            fig.update_yaxes(title_text="δ*", row=i, col=j)
+            fig.update_xaxes(gridcolor=grid_color, row=i, col=j)
+            fig.update_yaxes(gridcolor=grid_color, title_text="δ*", row=i, col=j)
     
     st.plotly_chart(fig, width='stretch')
     
@@ -3664,47 +4100,48 @@ class EnhancedVisualizationEngine:
         # Update layout
         sustainability_rate = mc_results['sustainable'].mean() * 100
         
-        fig.update_layout(
-            template="plotly_white",
+        # Use centralized professional layout
+        layout = get_professional_layout(height=1400)
+        
+        layout.update(
             title=dict(
                 text=f"<b>Comprehensive Monte Carlo Analysis Dashboard</b><br>" +
                      f"<sup>n = {len(mc_results):,} simulations | " +
                      f"Sustainability Rate: {sustainability_rate:.1f}%</sup>",
                 x=0.5,
-                font=dict(size=24, family="Arial")
+                font=dict(size=24, family="Arial", color=layout['font']['color'])
             ),
-            font=dict(
-                family="Arial",
-                size=12,
-                color="#0F172A"
-            ),
-            height=1400,
             showlegend=True,
             legend=dict(
                 orientation="h",
                 yanchor="bottom",
                 y=1.002,
                 xanchor="right",
-                x=1
+                x=1,
+                bgcolor=layout['legend']['bgcolor']
             ),
-            plot_bgcolor="white",
             margin=dict(t=140, b=50, l=60, r=40)
         )
         
+        fig.update_layout(layout)
+        
         # Consistent professional grid and axes styling
+        grid_color = layout['xaxis']['gridcolor']
+        text_color = layout['xaxis']['title_font']['color'] # Use layout color
+        
         fig.update_xaxes(
             showgrid=True, 
             gridwidth=1, 
-            gridcolor='#F1F5F9', 
+            gridcolor=grid_color, 
             zeroline=False,
-            title_font=dict(size=12, family="Arial", color="#334155")
+            title_font=dict(size=12, family="Arial", color=text_color)
         )
         fig.update_yaxes(
             showgrid=True, 
             gridwidth=1, 
-            gridcolor='#F1F5F9', 
+            gridcolor=grid_color, 
             zeroline=False,
-            title_font=dict(size=12, family="Arial", color="#334155")
+            title_font=dict(size=12, family="Arial", color=text_color)
         )
         
         # Update axes labels with better formatting
@@ -3729,8 +4166,8 @@ class EnhancedVisualizationEngine:
         fig.update_yaxes(title_text='<b>Average Margin</b>', row=3, col=3)
         
         # Add slight grid lines for readability
-        fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='#F1F5F9')
-        fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='#F1F5F9')
+        fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor=grid_color)
+        fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor=grid_color)
         
         return fig
     
@@ -3785,15 +4222,24 @@ class EnhancedVisualizationEngine:
         
         parameter = sensitivity_results['parameter'].iloc[0]
         
-        fig.update_layout(
+        # Use professional layout
+        layout = get_professional_layout(height=600)
+        
+        layout.update(
             title=dict(
                 text=f"<b>Sensitivity Analysis: Parameter {parameter}</b>",
                 x=0.5,
-                font=dict(size=18)
+                font=dict(size=18, color=layout['font']['color'])
             ),
-            height=600,
             showlegend=True
         )
+        
+        fig.update_layout(layout)
+        
+        # Apply grid colors
+        grid_color = layout['xaxis']['gridcolor']
+        fig.update_xaxes(gridcolor=grid_color)
+        fig.update_yaxes(gridcolor=grid_color)
         
         fig.update_xaxes(title_text=f'Parameter Value ({parameter})', row=1, col=1)
         fig.update_xaxes(title_text=f'Parameter Value ({parameter})', row=1, col=2)
@@ -4202,6 +4648,12 @@ def render_custom_analysis_workbench(
                 color_continuous_scale="RdBu_r",
                 title="Correlation Matrix"
             )
+            
+            # Apply professional layout
+            layout = get_professional_layout(height=600)
+            layout.update(title=dict(text="<b>Correlation Matrix</b>", font=dict(color=layout['font']['color'])))
+            fig.update_layout(layout)
+            
             st.plotly_chart(fig, width='stretch')
         else:
             st.info("Select at least two variables for correlation analysis.")
@@ -4213,6 +4665,17 @@ def render_custom_analysis_workbench(
             plot_df[date_col] = df[date_col]
             
             fig = px.line(plot_df, x=date_col, y=selected_cols, title="Variable Trends Over Time")
+            
+            # Apply professional layout
+            layout = get_professional_layout(height=600)
+            layout.update(title=dict(text="<b>Variable Trends Over Time</b>", font=dict(color=layout['font']['color'])))
+            fig.update_layout(layout)
+            
+            # Grid settings
+            grid_color = layout['xaxis']['gridcolor']
+            fig.update_xaxes(gridcolor=grid_color)
+            fig.update_yaxes(gridcolor=grid_color)
+            
             st.plotly_chart(fig, width='stretch')
         else:
             st.info("No timeline column detected for trend plotting.")
@@ -4275,60 +4738,85 @@ def render_advanced_analytics_page(
 
 def get_professional_layout(height=None):
     """Returns professional Plotly layout with modern font system."""
+    
+    # Check for dark mode
+    dark_mode = st.session_state.get('dark_mode', False)
+    
+    if dark_mode:
+        bg_color = '#0F172A'
+        paper_color = '#0F172A'
+        text_color = '#F8FAFC'
+        grid_color = '#334155'
+        legend_bg = 'rgba(15, 23, 42, 0.95)'
+        legend_border = '#334155'
+        hover_bg = '#1E293B'
+        hover_border = '#475569'
+        template = 'plotly_dark'
+    else:
+        bg_color = '#FFFFFF'
+        paper_color = '#FAFAFA'
+        text_color = '#0F0F0F'
+        grid_color = '#EEEEEE'
+        legend_bg = 'rgba(255, 255, 255, 0.98)'
+        legend_border = '#E5E5E5'
+        hover_bg = '#FFFFFF'
+        hover_border = '#E5E5E5'
+        template = 'plotly_white'
+
     return {
-        'template': 'plotly_white',
+        'template': template,
         'font': {
             'family': "'Plus Jakarta Sans', 'Segoe UI', sans-serif",
             'size': 14,
-            'color': '#0F0F0F'
+            'color': text_color
         },
         'title': {
             'font': {
                 'size': 22,
                 'family': "'Sora', sans-serif",
                 'weight': 700,
-                'color': '#0F0F0F'
+                'color': text_color
             },
             'x': 0.5,
             'xanchor': 'center',
             'y': 0.95
         },
-        'plot_bgcolor': '#FFFFFF',
-        'paper_bgcolor': '#FAFAFA',
+        'plot_bgcolor': bg_color,
+        'paper_bgcolor': paper_color,
         'height': height or ProfessionalTheme.PLOT_HEIGHT,
         'xaxis': {
             'showgrid': True,
             'gridwidth': 1,
-            'gridcolor': '#EEEEEE',
+            'gridcolor': grid_color,
             'zeroline': False,
             'showline': True,
             'linewidth': 2,
-            'linecolor': '#E0E0E0',
-            'title_font': {'size': 15, 'color': '#0F0F0F', 'family': "'Sora', sans-serif"},
-            'tickfont': {'size': 13, 'color': '#404040', 'family': "'DM Sans', sans-serif"}
+            'linecolor': grid_color,
+            'title_font': {'size': 15, 'color': text_color, 'family': "'Sora', sans-serif"},
+            'tickfont': {'size': 13, 'color': text_color, 'family': "'DM Sans', sans-serif"}
         },
         'yaxis': {
             'showgrid': True,
             'gridwidth': 1,
-            'gridcolor': '#EEEEEE',
+            'gridcolor': grid_color,
             'zeroline': False,
             'showline': True,
             'linewidth': 2,
-            'linecolor': '#E0E0E0',
-            'title_font': {'size': 15, 'color': '#0F0F0F', 'family': "'Sora', sans-serif"},
-            'tickfont': {'size': 13, 'color': '#404040', 'family': "'DM Sans', sans-serif"}
+            'linecolor': grid_color,
+            'title_font': {'size': 15, 'color': text_color, 'family': "'Sora', sans-serif"},
+            'tickfont': {'size': 13, 'color': text_color, 'family': "'DM Sans', sans-serif"}
         },
         'legend': {
-            'bgcolor': 'rgba(255, 255, 255, 0.98)',
-            'bordercolor': '#E5E5E5',
+            'bgcolor': legend_bg,
+            'bordercolor': legend_border,
             'borderwidth': 1,
-            'font': {'size': 13, 'color': '#0F0F0F', 'family': "'DM Sans', sans-serif"}
+            'font': {'size': 13, 'color': text_color, 'family': "'DM Sans', sans-serif"}
         },
         'margin': dict(l=80, r=60, t=100, b=80),
         'hoverlabel': {
-            'bgcolor': '#FFFFFF',
-            'bordercolor': '#E5E5E5',
-            'font': {'size': 13, 'family': "'Plus Jakarta Sans', sans-serif", 'color': '#0F0F0F'}
+            'bgcolor': hover_bg,
+            'bordercolor': hover_border,
+            'font': {'size': 13, 'family': "'Plus Jakarta Sans', sans-serif", 'color': text_color}
         },
         'colorway': [
             ProfessionalTheme.US_BLUE,
@@ -4497,20 +4985,23 @@ def render_comparison_chart(data_dict: dict, title: str,
                 hovertemplate=f"<b>{category}</b><br>Value: %{{y:.2f}}<extra></extra>"
             ))
         
-        fig.update_layout(
+        # Get theme-aware layout
+        layout = get_professional_layout(height=600)
+        
+        # Determine text color based on theme
+        dark_mode = st.session_state.get('dark_mode', False)
+        text_color = '#F8FAFC' if dark_mode else '#1E293B'
+        
+        layout.update(
             title=dict(
                 text=f"<b>{title}</b>",
                 x=0.5,
                 xanchor='center',
-                font=dict(size=20, family='Inter, sans-serif', color='#1E293B')
+                font=dict(size=20, family='Inter, sans-serif', color=text_color)
             ),
             xaxis_title="<b>Category</b>",
             yaxis_title="<b>Value</b>",
             barmode='group',
-            plot_bgcolor='white',
-            paper_bgcolor='#FAFAFA',
-            font=dict(family='Inter, sans-serif', size=12),
-            height=600,
             hovermode='x unified',
             legend=dict(
                 orientation="h",
@@ -4518,14 +5009,17 @@ def render_comparison_chart(data_dict: dict, title: str,
                 y=1.02,
                 xanchor="right",
                 x=1,
-                bgcolor='rgba(255, 255, 255, 0.9)',
-                bordercolor='#E2E8F0',
+                bgcolor='rgba(15, 23, 42, 0.9)' if dark_mode else 'rgba(255, 255, 255, 0.9)',
+                bordercolor='#334155' if dark_mode else '#E2E8F0',
                 borderwidth=1
             )
         )
         
-        fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='#F1F5F9', zeroline=False)
-        fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='#F1F5F9', zeroline=False)
+        fig.update_layout(layout)
+        
+        # Apply specific grid settings from layout
+        fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor=layout['xaxis']['gridcolor'], zeroline=False)
+        fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor=layout['yaxis']['gridcolor'], zeroline=False)
     
     elif chart_type == 'radar':
         categories = list(data_dict.keys())
@@ -4636,20 +5130,34 @@ def render_professional_timeline(events: list, title: str = "Historical Timeline
             opacity=1
         )
     
+    # Get theme-aware settings
+    dark_mode = st.session_state.get('dark_mode', False)
+    text_color = '#F8FAFC' if dark_mode else '#1E293B'
+    desc_color = '#94A3B8' if dark_mode else '#374151'
+    grid_color = '#334155' if dark_mode else '#E2E8F0'
+    paper_color = '#0F172A' if dark_mode else '#F8FAFC'
+    plot_color = '#0F172A' if dark_mode else '#FFFFFF'
+    tick_color = '#CBD5E1' if dark_mode else '#374151'
+    marker_line_color = '#0F172A' if dark_mode else 'white'
+    
     fig.update_layout(
         xaxis=dict(
-            title=dict(text="<b>Year</b>", font=dict(size=14, color='#1E293B')),
+            title=dict(text="<b>Year</b>", font=dict(size=14, color=text_color)),
             showgrid=True, 
-            gridcolor='#E2E8F0', 
+            gridcolor=grid_color, 
             zeroline=False,
-            tickfont=dict(size=12, color='#374151')
+            tickfont=dict(size=12, color=tick_color)
         ),
         yaxis=dict(showticklabels=False, showgrid=False, zeroline=False),
-        plot_bgcolor='#FFFFFF',
-        paper_bgcolor='#F8FAFC',
+        plot_bgcolor=plot_color,
+        paper_bgcolor=paper_color,
         height=max(500, len(events) * 120),
-        margin=dict(l=120, r=120, t=60, b=60)
+        margin=dict(l=120, r=120, t=60, b=60),
+        font=dict(color=text_color, family='Inter, sans-serif')
     )
+    
+    # Update marker stroke for dark mode
+    fig.update_traces(marker=dict(line=dict(color=marker_line_color, width=3)))
     
     st.plotly_chart(fig, use_container_width=True)
 
@@ -4675,12 +5183,36 @@ def render_kpi_dashboard(kpis: list):
             color = kpi.get('color', 'primary')
             delta_color = "normal" if color == 'success' else "inverse"
             
-            st.metric(
-                label=label,
-                value=value,
-                delta=delta,
-                delta_color=delta_color
-            )
+            # Custom HTML Metric Card
+            # This prevents truncation of long values like "Prisoner's Dilemma" 
+            # and aligns with the custom .metric-card CSS
+            
+            delta_html = ""
+            if delta:
+                # Color logic
+                d_color = "#64748B" # Default slate
+                if color == 'success': d_color = "#16A34A" # Green
+                elif color == 'danger': d_color = "#EF4444" # Red
+                elif color == 'warning': d_color = "#F59E0B" # Amber
+                
+                delta_html = f"<div style='font-size: 0.85rem; color: {d_color}; margin-top: 8px; font-weight: 600;'>{delta}</div>"
+            
+            # Dynamic font size for long values
+            font_size = "2.0rem"
+            if len(str(value)) > 15:
+                font_size = "1.5rem"
+            
+            st.markdown(f"""
+            <div class="metric-card" style="text-align: center; padding: 1.5rem 1rem;">
+                <div style="color: #64748B; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+                    {icon} {kpi['label']}
+                </div>
+                <div class="metric-value" style="font-size: {font_size}; line-height: 1.2;">
+                    {value}
+                </div>
+                {delta_html}
+            </div>
+            """, unsafe_allow_html=True)
 
 
 def render_professional_heatmap(data: np.ndarray, 
@@ -4709,40 +5241,52 @@ def render_professional_heatmap(data: np.ndarray,
         text=np.round(data, 2) if annotations else None,
         texttemplate='<b>%{text}</b>' if annotations else None,
         textfont=dict(size=14, family='Inter, sans-serif', color='white'),
-        hovertemplate='<b>%{y} × %{x}</b><br>Value: %{z:.2f}<extra></extra>',
+        hovertemplate='<b>%{y} × %{x}</b><br>Value: %{z:.2f}<extra></extra>'
+    ))
+
+    # Theme aware layout
+    dark_mode = st.session_state.get('dark_mode', False)
+    bg_color = '#0F172A' if dark_mode else '#FFFFFF'
+    paper_color = '#0F172A' if dark_mode else '#FAFAFA'
+    text_color = '#F8FAFC' if dark_mode else '#1E293B'
+    border_color = '#334155' if dark_mode else '#E2E8F0'
+    
+    # Update colorbar style
+    fig.update_traces(
         colorbar=dict(
-            title=dict(text="<b>Value</b>", side='right'),
+            title=dict(text="<b>Value</b>", side='right', font=dict(color=text_color)),
             thickness=20,
             len=0.7,
-            bgcolor='white',
-            bordercolor='#E2E8F0',
-            borderwidth=1
+            bgcolor=bg_color,
+            bordercolor=border_color,
+            borderwidth=1,
+            tickfont=dict(color=text_color)
         )
-    ))
+    )
     
     fig.update_layout(
         title=dict(
             text=f"<b>{title}</b>",
             x=0.5,
             xanchor='center',
-            font=dict(size=20, family='Inter, sans-serif', color='#1E293B')
+            font=dict(size=20, family='Inter, sans-serif', color=text_color)
         ),
         xaxis=dict(
             title="<b>X Axis</b>",
             side='bottom',
-            tickfont=dict(size=12, family='Inter, sans-serif'),
+            tickfont=dict(size=12, family='Inter, sans-serif', color=text_color),
             showgrid=False
         ),
         yaxis=dict(
             title="<b>Y Axis</b>",
-            tickfont=dict(size=12, family='Inter, sans-serif'),
+            tickfont=dict(size=12, family='Inter, sans-serif', color=text_color),
             showgrid=False,
             autorange='reversed'
         ),
-        plot_bgcolor='white',
-        paper_bgcolor='#FAFAFA',
+        plot_bgcolor=bg_color,
+        paper_bgcolor=paper_color,
         height=600,
-        font=dict(family='Inter, sans-serif')
+        font=dict(family='Inter, sans-serif', color=text_color)
     )
     
     st.plotly_chart(fig, use_container_width=True)
@@ -4784,17 +5328,19 @@ def render_sankey_diagram(source: list, target: list, value: list,
         )
     )])
     
-    fig.update_layout(
+    # Theme aware layout
+    layout = get_professional_layout(height=600)
+    
+    layout.update(
         title=dict(
             text=f"<b>{title}</b>",
             x=0.5,
-            font=dict(size=20, family='Inter, sans-serif', color='#1E293B')
+            font=dict(size=20, family='Inter, sans-serif', color=layout['font']['color'])
         ),
-        font=dict(size=12, family='Inter, sans-serif'),
-        plot_bgcolor='white',
-        paper_bgcolor='#FAFAFA',
-        height=600
+        font=dict(size=12, family='Inter, sans-serif')
     )
+    
+    fig.update_layout(layout)
     
     st.plotly_chart(fig, use_container_width=True)
 
@@ -4856,11 +5402,15 @@ def render_gauge_chart(value: float, title: str,
         }
     ))
     
-    fig.update_layout(
-        paper_bgcolor='#FAFAFA',
-        font={'family': 'Inter, sans-serif', 'color': '#1E293B'},
-        height=500
+    # Theme aware layout
+    layout = get_professional_layout(height=500)
+    
+    # Override layout specifics for gauge
+    layout.update(
+        font={'family': 'Inter, sans-serif', 'color': layout['font']['color']}
     )
+    
+    fig.update_layout(layout)
     
     st.plotly_chart(fig, use_container_width=True)
 
@@ -4889,19 +5439,22 @@ def render_waterfall_chart(categories: list, values: list, title: str):
         totals={"marker": {"color": "#1E3A8A"}}
     ))
     
-    fig.update_layout(
+    # Theme aware layout
+    layout = get_professional_layout(height=600)
+    grid_color = layout['xaxis']['gridcolor']
+    
+    layout.update(
         title=dict(
             text=f"<b>{title}</b>",
             x=0.5,
-            font=dict(size=20, family='Inter, sans-serif', color='#1E293B')
-        ),
-        xaxis=dict(title="<b>Components</b>", showgrid=False),
-        yaxis=dict(title="<b>Value</b>", showgrid=True, gridcolor='#F1F5F9'),
-        plot_bgcolor='white',
-        paper_bgcolor='#FAFAFA',
-        height=600,
-        font=dict(family='Inter, sans-serif')
+            font=dict(size=20, family='Inter, sans-serif', color=layout['font']['color'])
+        )
     )
+    
+    fig.update_layout(layout)
+    
+    fig.update_xaxes(title="<b>Components</b>", showgrid=False)
+    fig.update_yaxes(title="<b>Value</b>", showgrid=True, gridcolor=grid_color)
     
     st.plotly_chart(fig, use_container_width=True)
 
@@ -4980,7 +5533,7 @@ class VisualizationEngine:
                 text=us_payoffs,
                 texttemplate='<b>%{text}</b>',
                 textfont={"size": 18, "color": "white"},
-                colorbar=dict(x=0.45, len=0.8, title="Payoff"),
+                colorbar=dict(x=0.43, len=0.8, title="Payoff", thickness=15),
                 hovertemplate="U.S. Action: %{y}<br>China Action: %{x}<br>U.S. Payoff: %{z}<extra></extra>"
             ),
             row=1, col=1
@@ -4997,25 +5550,26 @@ class VisualizationEngine:
                 text=china_payoffs,
                 texttemplate='<b>%{text}</b>',
                 textfont={"size": 18, "color": "white"},
-                colorbar=dict(x=1.0, len=0.8, title="Payoff"),
+                colorbar=dict(x=1.02, len=0.8, title="Payoff", thickness=15),
                 hovertemplate="U.S. Action: %{y}<br>China Action: %{x}<br>China Payoff: %{z}<extra></extra>"
             ),
             row=1, col=2
         )
         
-        fig.update_layout(
+        # Theme aware layout
+        layout = get_professional_layout(height=700)
+        
+        layout.update(
             title=dict(
                 text=f"<b>{title}</b>",
                 x=0.5,
-                font=dict(size=22, family="Inter, sans-serif", color="#1E293B")
+                font=dict(size=22, family="Inter, sans-serif", color=layout['font']['color'])
             ),
-            height=650,
-            font=dict(family="Inter, sans-serif"),
-            paper_bgcolor='white',
-            plot_bgcolor='white',
-            xaxis=dict(title_text="China's Strategy", title_font=dict(size=14, weight='bold')),
-            yaxis=dict(title_text="U.S. Strategy", title_font=dict(size=14, weight='bold'))
+            xaxis=dict(title_text="China's Strategy", title_font=dict(size=14, weight='bold', color=layout['font']['color'])),
+            yaxis=dict(title_text="U.S. Strategy", title_font=dict(size=14, weight='bold', color=layout['font']['color']))
         )
+        
+        fig.update_layout(layout)
         
         return fig
     
@@ -5117,25 +5671,32 @@ class VisualizationEngine:
                 hovertemplate="Period: %{text}<br>δ = %{x:.2f}<br>Margin = %{y:.2f}<extra></extra>"
             ))
         
-        fig.update_layout(
+        # Theme aware layout
+        layout = get_professional_layout(height=700)
+        
+        layout.update(
             title=dict(
                 text="<b>Cooperation Sustainability Analysis</b><br>" +
                      "<sup>Folk Theorem Application: V<sub>coop</sub> vs V<sub>defect</sub></sup>",
                 x=0.5,
-                font=dict(size=18)
+                font=dict(size=18, color=layout['font']['color'])
             ),
             xaxis_title="<b>Discount Factor (δ)</b>",
             yaxis_title="<b>Present Value</b>",
             legend=dict(
-                x=0.02, y=0.98,
-                bgcolor='rgba(255,255,255,0.8)',
-                bordercolor='gray',
+                orientation="h",
+                y=1.1,
+                x=0.5,
+                xanchor="center",
+                bgcolor=layout['legend']['bgcolor'],
+                bordercolor=layout['legend']['bordercolor'],
                 borderwidth=1
             ),
-            height=650,
-            hovermode='x unified',
-            font=dict(family="Arial, sans-serif")
+            margin=dict(t=100),
+            hovermode='x unified'
         )
+        
+        fig.update_layout(layout)
         
         return fig
     
@@ -5194,20 +5755,29 @@ class VisualizationEngine:
             align='right'
         )
         
-        fig.update_layout(
+        # Theme aware layout
+        layout = get_professional_layout(height=700)
+        
+        layout.update(
             title=dict(
                 text="<b>Tit-for-Tat Tariff Escalation (2018-2025)</b><br>" +
                      "<sup>Empirical Validation of Repeated Game Dynamics</sup>",
                 x=0.5,
-                font=dict(size=18)
+                font=dict(size=18, color=layout['font']['color'])
             ),
             xaxis_title="<b>Date</b>",
             yaxis_title="<b>Average Tariff Rate (%)</b>",
-            legend=dict(x=0.02, y=0.98),
-            height=600,
+            legend=dict(orientation="h", y=1.1, x=0.5, xanchor="center", bgcolor=layout['legend']['bgcolor']),
             hovermode='x unified',
-            margin=dict(l=40, r=20, t=60, b=40)
+            margin=dict(l=40, r=20, t=100, b=40)
         )
+        
+        fig.update_layout(layout)
+        
+        # Consistent grid
+        grid_color = layout['xaxis']['gridcolor']
+        fig.update_xaxes(gridcolor=grid_color)
+        fig.update_yaxes(gridcolor=grid_color)
         
         return fig
     
@@ -5300,13 +5870,22 @@ class VisualizationEngine:
             row=2, col=2
         )
         
-        fig.update_layout(
-            height=750,
+        # Theme aware layout
+        layout = get_professional_layout(height=750)
+        
+        layout.update(
             showlegend=True,
-            title_text='<b>Macroeconomic Indicators Dashboard (2001-2024)</b>',
+            title=dict(text='<b>Macroeconomic Indicators Dashboard (2001-2024)</b>', font=dict(color=layout['font']['color'])),
             hovermode='x unified',
-            legend=dict(x=0.85, y=0.15)
+            legend=dict(orientation="h", y=1.05, x=0.5, xanchor="center", bgcolor=layout['legend']['bgcolor'])
         )
+        
+        fig.update_layout(layout)
+        
+        # Grid settings
+        grid_color = layout['xaxis']['gridcolor']
+        fig.update_xaxes(gridcolor=grid_color)
+        fig.update_yaxes(gridcolor=grid_color)
         
         fig.update_yaxes(title_text='$ Billion', row=1, col=1)
         fig.update_yaxes(title_text='$ Billion', row=1, col=2)
@@ -5398,13 +5977,23 @@ class VisualizationEngine:
             row=1, col=2
         )
         
-        fig.update_layout(
-            height=600,
+        # Theme aware layout
+        layout = get_professional_layout(height=700)
+        
+        layout.update(
             barmode='group',
-            title_text='<b>Game Structure Evolution (2001-2025)</b>',
+            title=dict(text='<b>Game Structure Evolution (2001-2025)</b>', font=dict(color=layout['font']['color'])),
             showlegend=True,
-            legend=dict(x=0.4, y=-0.15, orientation='h')
+            legend=dict(orientation="h", y=1.1, x=0.5, xanchor="center", bgcolor=layout['legend']['bgcolor']),
+            margin=dict(t=100)
         )
+        
+        fig.update_layout(layout)
+        
+        # Grid settings
+        grid_color = layout['xaxis']['gridcolor']
+        fig.update_xaxes(gridcolor=grid_color)
+        fig.update_yaxes(gridcolor=grid_color)
         
         fig.update_yaxes(title_text='Payoff', row=1, col=1)
         fig.update_yaxes(title_text='Discount Factor (δ)', range=[0, 1], row=1, col=2)
@@ -5497,12 +6086,21 @@ class VisualizationEngine:
             row=1, col=1
         )
         
-        fig.update_layout(
-            height=650,
-            title_text='<b>Strategy Simulation Results</b>',
+        # Theme aware layout
+        layout = get_professional_layout(height=650)
+        
+        layout.update(
+            title=dict(text='<b>Strategy Simulation Results</b>', font=dict(color=layout['font']['color'])),
             showlegend=True,
-            legend=dict(x=0.7, y=0.98)
+            legend=dict(x=0.7, y=0.98, bgcolor=layout['legend']['bgcolor'])
         )
+        
+        fig.update_layout(layout)
+        
+        # Grid settings
+        grid_color = layout['xaxis']['gridcolor']
+        fig.update_xaxes(gridcolor=grid_color)
+        fig.update_yaxes(gridcolor=grid_color)
         
         fig.update_xaxes(title_text='Round', row=2, col=1)
         fig.update_yaxes(title_text='Cumulative Payoff', row=2, col=1)
@@ -6049,7 +6647,7 @@ def main():
     )
     
     st.markdown("""
-    <div class="info-box">
+    <div class="info-box" style="color: inherit;">
     <strong>📊 PhD-Level Interactive Research Application</strong><br><br>
     This application implements rigorous game-theoretic frameworks to analyze the structural 
     transformation of U.S.-China economic relations from cooperative equilibrium (2001-2007) 
@@ -6064,6 +6662,13 @@ def main():
     # ==========================================================================
     # SIDEBAR NAVIGATION
     # ==========================================================================
+    # ==========================================================================
+    # SIDEBAR NAVIGATION
+    # ==========================================================================
+    
+    # Theme Toggle at the top
+    toggle_dark_mode()
+    
     st.sidebar.markdown("#### 🧭 Research Navigator")
     
     # Hierarchical Navigation
@@ -6211,7 +6816,7 @@ def main():
     # ==========================================================================
     
     if page == "🏠 Executive Summary":
-        toggle_dark_mode()
+
         render_executive_summary(harmony_matrix, pd_matrix, coop_data, tariff_data)
     
     elif page == "🎯 Nash Equilibrium Analysis":
@@ -11028,10 +11633,154 @@ def render_parameter_explorer_page(harmony_matrix: PayoffMatrix, pd_matrix: Payo
                             line=dict(color='#8B5CF6', width=2)), row=2, col=2)
     fig.add_vline(x=S, line_dash="dash", line_color="red", row=2, col=2)
     
-    fig.update_layout(height=600, showlegend=False,
-                     title_text="<b>How Parameters Affect δ*</b>")
+    # Theme aware layout
+    layout = get_professional_layout(height=600)
+    layout.update(
+        showlegend=False,
+        title_text="<b>How Parameters Affect δ*</b>"
+    )
+    fig.update_layout(layout)
+    
+    # Grid settings
+    grid_color = layout['xaxis']['gridcolor']
+    
+    for i in range(1, 3):
+        for j in range(1, 3):
+             fig.update_xaxes(gridcolor=grid_color, row=i, col=j)
+             fig.update_yaxes(gridcolor=grid_color, row=i, col=j)
     
     st.plotly_chart(fig, width='stretch')
+
+
+
+def generate_research_report(engine: GameTheoryEngine, results_summary: Dict[str, Any]) -> str:
+    """
+    Generate a professional HTML research report.
+    """
+    import datetime
+    
+    analysis = engine.get_full_analysis()
+    
+    # CSS for professional print layout
+    css = """
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Open+Sans:wght@400;600&display=swap');
+            body { 
+                font-family: 'Merriweather', serif; 
+                line-height: 1.6; 
+                color: #333; 
+                max-width: 800px; 
+                margin: 0 auto; 
+                padding: 40px; 
+            }
+            h1, h2, h3 { 
+                font-family: 'Open Sans', sans-serif; 
+                color: #2c3e50; 
+            }
+            h1 { 
+                text-align: center; 
+                border-bottom: 2px solid #2c3e50; 
+                padding-bottom: 20px; 
+                margin-bottom: 40px;
+            }
+            .header-info { text-align: center; font-style: italic; color: #666; margin-bottom: 40px; }
+            .abstract { 
+                background-color: #f8f9fa; 
+                padding: 20px; 
+                border-left: 5px solid #3498db; 
+                margin-bottom: 30px; 
+                font-style: italic;
+            }
+            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+            th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+            th { background-color: #f2f2f2; font-weight: bold; }
+            .metric-box { 
+                border: 1px solid #eee; 
+                padding: 15px; 
+                border-radius: 5px; 
+                margin-bottom: 20px; 
+                background: #fafafa;
+            }
+            .footer { 
+                margin-top: 50px; 
+                padding-top: 20px; 
+                border-top: 1px solid #eee; 
+                font-size: 0.8em; 
+                text-align: center; 
+                color: #999; 
+            }
+            @media print {
+                body { padding: 0; max-width: 100%; }
+                .no-print { display: none; }
+            }
+        </style>
+    """
+    
+    # Construct Report
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Strategic Analysis Report</title>
+        {css}
+    </head>
+    <body>
+        <h1>Game-Theoretic Analysis Report</h1>
+        
+        <div class="header-info">
+            Generated on: {datetime.datetime.now().strftime("%B %d, %Y")}<br>
+            Analysis Engine: U.S.-China Strategic Simulator v2.0
+        </div>
+        
+        <div class="abstract">
+            <strong>Executive Summary:</strong><br>
+            This report presents a quantitative analysis of strategic interactions based on the current 
+            payoff structure. The analysis identifies equilibrium conditions, critical thresholds for 
+            cooperation, and simulation outcomes.
+        </div>
+        
+        <h2>1. Game Structure Analysis</h2>
+        <div class="metric-box">
+            <strong>Payoff Matrix Parameters:</strong><br>
+            Reward (R): {engine.params['R']:.2f} | Temptation (T): {engine.params['T']:.2f}<br>
+            Punishment (P): {engine.params['P']:.2f} | Sucker (S): {engine.params['S']:.2f}
+        </div>
+        
+        <table>
+            <tr>
+                <th>Analyte</th>
+                <th>Result</th>
+            </tr>
+            <tr>
+                <td>Game Type</td>
+                <td>{engine.classify_game_type().value}</td>
+            </tr>
+            <tr>
+                <td>Nash Equilibria</td>
+                <td>{', '.join(analysis.nash_equilibria)}</td>
+            </tr>
+            <tr>
+                <td>Critical Discount Factor (δ*)</td>
+                <td>{engine.calculate_critical_discount_factor():.3f}</td>
+            </tr>
+        </table>
+        
+        <h2>2. Simulation Results</h2>
+        {results_summary.get('content', '<p>No simulation data available.</p>')}
+        
+        <div class="footer">
+            &copy; 2025 Advanced Agentic Coding Team. All rights reserved.<br>
+            Generated via Streamlit Automated Reporting Module.
+        </div>
+        
+        <script>
+            // Auto-print on load if desired, or just let user click print
+            // window.onload = function() {{ window.print(); }}
+        </script>
+    </body>
+    </html>
+    """
+    return html
 
 # =============================================================================
 # HELPER FUNCTIONS
@@ -11044,6 +11793,8 @@ def initialize_session_state():
         'evo_results': None,
         'learning_results': None,
         'stochastic_results': None,
+        'spatial_results': None,
+        'spatial_strategies': None,
         'quick_results': None,
         'quick_results_strategies': None,
         'mc_results': None,
@@ -11083,14 +11834,17 @@ def add_export_buttons(df: pd.DataFrame, filename_prefix: str):
         
     with col3:
         # Simple text summary
-        summary = str(df.describe())
-        st.download_button(
-            label="📥 Download Summary",
-            data=summary,
-            file_name=f"{filename_prefix}_summary.txt",
-            mime="text/plain",
-            use_container_width=True
-        )
+        try:
+            summary = str(df.describe())
+            st.download_button(
+                label="📥 Download Summary",
+                data=summary,
+                file_name=f"{filename_prefix}_summary.txt",
+                mime="text/plain",
+                use_container_width=True
+            )
+        except:
+             st.caption("Summary unobtainable")
 
 import hashlib
 
@@ -11166,8 +11920,8 @@ def toggle_dark_mode():
     if 'dark_mode' not in st.session_state:
         st.session_state['dark_mode'] = False
     
-    # Toggle button in sidebar
-    if st.sidebar.button("🌓 Toggle Theme"):
+    # Toggle button in sidebar (moved to top of sidebar in main function)
+    if st.sidebar.button("🌓 Toggle Theme", key="theme_toggle_btn"):
         st.session_state['dark_mode'] = not st.session_state['dark_mode']
         st.rerun()
     
@@ -11183,8 +11937,28 @@ def toggle_dark_mode():
             color: #F8FAFC;
         }
         
-        h1, h2, h3, h4, h5, h6, p, li, span, div {
-            color: #F8FAFC !important;
+        .sub-header {
+            color: #E2E8F0 !important;
+            border-left-color: #FFD700 !important;
+        }
+        
+        h1, h2, h3, h4, h5, h6, li, span, div, p {
+            color: #E2E8F0 !important;
+        }
+        
+        /* Fix button text color in dark mode */
+        .stButton button {
+            color: #FFFFFF !important;
+        }
+        
+        /* Fix selectbox and input labels */
+        label {
+            color: #E2E8F0 !important;
+        }
+        
+        /* Fix markdown links */
+        a {
+            color: #60A5FA !important;
         }
         
         .metric-card {
@@ -11194,10 +11968,15 @@ def toggle_dark_mode():
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
         }
         
-        .info-box {
-            background: rgba(30, 58, 138, 0.2) !important;
+        .info-box, .citation-box, .methodology-box {
+            background: rgba(30, 58, 138, 0.4) !important;
             border-left-color: #60A5FA !important;
-            border: 1px solid rgba(96, 165, 250, 0.1) !important;
+            border: 1px solid rgba(96, 165, 250, 0.2) !important;
+            color: #E2E8F0 !important;
+        }
+        
+        .info-box strong, .citation-box strong, .methodology-box strong {
+            color: #FFFFFF !important;
         }
         
         .metric-value {
@@ -11243,6 +12022,58 @@ def export_all_results():
             mime="application/zip",
             key="export_all_results_btn"
         )
+    
+    # Also offer report download here
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### 📄 Research Report")
+    
+    # Gather simulation summary
+    report_content = ""
+    if st.session_state.get('tournament_results') is not None:
+        report_content += "<h3>Tournament Results</h3><p>Tournament simulation completed.</p>"
+        report_content += st.session_state['tournament_results'].describe().to_html()
+        
+    if st.session_state.get('evo_results') is not None:
+        report_content += "<h3>Evolutionary Dynamics</h3><p>Evolutionary simulation completed.</p>"
+        report_content += st.session_state['evo_results'].tail().to_html()
+        
+    if st.session_state.get('spatial_results') is not None:
+        report_content += "<h3>Spatial Simulation</h3><p>Spatial evolutionary simulation was conducted. See application for visualization frames.</p>"
+        
+    summary_data = {'content': report_content}
+    
+    # We need an engine instance to create the report
+    # We'll use a default one based on current PD constants if available, or harmonized defaults
+    # Re-instantiating engine here is safe as it's lightweight
+    # NOTE: In a perfect world we pass the active engine, but sidebar is decoupled.
+    # We will assume standard PD for the report context or pull from somewhere?
+    # Actually, the user might be in "Parameter Explorer".
+    # For now, we use standard PD matrix for the report header context.
+    
+    if 'current_game_params' in st.session_state:
+        params = st.session_state['current_game_params']
+        # Reconstruct matrix from params (T, R, P, S)
+        # Note: PayoffMatrix takes (row, col) tuples. 
+        # Standard: cc=(R,R), cd=(S,T) [Row Coop, Col Def], dc=(T,S) [Row Def, Col Coop], dd=(P,P)
+        matrix = PayoffMatrix(
+            cc=(params['R'], params['R']),
+            cd=(params['S'], params['T']), # Row=S, Col=T
+            dc=(params['T'], params['S']), # Row=T, Col=S
+            dd=(params['P'], params['P'])
+        )
+        report_engine = GameTheoryEngine(matrix)
+    else:
+        default_matrix = PayoffMatrix(cc=(6,6), cd=(2,8), dc=(8,2), dd=(3,3))
+        report_engine = GameTheoryEngine(default_matrix)
+    
+    report_html = generate_research_report(report_engine, summary_data)
+    
+    st.sidebar.download_button(
+        label="📄 Download Report (HTML)",
+        data=report_html,
+        file_name="research_report.html",
+        mime="text/html"
+    )
 
 def add_help_tooltip(text: str, help_text: str):
     """Add an interactive help tooltip."""
