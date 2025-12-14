@@ -987,6 +987,311 @@ h4 {
     }
 }
 
+/* ============================================
+   MOBILE RESPONSIVE DESIGN
+   ============================================ */
+
+/* Tablet Breakpoint (768px and below) */
+@media screen and (max-width: 768px) {
+    /* Typography Scaling */
+    .main-header {
+        font-size: 2rem !important;
+        padding: 1.5rem 0.75rem !important;
+    }
+    
+    .sub-header {
+        font-size: 1.4rem !important;
+        margin-top: 2rem !important;
+        padding-left: 0.75rem !important;
+    }
+    
+    h1 { font-size: 1.75rem !important; }
+    h2 { font-size: 1.5rem !important; }
+    h3 { font-size: 1.25rem !important; }
+    h4, h5, h6 { font-size: 1.1rem !important; }
+    
+    /* Card Adjustments */
+    .metric-card {
+        padding: 1rem !important;
+        border-radius: 12px !important;
+    }
+    
+    .metric-value {
+        font-size: 1.75rem !important;
+    }
+    
+    /* Proof Elements */
+    .theorem-box, .definition-card, .proof-container {
+        padding: 1rem 1.25rem !important;
+        margin: 1rem 0 !important;
+    }
+    
+    .proof-step {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+    }
+    
+    .proof-step-number {
+        align-self: flex-start !important;
+    }
+    
+    /* Equation Display */
+    .equation-display {
+        padding: 1rem !important;
+        font-size: 0.9rem !important;
+        overflow-x: auto !important;
+    }
+    
+    /* Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        flex-wrap: wrap !important;
+        gap: 4px !important;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        padding: 6px 12px !important;
+        font-size: 0.9rem !important;
+    }
+    
+    /* Sidebar */
+    [data-testid="stSidebar"] {
+        min-width: 280px !important;
+        width: 280px !important;
+    }
+    
+    /* Grid Layouts */
+    .related-concepts-container {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+    
+    /* Info Boxes */
+    .info-box, .citation-box, .methodology-box,
+    .citation-card, .concepts-card {
+        padding: 1rem !important;
+    }
+    
+    /* Buttons - Touch Friendly */
+    .stButton > button {
+        min-height: 44px !important;
+        padding: 0.75rem 1.25rem !important;
+        font-size: 1rem !important;
+    }
+    
+    /* Tables */
+    .stDataFrame, table {
+        font-size: 0.85rem !important;
+    }
+    
+    /* Plotly Charts */
+    .js-plotly-plot {
+        max-width: 100% !important;
+    }
+}
+
+/* Mobile Phone Breakpoint (480px and below) */
+@media screen and (max-width: 480px) {
+    /* Aggressive Typography Scaling */
+    .main-header {
+        font-size: 1.5rem !important;
+        padding: 1rem 0.5rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .sub-header {
+        font-size: 1.2rem !important;
+        margin-top: 1.5rem !important;
+        border-left-width: 3px !important;
+    }
+    
+    h1 { font-size: 1.4rem !important; }
+    h2 { font-size: 1.25rem !important; }
+    h3 { font-size: 1.1rem !important; }
+    
+    /* Metric Cards - Stack Friendly */
+    .metric-card {
+        padding: 0.75rem !important;
+    }
+    
+    .metric-card h3 {
+        font-size: 0.9rem !important;
+    }
+    
+    .metric-value {
+        font-size: 1.5rem !important;
+    }
+    
+    /* Proof Elements - Compact */
+    .theorem-box, .definition-card, .proof-container {
+        padding: 0.75rem 1rem !important;
+        border-radius: 8px !important;
+    }
+    
+    .theorem-title {
+        font-size: 1.1rem !important;
+    }
+    
+    .key-result, .corollary-box {
+        padding: 0.75rem !important;
+        font-size: 0.9rem !important;
+    }
+    
+    /* QED Box */
+    .qed-box {
+        padding: 0.5rem 0.75rem !important;
+        font-size: 0.85rem !important;
+    }
+    
+    /* Definition Card Label */
+    .definition-card::before {
+        font-size: 0.75rem !important;
+        padding: 1px 8px !important;
+    }
+    
+    /* Equations - Scrollable */
+    .equation-display {
+        padding: 0.75rem !important;
+        font-size: 0.8rem !important;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Sidebar - Collapsible on Mobile */
+    [data-testid="stSidebar"] {
+        min-width: 260px !important;
+        width: 260px !important;
+    }
+    
+    /* Buttons - Full Width on Mobile */
+    .stButton > button {
+        width: 100% !important;
+        min-height: 48px !important;
+    }
+    
+    /* Tab Navigation - Scrollable */
+    .stTabs [data-baseweb="tab-list"] {
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        padding-bottom: 4px !important;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        padding: 8px 10px !important;
+        font-size: 0.85rem !important;
+        flex-shrink: 0 !important;
+    }
+    
+    /* Expanders - Touch Friendly */
+    [data-testid="stExpander"] summary {
+        padding: 12px 16px !important;
+    }
+    
+    /* Citation Box Mobile */
+    .citation-card {
+        padding: 0.75rem !important;
+        border-radius: 8px !important;
+    }
+    
+    .access-link {
+        padding: 8px 12px !important;
+        font-size: 0.85rem !important;
+    }
+    
+    /* Slider/Input Touch Targets */
+    .stSlider > div > div {
+        height: 32px !important;
+    }
+    
+    .stNumberInput input,
+    .stTextInput input {
+        min-height: 44px !important;
+        font-size: 16px !important; /* Prevents iOS zoom */
+    }
+    
+    /* DataFrames - Horizontal Scroll */
+    [data-testid="stDataFrame"] {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* Very Small Devices (320px and below) */
+@media screen and (max-width: 320px) {
+    .main-header {
+        font-size: 1.25rem !important;
+    }
+    
+    h1 { font-size: 1.2rem !important; }
+    h2 { font-size: 1.1rem !important; }
+    h3 { font-size: 1rem !important; }
+    
+    .metric-value {
+        font-size: 1.25rem !important;
+    }
+    
+    /* Hide decorative elements */
+    .proof-step-number {
+        min-width: 24px !important;
+        min-height: 24px !important;
+        font-size: 0.8rem !important;
+    }
+}
+
+/* Landscape Mobile Orientation */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+    .main-header {
+        padding: 1rem 0.5rem !important;
+    }
+    
+    .metric-card {
+        padding: 0.75rem !important;
+    }
+    
+    /* Side-by-side layout for cards in landscape */
+    .stColumns > div {
+        min-width: 150px !important;
+    }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+    /* Larger touch targets */
+    .stButton > button,
+    .stTabs [data-baseweb="tab"],
+    .nav-item,
+    .access-link {
+        min-height: 44px !important;
+    }
+    
+    /* Remove hover effects that don't work on touch */
+    .metric-card:hover,
+    .info-box:hover,
+    .citation-box:hover {
+        transform: none !important;
+    }
+    
+    /* Active states instead of hover */
+    .stButton > button:active {
+        transform: scale(0.98) !important;
+    }
+    
+    .nav-item:active {
+        background: #312e81 !important;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .stSidebar, .stButton, [data-testid="stSidebar"] {
+        display: none !important;
+    }
+    
+    .main-header {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
 </style>
 """, unsafe_allow_html=True)
 
