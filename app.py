@@ -1327,11 +1327,13 @@ class AdvancedSimulationEngine:
         elif strategy == StrategyType.PAVLOV:
             if round_num == 0:
                 return 'C'
+            # FIX BUG-007: Use correct parameter extraction
             # Win-Stay, Lose-Shift
-            R = self.engine.params['R']
+            params = self.matrix.get_payoff_parameters_row()
+            R = params['R']
             if own_payoffs[-1] >= R:
-                return own_history[-1]
-            return 'D' if own_history[-1] == 'C' else 'C'
+                return own_history[-1]  # Stay with last action
+            return 'D' if own_history[-1] == 'C' else 'C'  # Shift
         
         elif strategy == StrategyType.GENEROUS_TFT:
             if round_num == 0:
@@ -1385,7 +1387,7 @@ class AdvancedSimulationEngine:
     def run_evolutionary_simulation(self, initial_population: Dict[StrategyType, int] = None,
                                    generations: int = None) -> pd.DataFrame:
         """
-        Run evolutionary dynamics simulation.
+        Run evolutionary dynamics simulation using replicator dynamics.
         
         Strategies reproduce proportionally to their fitness (average payoff).
         
@@ -1406,80 +1408,56 @@ class AdvancedSimulationEngine:
             initial_population = {s: pop_size // len(strategies) for s in strategies}
         
         population = initial_population.copy()
-        history = []
+        history: List[Dict[str, Any]] = []
+        total_pop = sum(population.values())
         
         for gen in range(generations):
             # Record current state
-            total_pop = sum(population.values())
-            record = {'Generation': gen}
+            record: Dict[str, Any] = {'Generation': gen}
             for strat, count in population.items():
                 record[strat.value] = count
-                record[f'{strat.value}_Share'] = count / total_pop if total_pop > 0 else 0
+                record[f'{strat.value}_Share'] = count / total_pop if total_pop > 0 else 0.0
             history.append(record)
             
-            # Calculate fitness for each strategy
-            fitness = {}
-            for strat in population:
-                total_payoff = 0
-                for opponent, count in population.items():
-                    if count > 0:
-                        # Match payoff * number of opponents
-                        # Note: We assume "well-mixed" population (all play all)
-                        # Average payoff = (Payoff vs X * Prob X)
-                        payoff = self._simulate_match(strat, opponent, 10)[0]
-                        total_payoff += payoff * (count / total_pop)
-                
-                fitness[strat] = total_payoff
+            # FIX BUG-008: Use helper functions instead of inline reproduction
+            # Calculate fitness using dedicated method
+            fitness = self._calculate_population_fitness(population)
             
-            # Reproduce (Replicator Dynamics)
-            avg_fitness = sum(fitness[s] * (population[s]/total_pop) for s in population)
+            # Reproduce using dedicated method
+            population = self._reproduce(population, fitness)
             
-            new_population = {}
-            for strat, count in population.items():
-                if avg_fitness > 0:
-                    # Change proportional to fitness relative to average
-                    # delta = count * (fitness - avg) / avg * rate
-                    growth_rate = 0.1 # Speed of evolution
-                    relative_fitness = (fitness[strat] - avg_fitness) / avg_fitness
-                    change = int(count * relative_fitness * growth_rate)
-                    
-                    # Apply mutation
-                    mutation = 0
-                    if self.config.mutation_rate > 0:
-                        mutation = int(total_pop * self.config.mutation_rate / len(population))
-                        # Simple mutation: random flow in/out
-                        
-                    new_count = max(0, count + change + mutation)
-                    new_population[strat] = new_count
-                else:
-                    new_population[strat] = count
+            # Apply mutations using dedicated method
+            population = self._mutate(population)
             
-            # Rescale to constant population size
-            current_total = sum(new_population.values())
-            if current_total > 0:
-                scale = self.config.population_size / current_total
-                population = {s: int(c * scale) for s, c in new_population.items()}
-            else:
-                population = initial_population.copy() # Restart if extinction
+            # Ensure population size maintained
+            total_pop = sum(population.values())
+            if total_pop > self.config.population_size:
+                scale = self.config.population_size / total_pop
+                population = {s: max(1, int(c * scale)) for s, c in population.items()}
+            elif total_pop == 0:
+                population = initial_population.copy()  # Restart if extinction
+            
+            total_pop = sum(population.values())
                 
         return pd.DataFrame(history)
     
     def _calculate_population_fitness(self, population: Dict[StrategyType, int]) -> Dict[StrategyType, float]:
         """Calculate average fitness for each strategy in population."""
-        fitness = {}
+        fitness: Dict[StrategyType, float] = {}
         strategies = list(population.keys())
         total_pop = sum(population.values())
         
-        # Cache for pairwise simulation results to improve performance
-        match_cache = {}
+        # FIX BUG-006: Use ordered cache key (strat, opp) instead of sorted()
+        # This preserves the order so we can correctly retrieve asymmetric payoffs
+        match_cache: Dict[Tuple[str, str], Tuple[float, float]] = {}
 
         for strat in strategies:
             if population[strat] == 0:
-                fitness[strat] = 0
+                fitness[strat] = 0.0
                 continue
             
-            total_payoff = 0
-            interactions = 0
+            total_payoff = 0.0
+            num_opponents = 0
             
             for opp_strat in strategies:
                 if population[opp_strat] == 0:
@@ -1488,28 +1466,20 @@ class AdvancedSimulationEngine:
                 # Weight by opponent frequency
                 weight = population[opp_strat] / total_pop
                 
-                # Check cache
-                cache_key = tuple(sorted((strat.value, opp_strat.value)))
-                if cache_key in match_cache:
-                    # Need to handle asymmetry if strategies are different
-                    res = match_cache[cache_key]
-                    if strat.value == res['s1']:
-                        payoff = res['p1']
-                    else:
-                        payoff = res['p2']
-                else:
-                    # Run simulation
-                    payoffs = self._simulate_match(strat, opp_strat, 10)
-                    match_cache[cache_key] = {
-                        's1': strat.value, 's2': opp_strat.value,
-                        'p1': payoffs[0], 'p2': payoffs[1]
-                    }
-                    payoff = payoffs[0]
+                # FIX BUG-006: Key preserves order! (strat, opp) not sorted()
+                key = (strat.value, opp_strat.value)
                 
-                total_payoff += payoff * weight
-                interactions += 1
+                if key in match_cache:
+                    p1, _ = match_cache[key]
+                else:
+                    # Run simulation and cache with ordered key
+                    p1, p2, _, _ = self._simulate_match(strat, opp_strat, 10)
+                    match_cache[key] = (p1, p2)
+                
+                total_payoff += p1 * weight
+                num_opponents += 1
             
-            fitness[strat] = total_payoff / interactions if interactions > 0 else 0
+            fitness[strat] = total_payoff if num_opponents > 0 else 0.0
         
         return fitness
     
@@ -1663,31 +1633,39 @@ class AdvancedSimulationEngine:
     
     def _fictitious_play_simulation(self, rounds: int) -> pd.DataFrame:
         """
-        Simulate fictitious play learning.
+        Fictitious play learning algorithm.
         
-        Each player best-responds to the empirical distribution of opponent's past actions.
+        Each player maintains beliefs about opponent's cooperation frequency
+        and best responds to those beliefs.
         """
         history = []
-        us_coop_count, china_coop_count = 1, 1  # Laplace smoothing
-        us_total, china_total = 2, 2
+        
+        # FIX BUG-009: Correct variable semantics - beliefs about opponent
+        # Observations of opponent actions (Laplace prior: 1 coop, 1 defect)
+        us_obs_china_coop = 1    # US's observations of China cooperating
+        us_obs_china_total = 2   # Total observations of China by US
+        china_obs_us_coop = 1    # China's observations of US cooperating
+        china_obs_us_total = 2   # Total observations of US by China
         
         for r in range(rounds):
-            # Calculate beliefs
-            us_belief_china_coop = china_coop_count / china_total
-            china_belief_us_coop = us_coop_count / us_total
+            # Calculate beliefs about opponent's cooperation tendency
+            us_belief_china_coop = us_obs_china_coop / us_obs_china_total
+            china_belief_us_coop = china_obs_us_coop / china_obs_us_total
             
-            # Best respond to beliefs
+            # Best respond to beliefs about opponent
             us_action = self._best_respond_to_belief(us_belief_china_coop, 'US')
             china_action = self._best_respond_to_belief(china_belief_us_coop, 'China')
             
-            # Update counts
-            if us_action == 'C':
-                us_coop_count += 1
-            us_total += 1
-            
+            # FIX BUG-009: Update opponent observations (not own actions!)
+            # US observes what China did
             if china_action == 'C':
-                china_coop_count += 1
-            china_total += 1
+                us_obs_china_coop += 1
+            us_obs_china_total += 1
+            
+            # China observes what US did
+            if us_action == 'C':
+                china_obs_us_coop += 1
+            china_obs_us_total += 1
             
             # Get payoffs
             us_payoff, china_payoff = self._get_payoffs(us_action, china_action)
@@ -1700,8 +1678,8 @@ class AdvancedSimulationEngine:
                 'China_Payoff': china_payoff,
                 'US_Belief_China_Coop': us_belief_china_coop,
                 'China_Belief_US_Coop': china_belief_us_coop,
-                'US_Coop_Rate': us_coop_count / us_total,
-                'China_Coop_Rate': china_coop_count / china_total
+                'US_Coop_Rate': china_obs_us_coop / china_obs_us_total,   # Actual US coop rate
+                'China_Coop_Rate': us_obs_china_coop / us_obs_china_total  # Actual China coop rate
             })
         
         return pd.DataFrame(history)
@@ -1775,6 +1753,9 @@ class AdvancedSimulationEngine:
         us_regret = {'C': 0.0, 'D': 0.0}
         china_regret = {'C': 0.0, 'D': 0.0}
         
+        # FIX BUG-010: Bound regrets to prevent unbounded growth/overflow
+        MAX_REGRET = 10000.0
+        
         for r in range(rounds):
             # Calculate strategy from regrets
             us_prob_coop = self._regret_to_probability(us_regret)
@@ -1798,6 +1779,12 @@ class AdvancedSimulationEngine:
             us_regret['D'] += us_cf_defect - us_payoff
             china_regret['C'] += china_cf_coop - china_payoff
             china_regret['D'] += china_cf_defect - china_payoff
+            
+            # FIX BUG-010: Clamp regrets to prevent unbounded growth
+            us_regret['C'] = np.clip(us_regret['C'], -MAX_REGRET, MAX_REGRET)
+            us_regret['D'] = np.clip(us_regret['D'], -MAX_REGRET, MAX_REGRET)
+            china_regret['C'] = np.clip(china_regret['C'], -MAX_REGRET, MAX_REGRET)
+            china_regret['D'] = np.clip(china_regret['D'], -MAX_REGRET, MAX_REGRET)
             
             history.append({
                 'Round': r + 1,
