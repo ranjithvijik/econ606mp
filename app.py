@@ -10089,7 +10089,7 @@ def render_proof_visuals(proof_type: str):
             margin=dict(l=80, r=50, t=80, b=50),
             plot_bgcolor='white'
         )
-        st.plotly_chart(fig)
+        st.plotly_chart(fig, use_container_width=True)
 
     elif "Dominant Strategy" in proof_type:
         # Bar chart comparing payoffs
@@ -10115,7 +10115,7 @@ def render_proof_visuals(proof_type: str):
                      color_discrete_map={"Cooperate": "#319795", "Defect": "#e53e3e"},
                      title=title, height=500)
         fig.update_layout(font_family="Inter", plot_bgcolor='white', yaxis_gridcolor='#F1F5F9')
-        st.plotly_chart(fig)
+        st.plotly_chart(fig, use_container_width=True)
 
     elif "Pareto" in proof_type:
         # Scatter plot of outcome space
@@ -10157,7 +10157,7 @@ def render_proof_visuals(proof_type: str):
             height=650
         )
         # Draw arrow to Pareto frontier
-        st.plotly_chart(fig)
+        st.plotly_chart(fig, use_container_width=True)
         
     elif "Discount Factor" in proof_type or "Folk" in proof_type:
         # Cooperation Margin Analysis
@@ -10205,7 +10205,7 @@ def render_proof_visuals(proof_type: str):
             xaxis_gridcolor='#F1F5F9',
             yaxis_gridcolor='#F1F5F9'
         )
-        st.plotly_chart(fig)
+        st.plotly_chart(fig, use_container_width=True)
 
     elif "Yield Suppression" in proof_type:
          years = [2005, 2008, 2011, 2013, 2016, 2020, 2024]
@@ -10249,7 +10249,7 @@ def render_proof_visuals(proof_type: str):
              yaxis_gridcolor='#F1F5F9',
              legend=dict(x=0.02, y=0.02)
          )
-         st.plotly_chart(fig)
+         st.plotly_chart(fig, use_container_width=True)
 
     elif "Correlation" in proof_type:
          st.markdown("#### 📊 Statistical Evidence")
