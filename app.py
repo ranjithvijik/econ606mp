@@ -1394,12 +1394,15 @@ class AdvancedVisualizationEngine:
                 else:
                     payoff_matrix[i, j] = np.nan
         
+        # Handle NaN for text display - replace with empty string
+        text_matrix = np.where(np.isnan(payoff_matrix), '', np.round(payoff_matrix, 1).astype(str))
+        
         fig = go.Figure(data=go.Heatmap(
             z=payoff_matrix,
             x=strategies,
             y=strategies,
             colorscale='Blues',
-            text=np.round(payoff_matrix, 1),
+            text=text_matrix,
             texttemplate='%{text}',
             textfont={"size": 14, "color": "white"},
             colorbar=dict(title="Payoff"),
