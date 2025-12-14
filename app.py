@@ -748,6 +748,240 @@ h4 {
     margin-top: 1.5rem !important;
 }
 
+/* ============================================ */
+/* CITATION BOX STYLING */
+/* ============================================ */
+
+.citation-card {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 1px solid #bae6fd;
+    border-left: 4px solid #0284c7;
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0;
+    box-shadow: 0 2px 4px rgba(2, 132, 199, 0.1);
+}
+
+.citation-card .citation-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0369a1;
+}
+
+.citation-card .citation-text {
+    font-style: italic;
+    color: #1e3a5f;
+    line-height: 1.6;
+    margin-bottom: 0.75rem;
+}
+
+.citation-card .access-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #0284c7, #0ea5e9);
+    color: white !important;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    text-decoration: none !important;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    margin-top: 0.5rem;
+}
+
+.citation-card .access-link:hover {
+    background: linear-gradient(135deg, #0369a1, #0284c7);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(2, 132, 199, 0.3);
+}
+
+/* ============================================ */
+/* QUICK NAVIGATION GRID */
+/* ============================================ */
+
+.nav-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.nav-category-card {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: all 0.2s;
+}
+
+.nav-category-card:hover {
+    border-color: #6366f1;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+    transform: translateY(-2px);
+}
+
+.nav-category-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #4338ca;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-item-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-item {
+    padding: 0.5rem 0.75rem;
+    margin: 0.25rem 0;
+    background: white;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
+}
+
+.nav-item:hover {
+    background: #e0e7ff;
+    color: #4338ca;
+    border-left-color: #6366f1;
+}
+
+/* ============================================ */
+/* RELATED CONCEPTS CARDS */
+/* ============================================ */
+
+.related-concepts-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin: 1rem 0;
+}
+
+.concepts-card {
+    background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+    border: 1px solid #e9d5ff;
+    border-radius: 12px;
+    padding: 1.25rem;
+}
+
+.concepts-card.key-concepts {
+    border-left: 4px solid #a855f7;
+}
+
+.concepts-card.applications {
+    border-left: 4px solid #22c55e;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-color: #bbf7d0;
+}
+
+.concepts-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.concepts-card.key-concepts .concepts-card-title {
+    color: #7c3aed;
+}
+
+.concepts-card.applications .concepts-card-title {
+    color: #16a34a;
+}
+
+.concepts-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.concepts-list li {
+    padding: 0.4rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+    color: #4b5563;
+    font-size: 0.95rem;
+}
+
+.concepts-list li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: #9ca3af;
+}
+
+/* Dark Mode Adjustments for New Elements */
+@media (prefers-color-scheme: dark) {
+    .citation-card {
+        background: linear-gradient(135deg, #1e3a5f 0%, #0c4a6e 100%);
+        border-color: #0369a1;
+    }
+    
+    .citation-card .citation-header {
+        color: #7dd3fc;
+    }
+    
+    .citation-card .citation-text {
+        color: #e0f2fe;
+    }
+    
+    .nav-category-card {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border-color: #334155;
+    }
+    
+    .nav-category-title {
+        color: #a5b4fc;
+    }
+    
+    .nav-item {
+        background: #1e293b;
+        color: #cbd5e1;
+    }
+    
+    .nav-item:hover {
+        background: #312e81;
+        color: #c7d2fe;
+    }
+    
+    .concepts-card {
+        background: linear-gradient(135deg, #2e1065 0%, #1e1b4b 100%);
+        border-color: #6d28d9;
+    }
+    
+    .concepts-card.applications {
+        background: linear-gradient(135deg, #14532d 0%, #052e16 100%);
+        border-color: #16a34a;
+    }
+    
+    .concepts-card-title {
+        color: #c4b5fd;
+    }
+    
+    .concepts-card.applications .concepts-card-title {
+        color: #86efac;
+    }
+    
+    .concepts-list li {
+        color: #cbd5e1;
+    }
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -8577,8 +8811,9 @@ def render_dominant_strategy_harmony(show_citations: bool):
     ### 🎯 Theorem 2.1: Cooperation as Dominant Strategy (Harmony Game)
     
     <div class="theorem-box">
-    <strong>📋 Statement:</strong> In the Harmony Game payoff structure (2001-2007), 
-    <em>Cooperate</em> is a strictly dominant strategy for both players.
+        <div class="theorem-title">📋 Theorem Statement</div>
+        In the Harmony Game payoff structure (2001-2007), 
+        <span class="key-result"><em>Cooperate</em> is a strictly dominant strategy</span> for both players.
     </div>
     """, unsafe_allow_html=True)
     
@@ -8592,45 +8827,86 @@ def render_dominant_strategy_harmony(show_citations: bool):
     
     with st.expander("🇺🇸 **Proof for United States**", expanded=True):
         st.markdown("""
-        **Definition:** Strategy $C$ is strictly dominant for U.S. if:
-        $$u_U(C, s_C) > u_U(D, s_C) \\quad \\forall s_C \\in \\{C, D\\}$$
+        <div class="proof-container">
         
-        ---
+        <div class="definition-card">
+            <strong>📚 Definition:</strong> Strategy $C$ is strictly dominant for U.S. if:
+            <div class="equation-display">
+            $$u_U(C, s_C) > u_U(D, s_C) \\quad \\forall s_C \\in \\{C, D\\}$$
+            </div>
+        </div>
         
-        **Case 1: China plays Cooperate**
-        $$u_U(C, C) = 8 > 5 = u_U(D, C)$$
-        $$\\therefore \\text{Cooperate strictly better when China cooperates} \\quad ✓$$
+        <div class="proof-step">
+            <div class="proof-step-number">1</div>
+            <div class="proof-step-content">
+                <strong>Case 1: China plays Cooperate</strong>
+                <div class="equation-display">
+                $$u_U(C, C) = 8 > 5 = u_U(D, C)$$
+                </div>
+                <div class="corollary-box">
+                Cooperate strictly better when China cooperates ✓
+                </div>
+            </div>
+        </div>
         
-        ---
+        <div class="proof-step">
+            <div class="proof-step-number">2</div>
+            <div class="proof-step-content">
+                <strong>Case 2: China plays Defect</strong>
+                <div class="equation-display">
+                $$u_U(C, D) = 2 > 1 = u_U(D, D)$$
+                </div>
+                <div class="corollary-box">
+                Cooperate strictly better when China defects ✓
+                </div>
+            </div>
+        </div>
         
-        **Case 2: China plays Defect**
-        $$u_U(C, D) = 2 > 1 = u_U(D, D)$$
-        $$\\therefore \\text{Cooperate strictly better when China defects} \\quad ✓$$
+        <div class="qed-box">
+            <strong>Conclusion:</strong> Since $u_U(C, s_C) > u_U(D, s_C)$ for all $s_C \\in \\{C, D\\}$:
+            $$\\boxed{\\text{Cooperate is strictly dominant for U.S.}}$$
+        </div>
         
-        ---
-        
-        **Conclusion:**
-        Since $u_U(C, s_C) > u_U(D, s_C)$ for all $s_C \\in \\{C, D\\}$:
-        $$\\boxed{\\text{Cooperate is strictly dominant for U.S.}}$$
-        """)
+        </div>
+        """, unsafe_allow_html=True)
     
     with st.expander("🇨🇳 **Proof for China (Symmetric)**", expanded=True):
         st.markdown("""
-        **Case 1: U.S. plays Cooperate**
-        $$u_C(C, C) = 8 > 2 = u_C(C, D)$$
-        $$\\therefore \\text{Cooperate strictly better when U.S. cooperates} \\quad ✓$$
+        <div class="proof-container">
         
-        ---
+        <div class="proof-step">
+            <div class="proof-step-number">1</div>
+            <div class="proof-step-content">
+                <strong>Case 1: U.S. plays Cooperate</strong>
+                <div class="equation-display">
+                $$u_C(C, C) = 8 > 2 = u_C(C, D)$$
+                </div>
+                <div class="corollary-box">
+                Cooperate strictly better when U.S. cooperates ✓
+                </div>
+            </div>
+        </div>
         
-        **Case 2: U.S. plays Defect**
-        $$u_C(D, C) = 5 > 1 = u_C(D, D)$$
-        $$\\therefore \\text{Cooperate strictly better when U.S. defects} \\quad ✓$$
+        <div class="proof-step">
+            <div class="proof-step-number">2</div>
+            <div class="proof-step-content">
+                <strong>Case 2: U.S. plays Defect</strong>
+                <div class="equation-display">
+                $$u_C(D, C) = 5 > 1 = u_C(D, D)$$
+                </div>
+                <div class="corollary-box">
+                Cooperate strictly better when U.S. defects ✓
+                </div>
+            </div>
+        </div>
         
-        ---
+        <div class="qed-box">
+            <strong>Conclusion:</strong>
+            $$\\boxed{\\text{Cooperate is strictly dominant for China}}$$
+        </div>
         
-        **Conclusion:**
-        $$\\boxed{\\text{Cooperate is strictly dominant for China}}$$
-        """)
+        </div>
+        """, unsafe_allow_html=True)
 
     st.markdown("""
     <div class="theorem-box info">
@@ -8668,8 +8944,9 @@ def render_dominant_strategy_prisoners(show_citations: bool):
     ### 🎯 Theorem 2.2: Defection as Dominant Strategy (Prisoner's Dilemma)
     
     <div class="theorem-box danger">
-    <strong>📋 Statement:</strong> In the Prisoner's Dilemma (2008-2025), 
-    <em>Defect</em> is a strictly dominant strategy for both players.
+        <div class="theorem-title">📋 Theorem Statement</div>
+        In the Prisoner's Dilemma (2008-2025), 
+        <span class="key-result"><em>Defect</em> is a strictly dominant strategy</span> for both players.
     </div>
     """, unsafe_allow_html=True)
     
@@ -8683,40 +8960,84 @@ def render_dominant_strategy_prisoners(show_citations: bool):
     
     with st.expander("🇺🇸 **Proof for United States**", expanded=True):
         st.markdown("""
-        **Definition:** Strategy $D$ is strictly dominant for U.S. if:
-        $$u_U(D, s_C) > u_U(C, s_C) \\quad \\forall s_C \\in \\{C, D\\}$$
+        <div class="proof-container">
         
-        ---
+        <div class="definition-card">
+            <strong>📚 Definition:</strong> Strategy $D$ is strictly dominant for U.S. if:
+            <div class="equation-display">
+            $$u_U(D, s_C) > u_U(C, s_C) \\quad \\forall s_C \\in \\{C, D\\}$$
+            </div>
+        </div>
         
-        **Case 1: China plays Cooperate**
-        $$u_U(D, C) = 8 > 6 = u_U(C, C)$$
-        $$\\therefore \\text{Defect strictly better when China cooperates} \\quad ✓$$
+        <div class="proof-step">
+            <div class="proof-step-number">1</div>
+            <div class="proof-step-content">
+                <strong>Case 1: China plays Cooperate</strong>
+                <div class="equation-display">
+                $$u_U(D, C) = 8 > 6 = u_U(C, C)$$
+                </div>
+                <div class="corollary-box">
+                Defect strictly better when China cooperates ✓
+                </div>
+            </div>
+        </div>
         
-        ---
+        <div class="proof-step">
+            <div class="proof-step-number">2</div>
+            <div class="proof-step-content">
+                <strong>Case 2: China plays Defect</strong>
+                <div class="equation-display">
+                $$u_U(D, D) = 3 > 2 = u_U(C, D)$$
+                </div>
+                <div class="corollary-box">
+                Defect strictly better when China defects ✓
+                </div>
+            </div>
+        </div>
         
-        **Case 2: China plays Defect**
-        $$u_U(D, D) = 3 > 2 = u_U(C, D)$$
-        $$\\therefore \\text{Defect strictly better when China defects} \\quad ✓$$
+        <div class="qed-box">
+            <strong>Conclusion:</strong>
+            $$\\boxed{\\text{Defect is strictly dominant for U.S.}}$$
+        </div>
         
-        ---
-        
-        **Conclusion:**
-        $$\\boxed{\\text{Defect is strictly dominant for U.S.}}$$
-        """)
+        </div>
+        """, unsafe_allow_html=True)
     
     with st.expander("🇨🇳 **Proof for China (Symmetric)**", expanded=True):
         st.markdown("""
+        <div class="proof-container">
+        
+        <div class="corollary-box">
         By symmetry of the payoff matrix:
+        </div>
         
-        **Case 1: U.S. plays Cooperate**
-        $$u_C(C, D) = 8 > 6 = u_C(C, C)$$
+        <div class="proof-step">
+            <div class="proof-step-number">1</div>
+            <div class="proof-step-content">
+                <strong>Case 1: U.S. plays Cooperate</strong>
+                <div class="equation-display">
+                $$u_C(C, D) = 8 > 6 = u_C(C, C)$$
+                </div>
+            </div>
+        </div>
         
-        **Case 2: U.S. plays Defect**
-        $$u_C(D, D) = 3 > 2 = u_C(D, C)$$
+        <div class="proof-step">
+            <div class="proof-step-number">2</div>
+            <div class="proof-step-content">
+                <strong>Case 2: U.S. plays Defect</strong>
+                <div class="equation-display">
+                $$u_C(D, D) = 3 > 2 = u_C(D, C)$$
+                </div>
+            </div>
+        </div>
         
-        **Conclusion:**
-        $$\\boxed{\\text{Defect is strictly dominant for China}}$$
-        """)
+        <div class="qed-box">
+            <strong>Conclusion:</strong>
+            $$\\boxed{\\text{Defect is strictly dominant for China}}$$
+        </div>
+        
+        </div>
+        """, unsafe_allow_html=True)
 
     st.markdown("""
     <div class="theorem-box warning">
@@ -8758,46 +9079,71 @@ def render_pareto_efficiency_proof(show_citations: bool):
     ### 🎯 Theorem 3.1: Pareto Efficiency of $(C, C)$
     
     <div class="theorem-box">
-    <strong>📋 Statement:</strong> In the Harmony Game, the outcome $(C, C)$ is Pareto efficient.
+        <div class="theorem-title">📋 Theorem Statement</div>
+        In the Harmony Game, the outcome <span class="key-result">$(C, C)$ is Pareto efficient</span>.
     </div>
     """, unsafe_allow_html=True)
     
     with st.expander("📖 **Definition**", expanded=True):
         st.markdown("""
-        **Definition (Pareto Efficiency):**
-        
-        An outcome $x$ is Pareto efficient if there exists no feasible outcome $x'$ such that:
-        $$u_i(x') \\geq u_i(x) \\text{ for all } i, \\text{ with strict inequality for at least one } i$$
-        """)
+        <div class="definition-card">
+            <strong>📚 Definition (Pareto Efficiency):</strong><br><br>
+            An outcome $x$ is <em>Pareto efficient</em> if there exists no feasible outcome $x'$ such that:
+            <div class="equation-display">
+            $$u_i(x') \\geq u_i(x) \\text{ for all } i, \\text{ with strict inequality for at least one } i$$
+            </div>
+            In other words, no alternative allocation can make anyone better off without making someone else worse off.
+        </div>
+        """, unsafe_allow_html=True)
     
     with st.expander("🔍 **Proof**", expanded=True):
         st.markdown("""
-        For $(C, C)$ with payoffs $(8, 8)$ to be Pareto dominated, there must exist an outcome 
-        $(s_U', s_C')$ such that:
-        - $u_U(s_U', s_C') \\geq 8$ AND $u_C(s_U', s_C') \\geq 8$
-        - With at least one strict inequality
+        <div class="proof-container">
         
-        ---
+        <div class="proof-step">
+            <div class="proof-step-number">1</div>
+            <div class="proof-step-content">
+                <strong>Setup: Pareto Domination Condition</strong>
+                <br><br>
+                For $(C, C)$ with payoffs $(8, 8)$ to be Pareto dominated, there must exist an outcome 
+                $(s_U', s_C')$ such that:
+                <ul>
+                    <li>$u_U(s_U', s_C') \\geq 8$ AND $u_C(s_U', s_C') \\geq 8$</li>
+                    <li>With at least one strict inequality</li>
+                </ul>
+            </div>
+        </div>
         
-        **Verification:**
+        <div class="proof-step">
+            <div class="proof-step-number">2</div>
+            <div class="proof-step-content">
+                <strong>Systematic Verification of All Alternatives</strong>
+                <br><br>
+                
+                <strong>Test $(C, D)$:</strong>
+                <div class="equation-display">
+                $$u_U(C, D) = 2 < 8 \\quad \\text{✗ Fails U.S. condition}$$
+                </div>
+                
+                <strong>Test $(D, C)$:</strong>
+                <div class="equation-display">
+                $$u_C(D, C) = 2 < 8 \\quad \\text{✗ Fails China condition}$$
+                </div>
+                
+                <strong>Test $(D, D)$:</strong>
+                <div class="equation-display">
+                $$u_U(D, D) = 1 < 8 \\text{ AND } u_C(D, D) = 1 < 8 \\quad \\text{✗ Fails both conditions}$$
+                </div>
+            </div>
+        </div>
         
-        **Test $(C, D)$:**
-        $$u_U(C, D) = 2 < 8 \\quad ✗$$
+        <div class="qed-box">
+            <strong>Conclusion:</strong> No feasible outcome Pareto dominates $(C, C)$.<br>
+            Therefore, $(C, C)$ is Pareto efficient.
+        </div>
         
-        **Test $(D, C)$:**
-        $$u_C(D, C) = 2 < 8 \\quad ✗$$
-        
-        **Test $(D, D)$:**
-        $$u_U(D, D) = 1 < 8 \\text{ AND } u_C(D, D) = 1 < 8 \\quad ✗$$
-        
-        ---
-        
-        **Conclusion:**
-        
-        No outcome Pareto dominates $(C, C)$.
-        
-        $$\\boxed{(C, C) \\text{ is Pareto efficient}} \\quad \\blacksquare$$
-        """)
+        </div>
+        """, unsafe_allow_html=True)
 
     st.markdown("""
     <div class="theorem-box info">
@@ -8820,31 +9166,53 @@ def render_pareto_inefficiency_proof(show_citations: bool):
     ### 🎯 Theorem 3.2: Pareto Inefficiency of $(D, D)$
     
     <div class="theorem-box danger">
-    <strong>📋 Statement:</strong> In the Prisoner's Dilemma, the Nash Equilibrium 
-    $(D, D)$ is Pareto inefficient.
+        <div class="theorem-title">📋 Theorem Statement</div>
+        In the Prisoner's Dilemma, the Nash Equilibrium 
+        <span class="key-result">$(D, D)$ is Pareto inefficient</span>.
     </div>
     """, unsafe_allow_html=True)
     
     with st.expander("🔍 **Proof**", expanded=True):
         st.markdown("""
-        Consider outcomes $(D, D)$ with payoffs $(3, 3)$ and $(C, C)$ with payoffs $(6, 6)$.
+        <div class="proof-container">
         
-        **Comparison:**
-        $$u_U(C, C) = 6 > 3 = u_U(D, D)$$
-        $$u_C(C, C) = 6 > 3 = u_C(D, D)$$
+        <div class="proof-step">
+            <div class="proof-step-number">1</div>
+            <div class="proof-step-content">
+                <strong>Compare Nash Equilibrium to Alternative Outcome</strong>
+                <br><br>
+                Consider outcomes:
+                <ul>
+                    <li>Nash Equilibrium $(D, D)$ with payoffs $(3, 3)$</li>
+                    <li>Alternative $(C, C)$ with payoffs $(6, 6)$</li>
+                </ul>
+            </div>
+        </div>
         
-        Since both players are strictly better off at $(C, C)$:
+        <div class="proof-step">
+            <div class="proof-step-number">2</div>
+            <div class="proof-step-content">
+                <strong>Payoff Comparison</strong>
+                <div class="equation-display">
+                $$u_U(C, C) = 6 > 3 = u_U(D, D)$$
+                $$u_C(C, C) = 6 > 3 = u_C(D, D)$$
+                </div>
+                
+                <div class="corollary-box">
+                Both players are <strong>strictly better off</strong> at $(C, C)$ than at $(D, D)$.
+                </div>
+            </div>
+        </div>
         
-        $$\\boxed{(D, D) \\text{ is Pareto dominated by } (C, C)} \\quad \\blacksquare$$
+        <div class="qed-box">
+            <strong>Conclusion:</strong> $(D, D)$ is Pareto dominated by $(C, C)$.
+            The Nash Equilibrium is Pareto inefficient, illustrating the classic 
+            <em>Prisoner's Dilemma tragedy</em>: rational individual behavior leads to 
+            collectively suboptimal outcomes.
+        </div>
         
-        ---
-        
-        ### 🎓 Implication
-        
-        The Nash Equilibrium $(D, D)$ is Pareto inefficient, illustrating the classic 
-        **Prisoner's Dilemma tragedy**: rational individual behavior leads to collectively 
-        suboptimal outcomes.
-        """)
+        </div>
+        """, unsafe_allow_html=True)
 
     st.markdown(r"""
     <div class="theorem-box danger">
@@ -8874,31 +9242,58 @@ def render_nash_pareto_alignment(show_citations: bool):
     ### 🎯 Theorem 3.3: Nash-Pareto Alignment (Harmony Game)
     
     <div class="theorem-box">
-    <strong>📋 Statement:</strong> In the Harmony Game, the Nash Equilibrium coincides 
-    with the Pareto efficient outcome.
+        <div class="theorem-title">📋 Theorem Statement</div>
+        In the Harmony Game, the Nash Equilibrium <span class="key-result">coincides 
+        with the Pareto efficient outcome</span>.
     </div>
     """, unsafe_allow_html=True)
     
     with st.expander("🔍 **Proof**", expanded=True):
         st.markdown("""
-        From Theorem 1.2: $(C, C)$ is the unique Nash Equilibrium.
+        <div class="proof-container">
         
-        From Theorem 3.1: $(C, C)$ is Pareto efficient.
+        <div class="proof-step">
+            <div class="proof-step-number">1</div>
+            <div class="proof-step-content">
+                <strong>From Theorem 1.2</strong>
+                <br><br>
+                $(C, C)$ is the unique Nash Equilibrium.
+            </div>
+        </div>
         
-        $$\\therefore \\boxed{\\text{Nash Equilibrium} = \\text{Pareto Efficient Outcome}}$$
+        <div class="proof-step">
+            <div class="proof-step-number">2</div>
+            <div class="proof-step-content">
+                <strong>From Theorem 3.1</strong>
+                <br><br>
+                $(C, C)$ is Pareto efficient.
+            </div>
+        </div>
         
-        ---
+        <div class="proof-step">
+            <div class="proof-step-number">3</div>
+            <div class="proof-step-content">
+                <strong>Conclusion</strong>
+                <div class="equation-display">
+                $$\\therefore \\boxed{\\text{Nash Equilibrium} = \\text{Pareto Efficient Outcome}}$$
+                </div>
+            </div>
+        </div>
         
-        ### 🎓 Significance
+        <div class="qed-box">
+            <strong>🎓 Significance:</strong><br>
+            This alignment represents an <strong>ideal game structure</strong> where:
+            <ul>
+                <li>Individual rationality (Nash Equilibrium)</li>
+                <li>Collective optimality (Pareto Efficiency)</li>
+                <li>Are perfectly aligned</li>
+            </ul>
+            This explains the <strong>stability and mutual benefit</strong> of U.S.-China cooperation 
+            during 2001-2007.
+        </div>
         
-        This alignment represents an **ideal game structure** where:
-        - Individual rationality (Nash Equilibrium)
-        - Collective optimality (Pareto Efficiency)
-        - Are perfectly aligned
-        
-        This explains the **stability and mutual benefit** of U.S.-China cooperation 
-        during 2001-2007. $\\quad \\blacksquare$
-        """)
+        </div>
+        """, unsafe_allow_html=True)
     
     if show_citations:
         render_citation_box(
@@ -8914,43 +9309,70 @@ def render_nash_pareto_divergence(show_citations: bool):
     ### 🎯 Theorem 3.4: Nash-Pareto Divergence (Prisoner's Dilemma)
     
     <div class="theorem-box danger">
-    <strong>📋 Statement:</strong> In the Prisoner's Dilemma, the Nash Equilibrium 
-    diverges from the Pareto efficient outcome.
+        <div class="theorem-title">📋 Theorem Statement</div>
+        In the Prisoner's Dilemma, the Nash Equilibrium 
+        <span class="key-result">diverges from the Pareto efficient outcome</span>.
     </div>
     """, unsafe_allow_html=True)
     
     with st.expander("🔍 **Proof**", expanded=True):
         st.markdown("""
-        From Theorem 1.3: $(D, D)$ is the unique Nash Equilibrium.
+        <div class="proof-container">
         
-        From Theorem 3.2: $(D, D)$ is Pareto inefficient; $(C, C)$ is Pareto efficient.
+        <div class="proof-step">
+            <div class="proof-step-number">1</div>
+            <div class="proof-step-content">
+                <strong>From Theorem 1.3</strong>
+                <br><br>
+                $(D, D)$ is the unique Nash Equilibrium.
+            </div>
+        </div>
         
-        $$\\therefore \\boxed{\\text{Nash Equilibrium} \\neq \\text{Pareto Efficient Outcome}}$$
+        <div class="proof-step">
+            <div class="proof-step-number">2</div>
+            <div class="proof-step-content">
+                <strong>From Theorem 3.2</strong>
+                <br><br>
+                $(D, D)$ is Pareto inefficient; $(C, C)$ is Pareto efficient.
+            </div>
+        </div>
         
-        ---
+        <div class="proof-step">
+            <div class="proof-step-number">3</div>
+            <div class="proof-step-content">
+                <strong>Conclusion</strong>
+                <div class="equation-display">
+                $$\\therefore \\boxed{\\text{Nash Equilibrium} \\neq \\text{Pareto Efficient Outcome}}$$
+                </div>
+            </div>
+        </div>
         
-        ### 🎓 Quantification of Divergence
+        <div class="proof-step">
+            <div class="proof-step-number">4</div>
+            <div class="proof-step-content">
+                <strong>Quantification of Divergence</strong>
+                <br><br>
+                <em>Efficiency Loss:</em>
+                <ul>
+                    <li>Nash Equilibrium payoffs: $(3, 3)$</li>
+                    <li>Pareto efficient payoffs: $(6, 6)$</li>
+                </ul>
+                
+                <div class="equation-display">
+                $$\\Delta u_i = 6 - 3 = 3 \\text{ units (50\\% efficiency loss)}$$
+                </div>
+            </div>
+        </div>
         
-        **Efficiency Loss:**
+        <div class="qed-box">
+            <strong>🎓 Significance:</strong><br>
+            This divergence explains the <strong>instability and conflict</strong> in U.S.-China relations 
+            post-2008: individual rationality leads both countries away from mutually beneficial 
+            cooperation.
+        </div>
         
-        Nash Equilibrium payoffs: $(3, 3)$
-        
-        Pareto efficient payoffs: $(6, 6)$
-        
-        **Per-player loss:**
-        $$\\Delta u_i = 6 - 3 = 3 \\text{ units}$$
-        
-        **Percentage loss:**
-        $$\\frac{3}{6} \\times 100\\% = 50\\% \\text{ efficiency loss}$$
-        
-        ---
-        
-        ### 🎓 Significance
-        
-        This divergence explains the **instability and conflict** in U.S.-China relations 
-        post-2008: individual rationality leads both countries away from mutually beneficial 
-        cooperation. $\\quad \\blacksquare$
-        """)
+        </div>
+        """, unsafe_allow_html=True)
     
     if show_citations:
         render_citation_box(
@@ -8970,24 +9392,30 @@ def render_folk_theorem_proof(show_citations: bool):
     ### 🎯 Theorem 4.1: Folk Theorem Application to U.S.-China Game
     
     <div class="theorem-box danger">
-    <strong>📋 Folk Theorem (Friedman, 1971):</strong> In an infinitely repeated game with 
-    discount factor $\\delta$, any feasible payoff vector that strictly Pareto-dominates 
-    the stage-game Nash equilibrium payoffs can be sustained as a Subgame Perfect Equilibrium 
-    if $\\delta$ is sufficiently high.
+        <div class="theorem-title">📋 Folk Theorem (Friedman, 1971)</div>
+        In an infinitely repeated game with discount factor $\\delta$, any feasible payoff vector 
+        that strictly Pareto-dominates the stage-game Nash equilibrium payoffs can be sustained as a 
+        <span class="key-result">Subgame Perfect Equilibrium</span> if $\\delta$ is sufficiently high.
     </div>
     """, unsafe_allow_html=True)
     
     with st.expander("📐 **Formal Statement**", expanded=True):
         st.markdown("""
-        Let $\\pi^N$ be the Nash equilibrium payoffs of the stage game.
-        
-        **If:**
-        1. $\\pi$ is feasible (achievable by some strategy profile)
-        2. $\\pi_i > \\pi_i^N$ for all players $i$
-        
-        **Then:** $\\exists \\delta^* \\in (0,1)$ such that $\\forall \\delta > \\delta^*$, 
-        $\\pi$ can be sustained as a Subgame Perfect Equilibrium.
-        """)
+        <div class="definition-card">
+            <strong>📚 Formal Theorem Statement:</strong><br><br>
+            Let $\\pi^N$ be the Nash equilibrium payoffs of the stage game.
+            <br><br>
+            <strong>If:</strong>
+            <ol>
+                <li>$\\pi$ is <em>feasible</em> (achievable by some strategy profile)</li>
+                <li>$\\pi_i > \\pi_i^N$ for all players $i$</li>
+            </ol>
+            <div class="corollary-box">
+            <strong>Then:</strong> $\\exists \\delta^* \\in (0,1)$ such that $\\forall \\delta > \\delta^*$, 
+            $\\pi$ can be sustained as a Subgame Perfect Equilibrium.
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
     
     with st.expander("🔬 **Application to Harmony Game**", expanded=True):
         st.markdown("""
@@ -9082,45 +9510,75 @@ def render_grim_trigger_proof(show_citations: bool):
     ### 🎯 Theorem 4.2: Grim Trigger Strategy Analysis
     
     <div class="theorem-box warning">
-    <strong>📋 Statement:</strong> Grim Trigger sustains cooperation under the same 
-    conditions as Tit-for-Tat.
+        <div class="theorem-title">📋 Theorem Statement</div>
+        Grim Trigger sustains cooperation under the same conditions as Tit-for-Tat, with the 
+        <span class="key-result">critical discount factor $\\delta^* = 0.40$</span> for the Prisoner's Dilemma.
     </div>
     """, unsafe_allow_html=True)
     
     with st.expander("📖 **Definition**", expanded=True):
         st.markdown("""
-        **Definition (Grim Trigger Strategy):**
-        
-        - Start with Cooperate
-        - Continue Cooperating as long as opponent cooperates
-        - If opponent ever defects, switch to Defect **forever**
-        
-        **Formal Notation:**
-        $$s_i^{GT}(h_t) = \\begin{cases}
-        C & \\text{if } s_{-i}(\\tau) = C \\text{ for all } \\tau < t \\\\
-        D & \\text{otherwise}
-        \\end{cases}$$
-        """)
+        <div class="definition-card">
+            <strong>📚 Definition (Grim Trigger Strategy):</strong><br><br>
+            <ul>
+                <li>Start with Cooperate</li>
+                <li>Continue Cooperating as long as opponent cooperates</li>
+                <li>If opponent ever defects, switch to Defect <strong>forever</strong></li>
+            </ul>
+            <div class="equation-display">
+            $$s_i^{GT}(h_t) = \\begin{cases}
+            C & \\text{if } s_{-i}(\\tau) = C \\text{ for all } \\tau < t \\\\
+            D & \\text{otherwise}
+            \\end{cases}$$
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
     
     with st.expander("🔍 **Proof**", expanded=True):
         st.markdown("""
-        The one-shot deviation analysis is identical to TFT since:
-        - Deviation payoff: $T$ in period 0
-        - Punishment: $P$ forever after
+        <div class="proof-container">
         
-        The critical discount factor remains:
-        $$\\delta^* = \\frac{T - R}{T - P}$$
+        <div class="proof-step">
+            <div class="proof-step-number">1</div>
+            <div class="proof-step-content">
+                <strong>One-Shot Deviation Analysis</strong>
+                <br><br>
+                The one-shot deviation analysis is identical to TFT since:
+                <ul>
+                    <li>Deviation payoff: $T$ in period 0</li>
+                    <li>Punishment: $P$ forever after</li>
+                </ul>
+            </div>
+        </div>
         
-        ---
+        <div class="proof-step">
+            <div class="proof-step-number">2</div>
+            <div class="proof-step-content">
+                <strong>Critical Discount Factor</strong>
+                <div class="equation-display">
+                $$\\delta^* = \\frac{T - R}{T - P}$$
+                </div>
+            </div>
+        </div>
         
-        **For Prisoner's Dilemma:** $T = 8$, $R = 6$, $P = 3$
+        <div class="proof-step">
+            <div class="proof-step-number">3</div>
+            <div class="proof-step-content">
+                <strong>Prisoner's Dilemma Application</strong>
+                <br><br>
+                For: $T = 8$, $R = 6$, $P = 3$
+                <div class="equation-display">
+                $$\\delta^* = \\frac{8 - 6}{8 - 3} = \\frac{2}{5} = 0.40$$
+                </div>
+            </div>
+        </div>
         
-        $$\\delta^* = \\frac{8 - 6}{8 - 3} = \\frac{2}{5} = 0.40$$
+        <div class="qed-box">
+            <strong>Conclusion:</strong> Cooperation requires $\\delta > 0.40$.
+        </div>
         
-        **Conclusion:**
-        
-        Cooperation requires $\\delta > 0.40$. $\\quad \\blacksquare$
-        """)
+        </div>
+        """, unsafe_allow_html=True)
     
     with st.expander("⚖️ **Comparison: Grim Trigger vs. Tit-for-Tat**", expanded=True):
         st.markdown("""
@@ -9157,63 +9615,100 @@ def render_tit_for_tat_sustainability(show_citations: bool):
     ### 🎯 Theorem 4.3: Tit-for-Tat Sustainability
     
     <div class="theorem-box info">
-    <strong>📋 Statement:</strong> Tit-for-Tat sustains cooperation in the Prisoner's 
-    Dilemma if and only if $\\delta \\geq \\delta^* = 0.40$.
+        <div class="theorem-title">📋 Theorem Statement</div>
+        Tit-for-Tat sustains cooperation in the Prisoner's Dilemma 
+        <span class="key-result">if and only if $\\delta \\geq \\delta^* = 0.40$</span>.
     </div>
     """, unsafe_allow_html=True)
     
     with st.expander("📖 **Tit-for-Tat Definition**", expanded=True):
         st.markdown("""
-        **Definition (Tit-for-Tat):**
-        
-        $$s_i^{TFT}(h_t) = \\begin{cases}
-        C & \\text{if } t = 0 \\\\
-        s_{-i}(t-1) & \\text{if } t > 0
-        \\end{cases}$$
-        
-        **Properties:**
-        - **Nice:** Never defects first
-        - **Retaliatory:** Punishes defection immediately
-        - **Forgiving:** Returns to cooperation after one period
-        """)
+        <div class="definition-card">
+            <strong>📚 Definition (Tit-for-Tat):</strong><br><br>
+            <div class="equation-display">
+            $$s_i^{TFT}(h_t) = \\begin{cases}
+            C & \\text{if } t = 0 \\\\
+            s_{-i}(t-1) & \\text{if } t > 0
+            \\end{cases}$$
+            </div>
+            <br>
+            <strong>Properties:</strong>
+            <ul>
+                <li><strong>Nice:</strong> Never defects first</li>
+                <li><strong>Retaliatory:</strong> Punishes defection immediately</li>
+                <li><strong>Forgiving:</strong> Returns to cooperation after one period</li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
     
     with st.expander("🔍 **Proof**", expanded=True):
         st.markdown("""
-        **For Prisoner's Dilemma:** $T = 8$, $R = 6$, $P = 3$, $S = 2$
+        <div class="proof-container">
         
-        #### Cooperation Path Value
+        <div class="proof-step">
+            <div class="proof-step-number">1</div>
+            <div class="proof-step-content">
+                <strong>Setup</strong>
+                <br><br>
+                For Prisoner's Dilemma: $T = 8$, $R = 6$, $P = 3$, $S = 2$
+            </div>
+        </div>
         
-        $$V^{coop} = \\frac{R}{1-\\delta} = \\frac{6}{1-\\delta}$$
+        <div class="proof-step">
+            <div class="proof-step-number">2</div>
+            <div class="proof-step-content">
+                <strong>Cooperation Path Value</strong>
+                <div class="equation-display">
+                $$V^{coop} = \\frac{R}{1-\\delta} = \\frac{6}{1-\\delta}$$
+                </div>
+            </div>
+        </div>
         
-        #### Deviation Path Value
+        <div class="proof-step">
+            <div class="proof-step-number">3</div>
+            <div class="proof-step-content">
+                <strong>Deviation Path Value</strong>
+                <br><br>
+                If player deviates at $t=0$:
+                <ul>
+                    <li>Period 0: Receive $T = 8$ (exploit opponent's cooperation)</li>
+                    <li>Period 1: Opponent retaliates, both play $D$, receive $P = 3$</li>
+                    <li>Period 2+: Return to cooperation, receive $R = 6$</li>
+                </ul>
+                <div class="equation-display">
+                $$V^{dev} = T + \\delta P + \\frac{\\delta^2 R}{1-\\delta} = 8 + 3\\delta + \\frac{6\\delta^2}{1-\\delta}$$
+                </div>
+            </div>
+        </div>
         
-        If player deviates at $t=0$:
-        - Period 0: Receive $T = 8$ (exploit opponent's cooperation)
-        - Period 1: Opponent retaliates, both play $D$, receive $P = 3$
-        - Period 2+: Return to cooperation, receive $R = 6$
+        <div class="proof-step">
+            <div class="proof-step-number">4</div>
+            <div class="proof-step-content">
+                <strong>Cooperation Condition</strong>
+                <div class="equation-display">
+                $$V^{coop} \\geq V^{dev}$$
+                $$\\frac{6}{1-\\delta} \\geq 8 + 3\\delta + \\frac{6\\delta^2}{1-\\delta}$$
+                </div>
+                
+                Multiply by $(1-\\delta)$ and simplify:
+                <div class="equation-display">
+                $$3\\delta^2 - 5\\delta + 2 \\leq 0$$
+                </div>
+                
+                Solving the quadratic:
+                <div class="equation-display">
+                $$\\delta = \\frac{5 \\pm \\sqrt{25 - 24}}{6} = \\frac{5 \\pm 1}{6}$$
+                </div>
+            </div>
+        </div>
         
-        $$V^{dev} = T + \\delta P + \\frac{\\delta^2 R}{1-\\delta}$$
-        $$= 8 + 3\\delta + \\frac{6\\delta^2}{1-\\delta}$$
+        <div class="qed-box">
+            <strong>Simplified Condition:</strong>
+            $$\\boxed{\\delta \\geq 0.40}$$
+        </div>
         
-        #### Cooperation Condition
-        
-        $$V^{coop} \\geq V^{dev}$$
-        $$\\frac{6}{1-\\delta} \\geq 8 + 3\\delta + \\frac{6\\delta^2}{1-\\delta}$$
-        
-        Multiply by $(1-\\delta)$:
-        $$6 \\geq 8(1-\\delta) + 3\\delta(1-\\delta) + 6\\delta^2$$
-        $$6 \\geq 8 - 8\\delta + 3\\delta - 3\\delta^2 + 6\\delta^2$$
-        $$6 \\geq 8 - 5\\delta + 3\\delta^2$$
-        $$3\\delta^2 - 5\\delta + 2 \\leq 0$$
-        
-        Solving the quadratic:
-        $$\\delta = \\frac{5 \\pm \\sqrt{25 - 24}}{6} = \\frac{5 \\pm 1}{6}$$
-        
-        $$\\delta \\in \\left[\\frac{2}{3}, 1\\right] \\text{ or } \\delta \\in \\left[\\frac{1}{3}, \\frac{2}{3}\\right]$$
-        
-        **simplified condition:**
-        $$\\boxed{\\delta \\geq 0.40} \\quad \\blacksquare$$
-        """)
+        </div>
+        """, unsafe_allow_html=True)
 
     st.markdown(r"""
     <div class="theorem-box info">
@@ -9240,40 +9735,65 @@ def render_discount_factor_derivation(show_citations: bool):
     ### 🎯 Theorem 5.1: Critical Discount Factor Formula
     
     <div class="theorem-box info">
-    <strong>📋 Statement:</strong> For a symmetric 2×2 game with payoffs $T > R > P > S$, 
-    the critical discount factor is:
-    
-    $$\\delta^* = \\frac{T - R}{T - P}$$
+        <div class="theorem-title">📋 Theorem Statement</div>
+        For a symmetric 2×2 game with payoffs $T > R > P > S$, the 
+        <span class="key-result">critical discount factor</span> is:
+        <div class="equation-display">
+        $$\\delta^* = \\frac{T - R}{T - P}$$
+        </div>
     </div>
     """, unsafe_allow_html=True)
     
     with st.expander("🔍 **Derivation**", expanded=True):
         st.markdown("""
-        #### Step 1: Present Value of Cooperation
+        <div class="proof-container">
         
-        $$V^{coop} = \\sum_{t=0}^{\\infty} \\delta^t R = \\frac{R}{1-\\delta}$$
+        <div class="proof-step">
+            <div class="proof-step-number">1</div>
+            <div class="proof-step-content">
+                <strong>Present Value of Cooperation</strong>
+                <div class="equation-display">
+                $$V^{coop} = \\sum_{t=0}^{\\infty} \\delta^t R = \\frac{R}{1-\\delta}$$
+                </div>
+            </div>
+        </div>
         
-        ---
+        <div class="proof-step">
+            <div class="proof-step-number">2</div>
+            <div class="proof-step-content">
+                <strong>Present Value of Defection</strong>
+                <div class="equation-display">
+                $$V^{dev} = T + \\sum_{t=1}^{\\infty} \\delta^t P = T + \\frac{\\delta P}{1-\\delta}$$
+                </div>
+            </div>
+        </div>
         
-        #### Step 2: Present Value of Defection
+        <div class="proof-step">
+            <div class="proof-step-number">3</div>
+            <div class="proof-step-content">
+                <strong>Cooperation Condition</strong>
+                <div class="equation-display">
+                $$V^{coop} \\geq V^{dev}$$
+                $$\\frac{R}{1-\\delta} \\geq T + \\frac{\\delta P}{1-\\delta}$$
+                </div>
+                
+                Multiply by $(1-\\delta)$:
+                <div class="equation-display">
+                $$R \\geq T(1-\\delta) + \\delta P$$
+                $$R \\geq T - T\\delta + \\delta P$$
+                $$R - T \\geq \\delta(P - T)$$
+                $$\\delta \\geq \\frac{T - R}{T - P}$$
+                </div>
+            </div>
+        </div>
         
-        $$V^{dev} = T + \\sum_{t=1}^{\\infty} \\delta^t P = T + \\frac{\\delta P}{1-\\delta}$$
+        <div class="qed-box">
+            <strong>Final Formula:</strong>
+            $$\\boxed{\\delta^* = \\frac{T - R}{T - P}}$$
+        </div>
         
-        ---
-        
-        #### Step 3: Cooperation Condition
-        
-        $$V^{coop} \\geq V^{dev}$$
-        $$\\frac{R}{1-\\delta} \\geq T + \\frac{\\delta P}{1-\\delta}$$
-        
-        Multiply by $(1-\\delta)$:
-        $$R \\geq T(1-\\delta) + \\delta P$$
-        $$R \\geq T - T\\delta + \\delta P$$
-        $$R - T \\geq \\delta(P - T)$$
-        $$\\delta \\geq \\frac{T - R}{T - P}$$
-        
-        $$\\boxed{\\delta^* = \\frac{T - R}{T - P}} \\quad \\blacksquare$$
-        """)
+        </div>
+        """, unsafe_allow_html=True)
 
     st.markdown(r"""
     <div class="theorem-box info">
@@ -9297,26 +9817,46 @@ def render_cooperation_margin_proof(show_citations: bool):
     ### 🎯 Theorem 5.2: Cooperation Margin Derivation
     
     <div class="theorem-box">
-    <strong>📋 Definition:</strong> The cooperation margin $M(\\delta)$ measures the 
-    incentive strength to maintain cooperation.
+        <div class="theorem-title">📋 Definition</div>
+        The cooperation margin <span class="key-result">$M(\\delta)$</span> measures the 
+        incentive strength to maintain cooperation over deviation.
     </div>
     """, unsafe_allow_html=True)
     
     with st.expander("🔍 **Derivation**", expanded=True):
         st.markdown("""
-        **Definition:**
-        $$M(\\delta) = V^{coop}(\\delta) - V^{dev}(\\delta)$$
+        <div class="proof-container">
         
-        ---
+        <div class="proof-step">
+            <div class="proof-step-number">1</div>
+            <div class="proof-step-content">
+                <strong>Definition of Cooperation Margin</strong>
+                <div class="equation-display">
+                $$M(\\delta) = V^{coop}(\\delta) - V^{dev}(\\delta)$$
+                </div>
+                This represents the net present value advantage of cooperating versus deviating.
+            </div>
+        </div>
         
-        $$M(\\delta) = \\frac{R}{1-\\delta} - \\left(T + \\frac{\\delta P}{1-\\delta}\\right)$$
+        <div class="proof-step">
+            <div class="proof-step-number">2</div>
+            <div class="proof-step-content">
+                <strong>Substitution and Simplification</strong>
+                <div class="equation-display">
+                $$M(\\delta) = \\frac{R}{1-\\delta} - \\left(T + \\frac{\\delta P}{1-\\delta}\\right)$$
+                $$= \\frac{R - T(1-\\delta) - \\delta P}{1-\\delta}$$
+                $$= \\frac{R - T + T\\delta - \\delta P}{1-\\delta}$$
+                </div>
+            </div>
+        </div>
         
-        $$= \\frac{R - T(1-\\delta) - \\delta P}{1-\\delta}$$
+        <div class="qed-box">
+            <strong>Final Formula:</strong>
+            $$\\boxed{M(\\delta) = \\frac{R - T + \\delta(T - P)}{1-\\delta}}$$
+        </div>
         
-        $$= \\frac{R - T + T\\delta - \\delta P}{1-\\delta}$$
-        
-        $$\\boxed{M(\\delta) = \\frac{R - T + \\delta(T - P)}{1-\\delta}}$$
-        """)
+        </div>
+        """, unsafe_allow_html=True)
     
     with st.expander("📊 **Harmony Game Application**", expanded=True):
         st.markdown("""
@@ -9370,35 +9910,67 @@ def render_discount_factor_comparison(show_citations: bool):
     ### 🎯 Theorem 5.3: Discount Factor Comparative Analysis
     
     <div class="theorem-box warning">
-    <strong>📋 Statement:</strong> The critical discount factor $\\delta^*$ is inversely 
-    related to cooperation stability.
+        <div class="theorem-title">📋 Theorem Statement</div>
+        The critical discount factor <span class="key-result">$\\delta^*$ is inversely 
+        related to cooperation stability</span>.
     </div>
     """, unsafe_allow_html=True)
     
     with st.expander("🔍 **Analysis**", expanded=True):
         st.markdown("""
-        **Formula:**
-        $$\\delta^* = \\frac{T - R}{T - P}$$
+        <div class="proof-container">
         
-        ---
+        <div class="proof-step">
+            <div class="proof-step-number">1</div>
+            <div class="proof-step-content">
+                <strong>Base Formula</strong>
+                <div class="equation-display">
+                $$\\delta^* = \\frac{T - R}{T - P}$$
+                </div>
+            </div>
+        </div>
         
-        **Comparative Statics:**
+        <div class="proof-step">
+            <div class="proof-step-number">2</div>
+            <div class="proof-step-content">
+                <strong>Effect of Increasing $R$ (Cooperation Reward)</strong>
+                <div class="equation-display">
+                $$\\frac{\\partial \\delta^*}{\\partial R} = \\frac{-1}{T - P} < 0$$
+                </div>
+                <div class="corollary-box">
+                Higher cooperation rewards → Lower threshold → <strong>Easier cooperation</strong>
+                </div>
+            </div>
+        </div>
         
-        1. **Effect of increasing $R$ (cooperation reward):**
-           $$\\frac{\\partial \\delta^*}{\\partial R} = \\frac{-1}{T - P} < 0$$
-           
-           Higher cooperation rewards → Lower threshold → Easier cooperation
+        <div class="proof-step">
+            <div class="proof-step-number">3</div>
+            <div class="proof-step-content">
+                <strong>Effect of Increasing $T$ (Temptation)</strong>
+                <div class="equation-display">
+                $$\\frac{\\partial \\delta^*}{\\partial T} = \\frac{P - R}{(T - P)^2}$$
+                </div>
+                <div class="corollary-box">
+                For $R > P$: Higher temptation → Higher threshold → <strong>Harder cooperation</strong>
+                </div>
+            </div>
+        </div>
         
-        2. **Effect of increasing $T$ (temptation):**
-           $$\\frac{\\partial \\delta^*}{\\partial T} = \\frac{P - R}{(T - P)^2}$$
-           
-           For $R > P$: Higher temptation → Higher threshold → Harder cooperation
+        <div class="proof-step">
+            <div class="proof-step-number">4</div>
+            <div class="proof-step-content">
+                <strong>Effect of Increasing $P$ (Punishment)</strong>
+                <div class="equation-display">
+                $$\\frac{\\partial \\delta^*}{\\partial P} = \\frac{R - T}{(T - P)^2}$$
+                </div>
+                <div class="corollary-box">
+                For $T > R$: Harsher punishment → Lower threshold → <strong>Easier cooperation</strong>
+                </div>
+            </div>
+        </div>
         
-        3. **Effect of increasing $P$ (punishment):**
-           $$\\frac{\\partial \\delta^*}{\\partial P} = \\frac{R - T}{(T - P)^2}$$
-           
-           For $T > R$: Harsher punishment → Lower threshold → Easier cooperation
-        """)
+        </div>
+        """, unsafe_allow_html=True)
 
     st.markdown(r"""
     <div class="theorem-box warning">
@@ -9441,28 +10013,32 @@ def render_yield_suppression_coefficient(show_citations: bool):
     ### 🎯 Section 6.1: Yield Suppression Coefficient
     
     <div class="theorem-box info">
-    <strong>📋 Model:</strong> Based on Warnock and Warnock (2009) and Dallas Federal 
-    Reserve (2025), the yield suppression model is:
-    
-    $$\\Delta Y_t = \\beta_1 \\Delta F_t + \\epsilon_t$$
+        <div class="theorem-title">📋 Empirical Model</div>
+        Based on Warnock and Warnock (2009) and Dallas Federal Reserve (2025), the yield suppression model is:
+        <div class="equation-display">
+        $$\\Delta Y_t = \\beta_1 \\Delta F_t + \\epsilon_t$$
+        </div>
     </div>
     """, unsafe_allow_html=True)
     
     with st.expander("📖 **Model Specification**", expanded=True):
         st.markdown("""
-        **Variables:**
-        - $\\Delta Y_t$ = Change in 10-year Treasury yield (basis points)
-        - $\\Delta F_t$ = Change in foreign official inflows (\\$100 billion)
-        - $\\beta_1$ = Yield sensitivity coefficient = **-2.4 bp per \\$100B**
-        - $\\epsilon_t$ = Error term
+        <div class="definition-card">
+            <strong>📚 Variables:</strong><br><br>
+            <ul>
+                <li>$\\Delta Y_t$ = Change in 10-year Treasury yield (basis points)</li>
+                <li>$\\Delta F_t$ = Change in foreign official inflows (\\$100 billion)</li>
+                <li>$\\beta_1$ = Yield sensitivity coefficient = <span class="key-result">-2.4 bp per \\$100B</span></li>
+                <li>$\\epsilon_t$ = Error term</li>
+            </ul>
+        </div>
         
-        ---
-        
-        **Interpretation:**
-        
-        For every \\$100 billion increase in foreign official Treasury purchases, 
-        the 10-year yield decreases by **2.4 basis points**.
-        """)
+        <div class="corollary-box">
+            <strong>Interpretation:</strong><br>
+            For every \\$100 billion increase in foreign official Treasury purchases, 
+            the 10-year yield decreases by <strong>2.4 basis points</strong>.
+        </div>
+        """, unsafe_allow_html=True)
 
     st.markdown("""
     <div class="theorem-box info">
@@ -10139,43 +10715,61 @@ def render_tariff_correlation_proof(show_citations: bool):
     ### 🎯 Theorem 9.2: U.S.-China Tariff Correlation Analysis
     
     <div class="theorem-box">
-    <strong>📋 Statement:</strong> U.S. and Chinese tariff rates exhibit strong positive 
-    correlation during 2018-2025.
+        <div class="theorem-title">📋 Theorem Statement</div>
+        U.S. and Chinese tariff rates exhibit <span class="key-result">strong positive correlation</span> 
+        during 2018-2025, empirically validating Tit-for-Tat behavior.
     </div>
     """, unsafe_allow_html=True)
     
     with st.expander("📊 **Empirical Results**", expanded=True):
         st.markdown("""
-        **Data:**
-        - Sample period: 2018-2025 (quarterly data)
-        - $n = 32$ observations
-        - Variables: U.S. tariff rate ($x$), Chinese tariff rate ($y$)
+        <div class="proof-container">
         
-        ---
+        <div class="proof-step">
+            <div class="proof-step-number">1</div>
+            <div class="proof-step-content">
+                <strong>Data Specification</strong>
+                <ul>
+                    <li>Sample period: 2018-2025 (quarterly data)</li>
+                    <li>$n = 32$ observations</li>
+                    <li>Variables: U.S. tariff rate ($x$), Chinese tariff rate ($y$)</li>
+                </ul>
+            </div>
+        </div>
         
-        **Calculation:**
+        <div class="proof-step">
+            <div class="proof-step-number">2</div>
+            <div class="proof-step-content">
+                <strong>Correlation Calculation</strong>
+                <div class="equation-display">
+                $$r = 0.89$$
+                </div>
+            </div>
+        </div>
         
-        $$r = 0.89$$
+        <div class="proof-step">
+            <div class="proof-step-number">3</div>
+            <div class="proof-step-content">
+                <strong>Hypothesis Test</strong>
+                <div class="equation-display">
+                $$t = 0.89\\sqrt{\\frac{32-2}{1-0.89^2}} = 0.89\\sqrt{\\frac{30}{0.2079}} = 10.73$$
+                </div>
+                <ul>
+                    <li><strong>Critical Value:</strong> $t_{0.025, 30} = 2.042$</li>
+                    <li><strong>P-value:</strong> $p < 0.001$</li>
+                </ul>
+            </div>
+        </div>
         
-        **Test Statistic:**
+        <div class="qed-box">
+            <strong>Conclusion:</strong> Since $|t| = 10.73 > 2.042$ and $p < 0.001$:<br>
+            Strong positive correlation confirmed at $\\alpha = 0.05$.<br><br>
+            <em>Interpretation:</em> Tariff actions by one country strongly predict retaliatory 
+            tariffs by the other, consistent with tit-for-tat behavior.
+        </div>
         
-        $$t = 0.89\\sqrt{\\frac{32-2}{1-0.89^2}} = 0.89\\sqrt{\\frac{30}{0.2079}} = 10.73$$
-        
-        **Critical Value:** $t_{0.025, 30} = 2.042$
-        
-        **P-value:** $p < 0.001$
-        
-        ---
-        
-        **Conclusion:**
-        
-        Since $|t| = 10.73 > 2.042$ and $p < 0.001$:
-        
-        $$\\boxed{\\text{Strong positive correlation confirmed at } \\alpha = 0.05} \\quad \\blacksquare$$
-        
-        **Interpretation:** Tariff actions by one country strongly predict retaliatory 
-        tariffs by the other, consistent with tit-for-tat behavior.
-        """)
+        </div>
+        """, unsafe_allow_html=True)
 
     st.markdown("""
     <div class="theorem-box info">
@@ -10834,8 +11428,16 @@ def render_related_proofs(proof_type: str):
 def render_proof_navigator():
     """Render quick navigation for all proofs with working clickable buttons."""
     
-    st.markdown("### 🧭 All Proofs Quick Access")
-    st.markdown("*Click any theorem to jump directly to it*")
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); 
+                padding: 1rem 1.5rem; 
+                border-radius: 12px; 
+                margin-bottom: 1rem;
+                box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);">
+        <h3 style="color: white; margin: 0; font-size: 1.2rem;">🧭 All Proofs Quick Access</h3>
+        <p style="color: #e0e7ff; margin: 0.5rem 0 0 0; font-size: 0.95rem;">Click any theorem to jump directly to it</p>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Complete proof data structure
     proof_data = {
@@ -10932,74 +11534,86 @@ def render_proof_navigator():
                     st.rerun()
 
 def render_related_concepts(proof_type: str):
-    """Render related concepts and applications."""
+    """Render related concepts and applications with enhanced styling."""
     
-    st.markdown("### 🔗 Related Concepts & Applications")
+    # Define concept data based on proof type
+    concepts_data = {
+        "Nash": {
+            "key_concepts": ["Best Response Functions", "Rationalizability", "Iterated Elimination of Dominated Strategies"],
+            "applications": ["Trade negotiations", "Oligopoly pricing", "Auction design"]
+        },
+        "Pareto": {
+            "key_concepts": ["Social Welfare", "Efficiency Frontier", "Market Failures"],
+            "applications": ["Policy evaluation", "Resource allocation", "Welfare economics"]
+        },
+        "Folk Theorem": {
+            "key_concepts": ["Subgame Perfect Equilibrium", "Trigger Strategies", "Reputation Effects"],
+            "applications": ["International cooperation", "Cartel stability", "Long-term contracts"]
+        },
+        "Yield": {
+            "key_concepts": ["Bond Pricing", "Interest Rate Determination", "Capital Flows"],
+            "applications": ["Monetary policy", "Exchange rate management", "Financial stability"]
+        },
+        "Dominant": {
+            "key_concepts": ["Strict Dominance", "Weak Dominance", "Iterated Elimination"],
+            "applications": ["Strategic decision-making", "Market competition", "Policy analysis"]
+        },
+        "Discount": {
+            "key_concepts": ["Time Preference", "Future Payoff Valuation", "Present Value"],
+            "applications": ["Long-term agreements", "Investment decisions", "Treaty negotiations"]
+        }
+    }
     
-    if "Nash" in proof_type:
-        st.markdown("""
-        **Key Concepts:**
-        - Best Response Functions
-        - Rationalizability
-        - Iterated Elimination of Dominated Strategies
-        
-        **Applications:**
-        - Trade negotiations
-        - Oligopoly pricing
-        - Auction design
-        """)
+    # Find matching concepts
+    matched_data = None
+    for key, data in concepts_data.items():
+        if key in proof_type:
+            matched_data = data
+            break
     
-    elif "Pareto" in proof_type:
-        st.markdown("""
-        **Key Concepts:**
-        - Social Welfare
-        - Efficiency Frontier
-        - Market Failures
-        
-        **Applications:**
-        - Policy evaluation
-        - Resource allocation
-        - Welfare economics
-        """)
+    if not matched_data:
+        # Default concepts
+        matched_data = {
+            "key_concepts": ["Game Theory Fundamentals", "Strategic Interaction", "Equilibrium Analysis"],
+            "applications": ["Economic modeling", "International relations", "Strategic planning"]
+        }
     
-    elif "Folk Theorem" in proof_type:
-        st.markdown("""
-        **Key Concepts:**
-        - Subgame Perfect Equilibrium
-        - Trigger Strategies
-        - Reputation Effects
-        
-        **Applications:**
-        - International cooperation
-        - Cartel stability
-        - Long-term contracts
-        """)
+    # Build the HTML
+    key_concepts_items = "".join([f"<li>{c}</li>" for c in matched_data["key_concepts"]])
+    applications_items = "".join([f"<li>{a}</li>" for a in matched_data["applications"]])
     
-    elif "Yield" in proof_type:
-        st.markdown("""
-        **Key Concepts:**
-        - Bond Pricing
-        - Interest Rate Determination
-        - Capital Flows
-        
-        **Applications:**
-        - Monetary policy
-        - Exchange rate management
-        - Financial stability
-        """)
+    html = f"""
+    <div class="related-concepts-container">
+        <div class="concepts-card key-concepts">
+            <div class="concepts-card-title">📖 Key Concepts</div>
+            <ul class="concepts-list">
+                {key_concepts_items}
+            </ul>
+        </div>
+        <div class="concepts-card applications">
+            <div class="concepts-card-title">🎯 Applications</div>
+            <ul class="concepts-list">
+                {applications_items}
+            </ul>
+        </div>
+    </div>
+    """
+    
+    st.markdown(html, unsafe_allow_html=True)
 
 
 def render_citation_box(citation: str, url: Optional[str] = None):
-    """Render formatted citation box."""
+    """Render formatted citation box with enhanced styling."""
     
-    st.markdown("---")
-    st.markdown("### 📚 Citation")
+    access_link_html = ""
+    if url:
+        access_link_html = f'<a href="{url}" target="_blank" class="access-link">🔗 Access Source</a>'
     
     citation_html = f"""
-    <div style="background-color: #f7fafc; padding: 1rem; border-left: 4px solid #4299e1; 
-                border-radius: 5px; margin: 1rem 0;">
-        <p style="margin: 0; font-style: italic;">{citation}</p>
-        {f'<p style="margin-top: 0.5rem;"><a href="{url}" target="_blank">🔗 Access Source</a></p>' if url else ''}
+    <div class="citation-card">
+        <div class="citation-header">📚 Citation</div>
+        <div class="citation-text">{citation}</div>
+        {access_link_html}
     </div>
     """
     
