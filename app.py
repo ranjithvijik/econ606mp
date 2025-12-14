@@ -1,15 +1,11 @@
 """
-PhD-Level Interactive Research Application:
+Interactive Research Application:
 Game-Theoretic Analysis of U.S.-China Economic Relations (2001-2025)
 
 =========================================================================
 A comprehensive interactive application implementing rigorous game-theoretic
 frameworks to analyze the structural transformation of U.S.-China economic
 relations from cooperative equilibrium to strategic conflict.
-
-Author: ECON 606 Research Team
-Version: 3.0.0 - PhD Research Edition
-Last Updated: December 2025
 
 Theoretical Frameworks:
 - Nash Equilibrium Analysis (Nash, 1950)
@@ -61,7 +57,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 st.set_page_config(
-    page_title="U.S.-China Game Theory Analysis | PhD Research Tool",
+    page_title="U.S.-China Game Theory Analysis",
     page_icon="🇨🇳↔🇺🇸",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -69,12 +65,10 @@ st.set_page_config(
         'Get Help': 'https://github.com/research/us-china-game-theory',
         'Report a bug': 'https://github.com/research/us-china-game-theory/issues',
         'About': """
-        ## PhD-Level Game Theory Research Application
+        ## Game Theory Research Application
         
         This application implements rigorous game-theoretic frameworks to analyze 
         U.S.-China economic relations from 2001-2025.
-        
-        **Version:** 3.0.0 - PhD Research Edition
         
         **Citation:**
         Author (2025). Game-Theoretic Analysis of U.S.-China Economic Relations.
@@ -6648,7 +6642,7 @@ def main():
     
     st.markdown("""
     <div class="info-box" style="color: inherit;">
-    <strong>📊 PhD-Level Interactive Research Application</strong><br><br>
+    <strong>📊 Interactive Research Application</strong><br><br>
     This application implements rigorous game-theoretic frameworks to analyze the structural 
     transformation of U.S.-China economic relations from cooperative equilibrium (2001-2007) 
     to strategic conflict (2018-2025).<br><br>
