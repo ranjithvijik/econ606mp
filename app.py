@@ -378,10 +378,26 @@ h1, h2, h3 {
 }
 
 [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3, 
-[data-testid="stSidebar"] h4, [data-testid="stSidebar"] p, [data-testid="stSidebar"] span, 
+[data-testid="stSidebar"] h4, [data-testid="stSidebar"] h5, [data-testid="stSidebar"] h6,
+[data-testid="stSidebar"] p, [data-testid="stSidebar"] span, 
 [data-testid="stSidebar"] label, [data-testid="stSidebar"] small, [data-testid="stSidebar"] caption,
-[data-testid="stSidebar"] li {
+[data-testid="stSidebar"] li, [data-testid="stSidebar"] div,
+[data-testid="stSidebar"] strong, [data-testid="stSidebar"] em,
+[data-testid="stSidebar"] b, [data-testid="stSidebar"] i {
     color: #F1F5F9 !important;
+}
+
+/* Sidebar input and button text */
+[data-testid="stSidebar"] input,
+[data-testid="stSidebar"] button,
+[data-testid="stSidebar"] select,
+[data-testid="stSidebar"] textarea {
+    color: #F1F5F9 !important;
+}
+
+/* Sidebar links */
+[data-testid="stSidebar"] a {
+    color: #60A5FA !important;
 }
 
 [data-testid="stSidebar"] .stRadio label {
