@@ -6131,7 +6131,7 @@ def render_kpi_dashboard(kpis: list):
             # and aligns with the custom .metric-card CSS
             
             delta_html = ""
-            if delta:
+            if delta and str(delta).lower() != "undefined" and str(delta).lower() != "none":
                 # Color logic
                 d_color = "#64748B" # Default slate
                 if color == 'success': d_color = "#16A34A" # Green
@@ -6141,6 +6141,9 @@ def render_kpi_dashboard(kpis: list):
                 delta_html = f"<div style='font-size: 0.85rem; color: {d_color}; margin-top: 8px; font-weight: 600;'>{delta}</div>"
             
             # Dynamic font size for long values
+            if not value or str(value).lower() == "undefined":
+                value = "N/A"
+                
             font_size = "2.0rem"
             if len(str(value)) > 15:
                 font_size = "1.5rem"
@@ -7144,7 +7147,7 @@ class VisualizationEngine:
             yaxis_title="<b>Cooperation Index (0-1)</b>",
             legend=dict(x=0.65, y=0.98),
             height=650,
-            hovermode='closest',
+            hovermode='x',
             yaxis=dict(range=[0, 1.1])
         )
         
@@ -12295,6 +12298,7 @@ def add_methodology_styling():
     
     .methodology-box {
         background-color: #fffaf0;
+        color: #000000;
         padding: 1.5rem;
         border-left: 4px solid #dd6b20;
         border-radius: 5px;
@@ -12312,12 +12316,33 @@ def add_methodology_styling():
         margin-bottom: 0.75rem;
     }
     
-    .methodology-box ol, .methodology-box ul {
+    .methodology-box ul {
         margin-bottom: 0;
+        line-height: 1.6;
+        padding-left: 0;
+        list-style-type: none;
+    }
+
+    .methodology-box ol {
+        margin-bottom: 0;
+        line-height: 1.6;
+        padding-left: 1.5rem;
     }
     
     .methodology-box li {
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.8rem;
+        padding-left: 0;
+    }
+    
+    .methodology-box a {
+        color: #00008B;
+        text-decoration: underline;
+        word-break: break-all;
+    }
+    
+    .methodology-box a:hover {
+        color: #0000CD;
+        text-decoration: none;
     }
     </style>
     """, unsafe_allow_html=True)
