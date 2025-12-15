@@ -6125,7 +6125,6 @@ def render_kpi_dashboard(kpis: list):
             
             # Determine if delta should be inverted
             color = kpi.get('color', 'primary')
-            delta_color = "normal" if color == 'success' else "inverse"
             
             # Custom HTML Metric Card
             # This prevents truncation of long values like "Prisoner's Dilemma" 
@@ -6639,7 +6638,7 @@ class VisualizationEngine:
                 borderwidth=1
             ),
             margin=dict(t=100),
-            hovermode='x unified'
+            hovermode='x'
         )
         
         fig.update_layout(layout)
@@ -6714,7 +6713,7 @@ class VisualizationEngine:
             xaxis_title="<b>Date</b>",
             yaxis_title="<b>Average Tariff Rate (%)</b>",
             legend=dict(orientation="h", y=1.1, x=0.5, xanchor="center", bgcolor=layout['legend']['bgcolor']),
-            hovermode='x unified',
+            hovermode='x',
             margin=dict(l=40, r=20, t=100, b=40)
         )
         
@@ -12259,7 +12258,7 @@ def add_methodology_styling():
     <style>
     .citation-box {
         background-color: #f7fafc;
-        color: #1a202c;
+        color: #000000;
         padding: 1.5rem;
         border-left: 4px solid #4299e1;
         border-radius: 5px;
@@ -12268,25 +12267,30 @@ def add_methodology_styling():
     
     .citation-box h3 {
         margin-top: 0;
-        color: #667eea;
+        color: #2b6cb0;
     }
     
     .citation-box ul {
         margin-bottom: 0;
+        line-height: 1.6;
+        padding-left: 0;
+        list-style-type: none;
     }
     
     .citation-box li {
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.8rem;
+        padding-left: 0;
     }
     
     .citation-box a {
-        color: #4299e1;
-        text-decoration: none;
+        color: #00008B;
+        text-decoration: underline;
         word-break: break-all;
     }
     
     .citation-box a:hover {
-        text-decoration: underline;
+        color: #0000CD;
+        text-decoration: none;
     }
     
     .methodology-box {
