@@ -113,12 +113,12 @@ class ProfessionalTheme:
     DANGER = '#B22234'        # U.S. Red (conflict)
     INFO = '#0284C7'          # Blue (information)
     
-    # Neutral Palette
-    BACKGROUND = '#FAFAFA'    # Off-white
-    SURFACE = '#FFFFFF'       # Pure white
-    TEXT_PRIMARY = '#18181B'  # Near black (Zinc 900)
-    TEXT_SECONDARY = '#3F3F46' # Dark gray (Zinc 700)
-    BORDER = '#D4D4D8'        # Medium gray (Zinc 300)
+    # Neutral Palette (Dark Mode Optimized)
+    BACKGROUND = '#0F172A'    # Dark Blue/Slate
+    SURFACE = '#1E293B'       # Slate 800
+    TEXT_PRIMARY = '#F8FAFC'  # Slate 50
+    TEXT_SECONDARY = '#CBD5E1' # Slate 300
+    BORDER = '#334155'        # Slate 700
     
     # Chart Colors (US/China themed)
     CHART_PALETTE = [
@@ -162,29 +162,29 @@ st.markdown("""
 
 :root {
     /* Brand Palette - Deep & Vibrant */
-    --us-blue: #0A2472;
-    --china-red: #D62828;
-    --china-gold: #F77F00;
+    --us-blue: #3B82F6;       /* Brighter Blue for Dark Mode */
+    --china-red: #EF4444;     /* Brighter Red for Dark Mode */
+    --china-gold: #F59E0B;    /* Brighter Gold */
     --accent: #FFD700;
     
-    /* Box Colors */
-    --box-blue-bg: #EFF6FF;
+    /* Box Colors - Dark Mode with Transparency */
+    --box-blue-bg: rgba(59, 130, 246, 0.1);
     --box-blue-border: #3B82F6;
-    --box-red-bg: #FEF2F2;
+    --box-red-bg: rgba(239, 68, 68, 0.1);
     --box-red-border: #EF4444;
-    --box-green-bg: #F0FDF4;
+    --box-green-bg: rgba(34, 197, 94, 0.1);
     --box-green-border: #22C55E;
     
-    /* Neutral System */
-    --bg-light: #F8FAFC;
-    --bg-dark: #0F172A;
-    --text-primary: #0F172A;
-    --text-secondary: #334155;
+    /* Neutral System (Dark) */
+    --bg-light: #0F172A;
+    --bg-dark: #020617;
+    --text-primary: #F8FAFC;
+    --text-secondary: #CBD5E1;
     
     /* Glassmorphism Tokens */
-    --glass-bg: rgba(255, 255, 255, 0.9);
-    --glass-border: 1px solid rgba(255, 255, 255, 0.6);
-    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    --glass-bg: rgba(30, 41, 59, 0.7);
+    --glass-border: 1px solid rgba(148, 163, 184, 0.1);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
     --backdrop-blur: blur(12px);
     
     /* Animation Tokens */
@@ -192,23 +192,23 @@ st.markdown("""
     --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Base Canvas Enhancement - Light Mode */
+/* Base Canvas Enhancement - Dark Mode */
 .stApp {
-    background: radial-gradient(circle at 10% 20%, rgb(239, 246, 255) 0%, rgb(248, 250, 252) 100%);
+    background-color: #0F172A;
     background-image: 
-        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 50%),
-        radial-gradient(at 100% 0%, rgba(239, 68, 68, 0.05) 0px, transparent 50%);
+        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(239, 68, 68, 0.15) 0px, transparent 50%);
     font-family: 'Plus Jakarta Sans', sans-serif;
-    color: #1E293B !important;
+    color: #F8FAFC !important;
 }
 
-/* Ensure all text is readable in light mode */
+/* Ensure all text is readable in dark mode */
 p, span, div, li, td, th, label {
-    color: #1E293B !important;
+    color: #CBD5E1 !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    color: #0F172A !important;
+    color: #F8FAFC !important;
 }
 
 /* ============================================
@@ -237,10 +237,10 @@ h1, h2, h3 {
     font-weight: 700;
     margin-top: 3rem;
     margin-bottom: 1.5rem;
-    color: var(--text-primary);
+    color: #F8FAFC;
     position: relative;
     padding-left: 1rem;
-    border-left: 5px solid var(--china-gold);
+    border-left: 5px solid var(--chain-gold);
 }
 
 /* ============================================
@@ -266,7 +266,7 @@ h1, h2, h3 {
 
 .metric-card h3 {
     font-size: 1.1rem;
-    color: var(--text-secondary);
+    color: #94A3B8; /* Slate 400 */
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 0.5rem;
@@ -285,30 +285,35 @@ h1, h2, h3 {
    INFO & CITATION BOXES
    ============================================ */
 .info-box, .citation-box, .methodology-box {
-    background: #FFFFFF;
+    background: rgba(30, 41, 59, 0.5); /* Dark background */
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    border: 1px solid #E2E8F0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(148, 163, 184, 0.1);
     transition: var(--transition-fast);
     margin: 1rem 0;
+    color: #E2E8F0;
+}
+
+.info-box strong, .citation-box strong, .methodology-box strong {
+    color: #F8FAFC !important;
 }
 
 .info-box {
     border-left: 5px solid var(--box-blue-border);
-    background: var(--box-blue-bg);
+    background: rgba(59, 130, 246, 0.1);
     border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 .citation-box {
     border-left: 5px solid var(--box-red-border);
-    background: var(--box-red-bg);
+    background: rgba(239, 68, 68, 0.1);
     border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .methodology-box {
     border-left: 5px solid var(--box-green-border);
-    background: var(--box-green-bg);
+    background: rgba(34, 197, 94, 0.1);
     border: 1px solid rgba(34, 197, 94, 0.2);
 }
 
@@ -339,25 +344,26 @@ h1, h2, h3 {
 
 /* Tabs */
 .stTabs [data-baseweb="tab-list"] {
-    background: rgba(255,255,255,0.6);
+    background: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(10px);
     border-radius: 12px;
     padding: 6px;
     gap: 8px;
-    border: 1px solid rgba(255,255,255,0.4);
+    border: 1px solid rgba(148, 163, 184, 0.1);
 }
 
 .stTabs [data-baseweb="tab"] {
     border-radius: 8px;
     font-weight: 600;
     padding: 8px 20px;
-    color: var(--text-secondary);
+    color: #94A3B8; /* Slate 400 */
 }
 
 .stTabs [aria-selected="true"] {
-    background: #FFFFFF;
-    color: var(--us-blue) !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    background: #1E293B; /* Slate 800 */
+    color: #F8FAFC !important; /* Slate 50 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    border: 1px solid rgba(148, 163, 184, 0.1);
 }
 
 /* ============================================
@@ -483,34 +489,35 @@ h1, h2, h3 {
 
 /* Theorem Statement Box */
 .theorem-box {
-    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-    border-left: 5px solid #16a34a;
+    background: linear-gradient(135deg, rgba(20, 83, 45, 0.3) 0%, rgba(22, 101, 52, 0.2) 100%);
+    border-left: 5px solid #22c55e;
     border-radius: 8px;
     padding: 1.5rem 2rem;
     margin: 1.5rem 0;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    color: #E2E8F0;
 }
 
 .theorem-box.warning {
-    background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
-    border-left-color: #ca8a04;
+    background: linear-gradient(135deg, rgba(161, 98, 7, 0.2) 0%, rgba(202, 138, 4, 0.1) 100%);
+    border-left-color: #eab308;
 }
 
 .theorem-box.danger {
-    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-    border-left-color: #dc2626;
+    background: linear-gradient(135deg, rgba(185, 28, 28, 0.2) 0%, rgba(239, 68, 68, 0.1) 100%);
+    border-left-color: #ef4444;
 }
 
 .theorem-box.info {
-    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-    border-left-color: #2563eb;
+    background: linear-gradient(135deg, rgba(29, 78, 216, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
+    border-left-color: #3b82f6;
 }
 
 .theorem-title {
     font-family: 'Georgia', 'Times New Roman', serif;
     font-size: 1.3rem;
     font-weight: 700;
-    color: #1e3a5f;
+    color: #F8FAFC;
     margin-bottom: 0.75rem;
     display: flex;
     align-items: center;
@@ -519,12 +526,13 @@ h1, h2, h3 {
 
 /* Definition Card */
 .definition-card {
-    background: #f8fafc;
-    border: 2px solid #e2e8f0;
+    background: #1E293B;
+    border: 2px solid #334155;
     border-radius: 12px;
     padding: 1.5rem 2rem;
     margin: 1rem 0;
     position: relative;
+    color: #E2E8F0;
 }
 
 .definition-card::before {
@@ -542,12 +550,13 @@ h1, h2, h3 {
 
 /* Proof Steps Container */
 .proof-container {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: #1E293B;
+    border: 1px solid #334155;
     border-radius: 12px;
     padding: 2rem;
     margin: 1.5rem 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    color: #E2E8F0;
 }
 
 .proof-step {
@@ -555,9 +564,10 @@ h1, h2, h3 {
     gap: 1rem;
     margin: 1.5rem 0;
     padding: 1rem;
-    background: #f9fafb;
+    background: #0F172A; /* Dark background for steps */
     border-radius: 8px;
     border-left: 3px solid #6366f1;
+    color: #CBD5E1;
 }
 
 .proof-step-number {
@@ -577,34 +587,29 @@ h1, h2, h3 {
     flex: 1;
 }
 
-/* QED Box */
+/* Reference to removed QED Box section if needed, mostly re-styling */
 .qed-box {
-    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    background: linear-gradient(135deg, rgba(6, 78, 59, 0.2) 0%, rgba(6, 95, 70, 0.1) 100%);
     border: 2px solid #10b981;
     border-radius: 8px;
     padding: 1.25rem 1.5rem;
     margin: 1.5rem 0;
     text-align: center;
     font-size: 1.1rem;
+    color: #E2E8F0;
 }
-
-.qed-box::after {
-    content: " ∎";
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: #059669;
-}
-
+/* ... */
 /* LaTeX Equation Container */
 .equation-display {
-    background: #fefefe;
-    border: 1px solid #e5e7eb;
+    background: #1E293B;
+    border: 1px solid #334155;
     border-radius: 8px;
     padding: 1.5rem 2rem;
     margin: 1rem 0;
     text-align: center;
     overflow-x: auto;
     position: relative;
+    color: #F8FAFC;
 }
 
 .equation-display::before {
@@ -620,21 +625,23 @@ h1, h2, h3 {
 
 /* Key Result Highlight */
 .key-result {
-    background: linear-gradient(90deg, #fef3c7 0%, #fde68a 100%);
+    background: linear-gradient(90deg, rgba(120, 53, 15, 0.3) 0%, rgba(146, 64, 14, 0.2) 100%);
     border-radius: 4px;
     padding: 0.25rem 0.5rem;
     font-weight: 600;
     display: inline-block;
+    color: #FCD34D;
 }
 
 /* Assumption Box */
 .assumption-box {
-    background: #fefce8;
+    background: rgba(66, 32, 6, 0.2);
     border: 1px dashed #ca8a04;
     border-radius: 8px;
     padding: 1rem 1.5rem;
     margin: 1rem 0;
     font-style: italic;
+    color: #E2E8F0;
 }
 
 .assumption-box::before {
@@ -645,20 +652,22 @@ h1, h2, h3 {
 
 /* Lemma Box */
 .lemma-box {
-    background: #f0f9ff;
+    background: rgba(12, 74, 110, 0.2);
     border-left: 4px solid #0ea5e9;
     border-radius: 0 8px 8px 0;
     padding: 1rem 1.5rem;
     margin: 1rem 0;
+    color: #E2E8F0;
 }
 
 /* Corollary Box */
 .corollary-box {
-    background: #faf5ff;
+    background: rgba(88, 28, 135, 0.2);
     border-left: 4px solid #a855f7;
     border-radius: 0 8px 8px 0;
     padding: 1rem 1.5rem;
     margin: 1rem 0;
+    color: #E2E8F0;
 }
 
 /* Proof Navigation Tabs */
@@ -670,8 +679,8 @@ h1, h2, h3 {
 }
 
 .proof-nav-item {
-    background: #e0e7ff;
-    color: #4338ca;
+    background: #1E293B;
+    color: #818CF8;
     padding: 0.5rem 1rem;
     border-radius: 20px;
     font-size: 0.9rem;
@@ -687,7 +696,8 @@ h1, h2, h3 {
 
 /* Math Notation Highlight */
 .math-highlight {
-    background: #dbeafe;
+    background: #1E293B;
+    color: #E2E8F0;
     padding: 0.15rem 0.4rem;
     border-radius: 4px;
     font-family: 'Computer Modern', 'Georgia', serif;
@@ -732,23 +742,24 @@ h1, h2, h3 {
 }
 
 .derivation-reason {
-    color: #6b7280;
+    color: #94A3B8;
     font-size: 0.9rem;
     font-style: italic;
 }
 
 /* Interactive proof sections */
 .stExpander[data-baseweb="accordion"] > div:first-child {
-    background: linear-gradient(90deg, #f8fafc, #f1f5f9) !important;
+    background: linear-gradient(90deg, #1E293B, #0F172A) !important;
     border-radius: 8px !important;
     font-weight: 600 !important;
+    color: #F8FAFC !important;
 }
 
 /* Proof header styling */
 h4 {
-    color: #1e40af !important;
+    color: #60A5FA !important;
     font-family: 'Georgia', serif !important;
-    border-bottom: 2px solid #dbeafe;
+    border-bottom: 2px solid #3B82F6;
     padding-bottom: 0.5rem;
     margin-top: 1.5rem !important;
 }
@@ -758,13 +769,14 @@ h4 {
 /* ============================================ */
 
 .citation-card {
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    border: 1px solid #bae6fd;
+    background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+    border: 1px solid #0369a1;
     border-left: 4px solid #0284c7;
     border-radius: 12px;
     padding: 1.25rem 1.5rem;
     margin: 1.5rem 0;
-    box-shadow: 0 2px 4px rgba(2, 132, 199, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    color: #E2E8F0;
 }
 
 .citation-card .citation-header {
@@ -774,12 +786,12 @@ h4 {
     margin-bottom: 0.75rem;
     font-size: 1.1rem;
     font-weight: 600;
-    color: #0369a1;
+    color: #7DD3FC;
 }
 
 .citation-card .citation-text {
     font-style: italic;
-    color: #1e3a5f;
+    color: #E2E8F0;
     line-height: 1.6;
     margin-bottom: 0.75rem;
 }
@@ -817,8 +829,8 @@ h4 {
 }
 
 .nav-category-card {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border: 1px solid #e2e8f0;
+    background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+    border: 1px solid #334155;
     border-radius: 12px;
     padding: 1.25rem;
     transition: all 0.2s;
@@ -826,14 +838,14 @@ h4 {
 
 .nav-category-card:hover {
     border-color: #6366f1;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
     transform: translateY(-2px);
 }
 
 .nav-category-title {
     font-size: 1.05rem;
     font-weight: 600;
-    color: #4338ca;
+    color: #818CF8;
     margin-bottom: 0.75rem;
     display: flex;
     align-items: center;
@@ -849,18 +861,18 @@ h4 {
 .nav-item {
     padding: 0.5rem 0.75rem;
     margin: 0.25rem 0;
-    background: white;
+    background: #1E293B;
     border-radius: 6px;
     font-size: 0.9rem;
-    color: #475569;
+    color: #CBD5E1;
     cursor: pointer;
     transition: all 0.15s;
     border-left: 3px solid transparent;
 }
 
 .nav-item:hover {
-    background: #e0e7ff;
-    color: #4338ca;
+    background: #312E81;
+    color: #F8FAFC;
     border-left-color: #6366f1;
 }
 
@@ -876,10 +888,11 @@ h4 {
 }
 
 .concepts-card {
-    background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
-    border: 1px solid #e9d5ff;
+    background: linear-gradient(135deg, #3B0764 0%, #1E1B4B 100%);
+    border: 1px solid #6B21A8;
     border-radius: 12px;
     padding: 1.25rem;
+    color: #E2E8F0;
 }
 
 .concepts-card.key-concepts {
@@ -888,8 +901,8 @@ h4 {
 
 .concepts-card.applications {
     border-left: 4px solid #22c55e;
-    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-    border-color: #bbf7d0;
+    background: linear-gradient(135deg, #14532D 0%, #052E16 100%);
+    border-color: #16a34a;
 }
 
 .concepts-card-title {
@@ -902,11 +915,11 @@ h4 {
 }
 
 .concepts-card.key-concepts .concepts-card-title {
-    color: #7c3aed;
+    color: #A78BFA;
 }
 
 .concepts-card.applications .concepts-card-title {
-    color: #16a34a;
+    color: #4ADE80;
 }
 
 .concepts-list {
@@ -919,7 +932,7 @@ h4 {
     padding: 0.4rem 0;
     padding-left: 1.5rem;
     position: relative;
-    color: #4b5563;
+    color: #CBD5E1;
     font-size: 0.95rem;
 }
 
@@ -2762,14 +2775,21 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
             st.session_state['tournament_noise'] = preset_config['noise']
             st.rerun()
 
+        # Initialize default strategies if not in session state
+        if "tournament_strategies" not in st.session_state:
+            st.session_state["tournament_strategies"] = [
+                StrategyType.TIT_FOR_TAT.value, 
+                StrategyType.ALWAYS_COOPERATE.value,
+                StrategyType.ALWAYS_DEFECT.value, 
+                StrategyType.GRIM_TRIGGER.value
+            ]
+
         col1, col2 = st.columns(2)
         
         with col1:
             selected_strategies = st.multiselect(
                 "Select Strategies to Compete:",
                 [s.value for s in StrategyType],
-                default=[StrategyType.TIT_FOR_TAT.value, StrategyType.ALWAYS_COOPERATE.value,
-                         StrategyType.ALWAYS_DEFECT.value, StrategyType.GRIM_TRIGGER.value],
                 key="tournament_strategies"
             )
         
@@ -2802,15 +2822,19 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
         if st.session_state['tournament_results'] is not None:
             results = st.session_state['tournament_results']
             
-            col1, col2 = st.columns(2)
+            # Vertical layout for Tournament Results
             
-            with col1:
-                fig = AdvancedVisualizationEngine.create_tournament_heatmap(results)
-                st.plotly_chart(fig, use_container_width=True)
+            # 1. Tournament Heatmap
+            fig = AdvancedVisualizationEngine.create_tournament_heatmap(results)
+            fig.update_layout(height=600)
+            st.plotly_chart(fig, use_container_width=True)
             
-            with col2:
-                fig = AdvancedVisualizationEngine.create_tournament_rankings(results)
-                st.plotly_chart(fig, use_container_width=True)
+            st.markdown("<div style='height: 20px'></div>", unsafe_allow_html=True)
+            
+            # 2. Tournament Rankings
+            fig = AdvancedVisualizationEngine.create_tournament_rankings(results)
+            fig.update_layout(height=600)
+            st.plotly_chart(fig, use_container_width=True)
             
             # Winner announcement
             rankings = results.groupby('Strategy_1')['Payoff_1'].sum().sort_values(ascending=False)
@@ -5659,7 +5683,8 @@ def get_professional_layout(height=None):
     """Returns professional Plotly layout with modern font system."""
     
     # Check for dark mode
-    dark_mode = st.session_state.get('dark_mode', False)
+    # Dark mode enforced
+    dark_mode = True
     
     if dark_mode:
         bg_color = '#0F172A'
@@ -5752,19 +5777,19 @@ def render_professional_metric(label: str, value: str, delta: str = None,
     """Renders a professional metric card."""
     
     color_map = {
-        'primary': '#1E3A8A',
-        'success': '#059669',
-        'warning': '#F59E0B',
-        'danger': '#DC2626'
+        'primary': '#60A5FA',    # Blue 400
+        'success': '#34D399',    # Green 400
+        'warning': '#FBBF24',    # Amber 400
+        'danger': '#F87171'      # Red 400
     }
     
     delta_html = ""
     if delta:
-        delta_color = '#059669' if '+' in delta or '↑' in delta else '#DC2626'
+        delta_color = '#34D399' if '+' in delta or '↑' in delta else '#F87171'
         # Heuristic: if delta starts with -, it's red. If +, green. 
         # But 'from 2001' might just be context. Let's assume standard negative/positive connotations.
         if delta.startswith('-'):
-            delta_color = '#DC2626'
+            delta_color = '#F87171'
         
         delta_html = f'<div style="color: {delta_color}; font-size: 0.9rem; font-weight: 600; margin-top: 0.5rem;">{delta}</div>'
     
@@ -5772,9 +5797,9 @@ def render_professional_metric(label: str, value: str, delta: str = None,
     <div class="metric-card">
         <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
             <span style="font-size: 2rem;">{icon}</span>
-            <h3 style="margin: 0; color: #64748B; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">{label}</h3>
+            <h3 style="margin: 0; color: #94A3B8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">{label}</h3>
         </div>
-        <div class="value" style="font-size: 2.5rem; font-weight: 800; color: {color_map.get(color, '#1E3A8A')}; margin: 0.5rem 0;">
+        <div class="value" style="font-size: 2.5rem; font-weight: 800; color: {color_map.get(color, '#60A5FA')}; margin: 0.5rem 0;">
             {value}
         </div>
         {delta_html}
@@ -5786,10 +5811,10 @@ def show_professional_loading(message: str = "Processing..."):
     return st.markdown(f"""
     <div style="display: flex; flex-direction: column; align-items: center; 
                 justify-content: center; padding: 3rem; gap: 1rem;">
-        <div style="width: 60px; height: 60px; border: 4px solid #E2E8F0; 
-                    border-top-color: #1E3A8A; border-radius: 50%; 
+        <div style="width: 60px; height: 60px; border: 4px solid #334155; 
+                    border-top-color: #60A5FA; border-radius: 50%; 
                     animation: spin 1s linear infinite;"></div>
-        <p style="color: #64748B; font-weight: 600; font-size: 1.1rem;">{message}</p>
+        <p style="color: #94A3B8; font-weight: 600; font-size: 1.1rem;">{message}</p>
     </div>
     <style>
     @keyframes spin {{
@@ -5819,7 +5844,7 @@ def render_professional_table(df: pd.DataFrame, title: str = None,
     
     if title:
         st.markdown(f"""
-        <div style="background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%);
+        <div style="background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
                     color: white; padding: 1rem 1.5rem; border-radius: 12px 12px 0 0;
                     font-weight: 700; font-size: 1.2rem; display: flex; 
                     align-items: center; gap: 0.75rem;">
@@ -5908,7 +5933,7 @@ def render_comparison_chart(data_dict: dict, title: str,
         layout = get_professional_layout(height=600)
         
         # Determine text color based on theme
-        dark_mode = st.session_state.get('dark_mode', False)
+        dark_mode = True
         text_color = '#F8FAFC' if dark_mode else '#1E293B'
         
         layout.update(
@@ -5980,7 +6005,7 @@ def render_professional_timeline(events: list, title: str = "Historical Timeline
     
     st.markdown(f"""
     <div style="text-align: center; margin-bottom: 2rem;">
-        <h2 style="font-size: 2rem; font-weight: 700; color: #1E293B; margin-bottom: 0.5rem;">
+        <h2 style="font-size: 2rem; font-weight: 700; color: #F8FAFC; margin-bottom: 0.5rem;">
             {title}
         </h2>
         <div style="width: 100px; height: 4px; background: linear-gradient(90deg, #1E3A8A, #B91C1C); 
@@ -6032,7 +6057,7 @@ def render_professional_timeline(events: list, title: str = "Historical Timeline
         fig.add_annotation(
             x=event['year'],
             y=i,
-            text=f"<b style='font-size:14px'>{event['title']}</b><br><span style='color:#374151'>{event['description']}</span>",
+            text=f"<b style='font-size:14px; color:#F8FAFC'>{event['title']}</b><br><span style='color:#CBD5E1'>{event['description']}</span>",
             showarrow=True,
             arrowhead=2,
             arrowsize=1,
@@ -6040,17 +6065,17 @@ def render_professional_timeline(events: list, title: str = "Historical Timeline
             arrowcolor=event_color,
             ax=x_offset * 180,
             ay=0,
-            bgcolor='#FFFFFF',
+            bgcolor='#1E293B',
             bordercolor=event_color,
             borderwidth=3,
             borderpad=12,
-            font=dict(size=13, family='Inter, sans-serif', color='#1E293B'),
+            font=dict(size=13, family='Inter, sans-serif', color='#F8FAFC'),
             align='left' if side == 'right' else 'right',
             opacity=1
         )
     
     # Get theme-aware settings
-    dark_mode = st.session_state.get('dark_mode', False)
+    dark_mode = True
     text_color = '#F8FAFC' if dark_mode else '#1E293B'
     desc_color = '#94A3B8' if dark_mode else '#374151'
     grid_color = '#334155' if dark_mode else '#E2E8F0'
@@ -6164,7 +6189,7 @@ def render_professional_heatmap(data: np.ndarray,
     ))
 
     # Theme aware layout
-    dark_mode = st.session_state.get('dark_mode', False)
+    dark_mode = True
     bg_color = '#0F172A' if dark_mode else '#FFFFFF'
     paper_color = '#0F172A' if dark_mode else '#FAFAFA'
     text_color = '#F8FAFC' if dark_mode else '#1E293B'
@@ -6325,6 +6350,8 @@ def render_gauge_chart(value: float, title: str,
     layout = get_professional_layout(height=500)
     
     # Override layout specifics for gauge
+    layout.pop('xaxis', None)
+    layout.pop('yaxis', None)
     layout.update(
         font={'family': 'Inter, sans-serif', 'color': layout['font']['color']}
     )
@@ -7118,7 +7145,7 @@ class VisualizationEngine:
             yaxis_title="<b>Cooperation Index (0-1)</b>",
             legend=dict(x=0.65, y=0.98),
             height=650,
-            hovermode='x unified',
+            hovermode='closest',
             yaxis=dict(range=[0, 1.1])
         )
         
@@ -7586,7 +7613,8 @@ def main():
     # ==========================================================================
     
     # Theme Toggle at the top
-    toggle_dark_mode()
+    # Theme Toggle Removed - Dark Mode Enforced
+    # toggle_dark_mode()
     
     st.sidebar.markdown("#### 🧭 Research Navigator")
     
@@ -7835,19 +7863,25 @@ def render_executive_summary(harmony_matrix: PayoffMatrix, pd_matrix: PayoffMatr
 
     st.markdown("---")
 
-    # Main Visuals
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown("### 📉 Cooperation Collapse")
-        fig = VisualizationEngine.create_cooperation_index_chart(coop_data)
-        st.plotly_chart(fig, use_container_width=True)
-        st.caption("Figure 1: The composite cooperation index shows a structural break starting in 2018.")
+    # Main Visuals - Vertical Layout as requested
     
-    with col2:
-        st.markdown("### ⚔️ Tariff Escalation")
-        fig = VisualizationEngine.create_tariff_escalation_chart(tariff_data)
-        st.plotly_chart(fig, use_container_width=True)
-        st.caption("Figure 2: Tariff rates follow a strict Tit-for-Tat retaliation pattern.")
+    # Cooperation Collapse (Top)
+    st.markdown("### 📉 Cooperation Collapse")
+    fig = VisualizationEngine.create_cooperation_index_chart(coop_data)
+    # Increase height for better visibility due to full width
+    fig.update_layout(height=600)
+    st.plotly_chart(fig, use_container_width=True)
+    st.caption("Figure 1: The composite cooperation index shows a structural break starting in 2018.")
+    
+    st.markdown("<div style='height: 20px'></div>", unsafe_allow_html=True) # Spacer
+
+    # Tariff Escalation (Bottom)
+    st.markdown("### ⚔️ Tariff Escalation")
+    fig = VisualizationEngine.create_tariff_escalation_chart(tariff_data)
+    # Increase height for better visibility due to full width
+    fig.update_layout(height=600) 
+    st.plotly_chart(fig, use_container_width=True)
+    st.caption("Figure 2: Tariff rates follow a strict Tit-for-Tat retaliation pattern.")
 
     st.markdown("---")
     
@@ -8689,8 +8723,8 @@ def render_mathematical_proofs_page():
     st.markdown("---")
     
     # Quick Navigation at the bottom
-    with st.expander("🧭 Quick Navigation - Jump to Any Proof", expanded=False):
-        render_proof_navigator()
+    # Quick Navigation at the bottom
+    render_proof_navigator()
     
     # Related Concepts
     with st.expander("🔗 Related Concepts"):
@@ -8911,14 +8945,14 @@ def render_nash_existence_proof(show_citations: bool):
                 <br><br>
                 The game $\\Gamma$ satisfies:
                 <br><br>
-                <strong>① Finite Player Set:</strong>
-                $$N = \\{U, C\\} \\text{ with } |N| = 2$$
-                
-                <strong>② Finite Strategy Sets:</strong>
-                $$S_U = S_C = \\{C, D\\} \\text{ with } |S_i| = 2 \\text{ for each } i$$
-                
-                <strong>③ Well-Defined Payoffs:</strong>
-                $$u: S_U \\times S_C \\to \\mathbb{R}^2 \\text{ is well-defined on finite space}$$
+                <strong>① Finite Player Set:</strong><br>
+                $N = \\{U, C\\} \\text{ with } |N| = 2$
+                <br><br>
+                <strong>② Finite Strategy Sets:</strong><br>
+                $S_U = S_C = \\{C, D\\} \\text{ with } |S_i| = 2 \\text{ for each } i$
+                <br><br>
+                <strong>③ Well-Defined Payoffs:</strong><br>
+                $u: S_U \\times S_C \\to \\mathbb{R}^2 \\text{ is well-defined on finite space}$
             </div>
         </div>
         
@@ -9873,20 +9907,17 @@ def render_grim_trigger_proof(show_citations: bool):
                 <strong>One-Shot Deviation Analysis</strong>
                 <br><br>
                 The one-shot deviation analysis is identical to TFT since:
-                <ul>
-                    <li>Deviation payoff: $T$ in period 0</li>
-                    <li>Punishment: $P$ forever after</li>
-                </ul>
+                <br>
+                • Deviation payoff: $T$ in period 0<br>
+                • Punishment: $P$ forever after
             </div>
         </div>
         
         <div class="proof-step">
             <div class="proof-step-number">2</div>
             <div class="proof-step-content">
-                <strong>Critical Discount Factor</strong>
-                <div class="equation-display">
-                $$\\delta^* = \\frac{T - R}{T - P}$$
-                </div>
+                <strong>Critical Discount Factor</strong><br><br>
+                $\delta^* = \frac{T - R}{T - P}$
             </div>
         </div>
         
@@ -9986,10 +10017,8 @@ def render_tit_for_tat_sustainability(show_citations: bool):
         <div class="proof-step">
             <div class="proof-step-number">2</div>
             <div class="proof-step-content">
-                <strong>Cooperation Path Value</strong>
-                <div class="equation-display">
-                $$V^{coop} = \\frac{R}{1-\\delta} = \\frac{6}{1-\\delta}$$
-                </div>
+                <strong>Cooperation Path Value</strong><br><br>
+                $V^{coop} = \frac{R}{1-\delta} = \frac{6}{1-\delta}$
             </div>
         </div>
         
@@ -9998,42 +10027,33 @@ def render_tit_for_tat_sustainability(show_citations: bool):
             <div class="proof-step-content">
                 <strong>Deviation Path Value</strong>
                 <br><br>
-                If player deviates at $t=0$:
-                <ul>
-                    <li>Period 0: Receive $T = 8$ (exploit opponent's cooperation)</li>
-                    <li>Period 1: Opponent retaliates, both play $D$, receive $P = 3$</li>
-                    <li>Period 2+: Return to cooperation, receive $R = 6$</li>
-                </ul>
-                <div class="equation-display">
-                $$V^{dev} = T + \\delta P + \\frac{\\delta^2 R}{1-\\delta} = 8 + 3\\delta + \\frac{6\\delta^2}{1-\\delta}$$
-                </div>
+                If player deviates at $t=0$:<br>
+                • Period 0: Receive $T = 8$ (exploit opponent's cooperation)<br>
+                • Period 1: Opponent retaliates, both play $D$, receive $P = 3$<br>
+                • Period 2+: Return to cooperation, receive $R = 6$
+                <br><br>
+                $V^{dev} = T + \delta P + \frac{\delta^2 R}{1-\delta} = 8 + 3\delta + \frac{6\delta^2}{1-\delta}$
             </div>
         </div>
         
         <div class="proof-step">
             <div class="proof-step-number">4</div>
             <div class="proof-step-content">
-                <strong>Cooperation Condition</strong>
-                <div class="equation-display">
-                $$V^{coop} \\geq V^{dev}$$
-                $$\\frac{6}{1-\\delta} \\geq 8 + 3\\delta + \\frac{6\\delta^2}{1-\\delta}$$
-                </div>
-                
-                Multiply by $(1-\\delta)$ and simplify:
-                <div class="equation-display">
-                $$3\\delta^2 - 5\\delta + 2 \\leq 0$$
-                </div>
-                
-                Solving the quadratic:
-                <div class="equation-display">
-                $$\\delta = \\frac{5 \\pm \\sqrt{25 - 24}}{6} = \\frac{5 \\pm 1}{6}$$
-                </div>
+                <strong>Cooperation Condition</strong><br><br>
+                $V^{coop} \geq V^{dev}$<br>
+                $\frac{6}{1-\delta} \geq 8 + 3\delta + \frac{6\delta^2}{1-\delta}$
+                <br><br>
+                Multiply by $(1-\delta)$ and simplify:<br>
+                $3\delta^2 - 5\delta + 2 \leq 0$
+                <br><br>
+                Solving the quadratic:<br>
+                $\delta = \frac{5 \pm \sqrt{25 - 24}}{6} = \frac{5 \pm 1}{6}$
             </div>
         </div>
         
         <div class="qed-box">
-            <strong>Simplified Condition:</strong>
-            $$\\boxed{\\delta \\geq 0.40}$$
+            <strong>Simplified Condition:</strong><br>
+            $\boxed{\delta \geq 0.40}$
         </div>
         
         </div>
@@ -10080,45 +10100,38 @@ def render_discount_factor_derivation(show_citations: bool):
         <div class="proof-step">
             <div class="proof-step-number">1</div>
             <div class="proof-step-content">
-                <strong>Present Value of Cooperation</strong>
-                <div class="equation-display">
-                $$V^{coop} = \\sum_{t=0}^{\\infty} \\delta^t R = \\frac{R}{1-\\delta}$$
-                </div>
+                <strong>Present Value of Cooperation</strong><br><br>
+                $V^{coop} = \sum_{t=0}^{\infty} \delta^t R = \frac{R}{1-\delta}$
             </div>
         </div>
         
         <div class="proof-step">
             <div class="proof-step-number">2</div>
             <div class="proof-step-content">
-                <strong>Present Value of Defection</strong>
-                <div class="equation-display">
-                $$V^{dev} = T + \\sum_{t=1}^{\\infty} \\delta^t P = T + \\frac{\\delta P}{1-\\delta}$$
-                </div>
+                <strong>Present Value of Defection</strong><br><br>
+                $V^{dev} = T + \sum_{t=1}^{\infty} \delta^t P = T + \frac{\delta P}{1-\delta}$
             </div>
         </div>
         
         <div class="proof-step">
             <div class="proof-step-number">3</div>
             <div class="proof-step-content">
-                <strong>Cooperation Condition</strong>
-                <div class="equation-display">
-                $$V^{coop} \\geq V^{dev}$$
-                $$\\frac{R}{1-\\delta} \\geq T + \\frac{\\delta P}{1-\\delta}$$
-                </div>
-                
-                Multiply by $(1-\\delta)$:
-                <div class="equation-display">
-                $$R \\geq T(1-\\delta) + \\delta P$$
-                $$R \\geq T - T\\delta + \\delta P$$
-                $$R - T \\geq \\delta(P - T)$$
-                $$\\delta \\geq \\frac{T - R}{T - P}$$
-                </div>
+                <strong>Cooperation Condition</strong><br><br>
+                $V^{coop} \geq V^{dev}$<br>
+                $\frac{R}{1-\delta} \geq T + \frac{\delta P}{1-\delta}$
+                <br><br>
+                Multiply by $(1-\delta)$:
+                <br>
+                $R \geq T(1-\delta) + \delta P$<br>
+                $R \geq T - T\delta + \delta P$<br>
+                $R - T \geq \delta(P - T)$<br>
+                $\delta \geq \frac{T - R}{T - P}$
             </div>
         </div>
         
         <div class="qed-box">
-            <strong>Final Formula:</strong>
-            $$\\boxed{\\delta^* = \\frac{T - R}{T - P}}$$
+            <strong>Final Formula:</strong><br>
+            $\boxed{\delta^* = \frac{T - R}{T - P}}$
         </div>
         
         </div>
@@ -10159,10 +10172,9 @@ def render_cooperation_margin_proof(show_citations: bool):
         <div class="proof-step">
             <div class="proof-step-number">1</div>
             <div class="proof-step-content">
-                <strong>Definition of Cooperation Margin</strong>
-                <div class="equation-display">
-                $$M(\\delta) = V^{coop}(\\delta) - V^{dev}(\\delta)$$
-                </div>
+                <strong>Definition of Cooperation Margin</strong><br><br>
+                $M(\delta) = V^{coop}(\delta) - V^{dev}(\delta)$
+                <br>
                 This represents the net present value advantage of cooperating versus deviating.
             </div>
         </div>
@@ -10170,18 +10182,16 @@ def render_cooperation_margin_proof(show_citations: bool):
         <div class="proof-step">
             <div class="proof-step-number">2</div>
             <div class="proof-step-content">
-                <strong>Substitution and Simplification</strong>
-                <div class="equation-display">
-                $$M(\\delta) = \\frac{R}{1-\\delta} - \\left(T + \\frac{\\delta P}{1-\\delta}\\right)$$
-                $$= \\frac{R - T(1-\\delta) - \\delta P}{1-\\delta}$$
-                $$= \\frac{R - T + T\\delta - \\delta P}{1-\\delta}$$
-                </div>
+                <strong>Substitution and Simplification</strong><br><br>
+                $M(\delta) = \frac{R}{1-\delta} - \left(T + \frac{\delta P}{1-\delta}\right)$<br>
+                $= \frac{R - T(1-\delta) - \delta P}{1-\delta}$<br>
+                $= \frac{R - T + T\delta - \delta P}{1-\delta}$
             </div>
         </div>
         
         <div class="qed-box">
-            <strong>Final Formula:</strong>
-            $$\\boxed{M(\\delta) = \\frac{R - T + \\delta(T - P)}{1-\\delta}}$$
+            <strong>Final Formula:</strong><br>
+            $\boxed{M(\delta) = \frac{R - T + \delta(T - P)}{1-\delta}}$
         </div>
         
         </div>
@@ -10252,20 +10262,16 @@ def render_discount_factor_comparison(show_citations: bool):
         <div class="proof-step">
             <div class="proof-step-number">1</div>
             <div class="proof-step-content">
-                <strong>Base Formula</strong>
-                <div class="equation-display">
-                $$\\delta^* = \\frac{T - R}{T - P}$$
-                </div>
+                <strong>Base Formula</strong><br><br>
+                $\delta^* = \frac{T - R}{T - P}$
             </div>
         </div>
         
         <div class="proof-step">
             <div class="proof-step-number">2</div>
             <div class="proof-step-content">
-                <strong>Effect of Increasing $R$ (Cooperation Reward)</strong>
-                <div class="equation-display">
-                $$\\frac{\\partial \\delta^*}{\\partial R} = \\frac{-1}{T - P} < 0$$
-                </div>
+                <strong>Effect of Increasing $R$ (Cooperation Reward)</strong><br><br>
+                $\frac{\partial \delta^*}{\partial R} = \frac{-1}{T - P} < 0$
                 <div class="corollary-box">
                 Higher cooperation rewards → Lower threshold → <strong>Easier cooperation</strong>
                 </div>
@@ -10275,10 +10281,8 @@ def render_discount_factor_comparison(show_citations: bool):
         <div class="proof-step">
             <div class="proof-step-number">3</div>
             <div class="proof-step-content">
-                <strong>Effect of Increasing $T$ (Temptation)</strong>
-                <div class="equation-display">
-                $$\\frac{\\partial \\delta^*}{\\partial T} = \\frac{P - R}{(T - P)^2}$$
-                </div>
+                <strong>Effect of Increasing $T$ (Temptation)</strong><br><br>
+                $\frac{\partial \delta^*}{\partial T} = \frac{P - R}{(T - P)^2}$
                 <div class="corollary-box">
                 For $R > P$: Higher temptation → Higher threshold → <strong>Harder cooperation</strong>
                 </div>
@@ -10288,10 +10292,8 @@ def render_discount_factor_comparison(show_citations: bool):
         <div class="proof-step">
             <div class="proof-step-number">4</div>
             <div class="proof-step-content">
-                <strong>Effect of Increasing $P$ (Punishment)</strong>
-                <div class="equation-display">
-                $$\\frac{\\partial \\delta^*}{\\partial P} = \\frac{R - T}{(T - P)^2}$$
-                </div>
+                <strong>Effect of Increasing $P$ (Punishment)</strong><br><br>
+                $\frac{\partial \delta^*}{\partial P} = \frac{R - T}{(T - P)^2}$
                 <div class="corollary-box">
                 For $T > R$: Harsher punishment → Lower threshold → <strong>Easier cooperation</strong>
                 </div>
@@ -12235,26 +12237,15 @@ def render_research_documents_page():
             pdf_url = raw_base_url + pdf_mapping[selected_file]
             
             # Primary: Google Docs Viewer
-            viewer_url = f"https://docs.google.com/viewer?url={pdf_url}&embedded=true"
             # Fallback: Mozilla PDF.js
             pdfjs_url = f"https://mozilla.github.io/pdf.js/web/viewer.html?file={pdf_url}"
             
-            # Display with tabs for multiple viewers
-            tab1, tab2 = st.tabs(["📄 Google Viewer", "🔧 Alternative Viewer"])
-            
-            with tab1:
-                try:
-                    st.markdown(f'<iframe src="{viewer_url}" width="100%" height="800" style="border: none;"></iframe>', 
-                               unsafe_allow_html=True)
-                except Exception as e:
-                    st.error(f"Failed to load Google Viewer: {e}")
-            
-            with tab2:
-                try:
-                    st.markdown(f'<iframe src="{pdfjs_url}" width="100%" height="800" style="border: none;"></iframe>', 
-                               unsafe_allow_html=True)
-                except Exception as e:
-                    st.error(f"Failed to load PDF.js Viewer: {e}")
+
+            try:
+                st.markdown(f'<iframe src="{pdfjs_url}" width="100%" height="800" style="border: none;"></iframe>', 
+                           unsafe_allow_html=True)
+            except Exception as e:
+                st.error(f"Failed to load Document Viewer: {e}")
             
             # Fallback link
             st.markdown(f"[📥 Download / View on GitHub]({GITHUB_BASE_URL + pdf_mapping[selected_file]})")
@@ -12268,6 +12259,7 @@ def add_methodology_styling():
     <style>
     .citation-box {
         background-color: #f7fafc;
+        color: #1a202c;
         padding: 1.5rem;
         border-left: 4px solid #4299e1;
         border-radius: 5px;
@@ -12533,15 +12525,19 @@ def render_tournament_arena_page(harmony_matrix: PayoffMatrix, pd_matrix: Payoff
                 # Results visualization
                 st.markdown('<h3 class="section-header">Tournament Results</h3>', unsafe_allow_html=True)
                 
-                col1, col2 = st.columns(2)
+                # Vertical Layout as requested
                 
-                with col1:
-                    fig = AdvancedVisualizationEngine.create_tournament_heatmap(results)
-                    st.plotly_chart(fig, use_container_width=True)
+                # 1. Tournament Heatmap
+                fig = AdvancedVisualizationEngine.create_tournament_heatmap(results)
+                fig.update_layout(height=600)
+                st.plotly_chart(fig, use_container_width=True)
                 
-                with col2:
-                    fig = AdvancedVisualizationEngine.create_tournament_rankings(results)
-                    st.plotly_chart(fig, use_container_width=True)
+                st.markdown("<div style='height: 20px'></div>", unsafe_allow_html=True)
+                
+                # 2. Tournament Rankings
+                fig = AdvancedVisualizationEngine.create_tournament_rankings(results)
+                fig.update_layout(height=600)
+                st.plotly_chart(fig, use_container_width=True)
                 
                 # Winner announcement
                 rankings = results.groupby('Strategy_1')['Payoff_1'].sum().sort_values(ascending=False)
@@ -12885,17 +12881,22 @@ def render_parameter_explorer_page(harmony_matrix: PayoffMatrix, pd_matrix: Payo
     # Visualizations
     st.markdown("---")
     
-    col1, col2 = st.columns(2)
+    # Vertical Layout for Visualizations
     
-    with col1:
-        fig = VisualizationEngine.create_payoff_matrix_heatmap(
-            custom_matrix, f"Custom {game_type} Game"
-        )
-        st.plotly_chart(fig, use_container_width=True)
+    # 1. Payoff Matrix Heatmap
+    fig = VisualizationEngine.create_payoff_matrix_heatmap(
+        custom_matrix, f"Custom {game_type} Game"
+    )
+    # Heatmaps are square-ish, but let's give it proper height
+    fig.update_layout(height=600)
+    st.plotly_chart(fig, use_container_width=True)
     
-    with col2:
-        fig = VisualizationEngine.create_cooperation_margin_chart(engine, show_historical=False)
-        st.plotly_chart(fig, use_container_width=True)
+    st.markdown("<div style='height: 20px'></div>", unsafe_allow_html=True) # Spacer
+    
+    # 2. Cooperation Margin Chart
+    fig = VisualizationEngine.create_cooperation_margin_chart(engine, show_historical=False)
+    fig.update_layout(height=600)
+    st.plotly_chart(fig, use_container_width=True)
     
     # Comparative statics
     st.markdown('<h3 class="section-header">Comparative Statics</h3>', unsafe_allow_html=True)
@@ -13215,84 +13216,8 @@ def render_simulation_presets():
     return None
 
 def toggle_dark_mode():
-    """Toggle between light and dark themes."""
-    if 'dark_mode' not in st.session_state:
-        st.session_state['dark_mode'] = False
-    
-    # Toggle button in sidebar (moved to top of sidebar in main function)
-    if st.sidebar.button("🌓 Toggle Theme", key="theme_toggle_btn"):
-        st.session_state['dark_mode'] = not st.session_state['dark_mode']
-        st.rerun()
-    
-    # Apply theme
-    if st.session_state['dark_mode']:
-        st.markdown("""
-        <style>
-        .stApp {
-            background-color: #0F172A;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(239, 68, 68, 0.1) 0px, transparent 50%);
-            color: #F8FAFC;
-        }
-        
-        .sub-header {
-            color: #E2E8F0 !important;
-            border-left-color: #FFD700 !important;
-        }
-        
-        h1, h2, h3, h4, h5, h6, li, span, div, p {
-            color: #E2E8F0 !important;
-        }
-        
-        /* Fix button text color in dark mode */
-        .stButton button {
-            color: #FFFFFF !important;
-        }
-        
-        /* Fix selectbox and input labels */
-        label {
-            color: #E2E8F0 !important;
-        }
-        
-        /* Fix markdown links */
-        a {
-            color: #60A5FA !important;
-        }
-        
-        .metric-card {
-            background: rgba(30, 41, 59, 0.7) !important;
-            backdrop-filter: blur(12px) !important;
-            border: 1px solid rgba(148, 163, 184, 0.2) !important;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
-        }
-        
-        .info-box, .citation-box, .methodology-box {
-            background: rgba(30, 58, 138, 0.4) !important;
-            border-left-color: #60A5FA !important;
-            border: 1px solid rgba(96, 165, 250, 0.2) !important;
-            color: #E2E8F0 !important;
-        }
-        
-        .info-box strong, .citation-box strong, .methodology-box strong {
-            color: #FFFFFF !important;
-        }
-        
-        .metric-value {
-            background: linear-gradient(90deg, #60A5FA, #F87171) !important;
-            -webkit-background-clip: text !important;
-            -webkit-text-fill-color: transparent !important;
-        }
-        
-        /* Make graphs blend in */
-        .js-plotly-plot .plotly .bg {
-            fill: transparent !important;
-        }
-        .js-plotly-plot .plotly .main-svg {
-            background: transparent !important;
-        }
-        </style>
-        """, unsafe_allow_html=True)
+    """Dark mode is now enforced by default css."""
+    pass
 
 def export_all_results():
     """Export all session state results as ZIP."""
