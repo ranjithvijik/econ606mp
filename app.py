@@ -524,6 +524,21 @@ h1, h2, h3 {
     gap: 0.5rem;
 }
 
+/* Metric Cards */
+.metric-card {
+    background: #1E293B;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: transform 0.2s;
+    /* Ensure content doesn't overflow */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    min-width: 0; /* fixes flex item overflow */
+    color: #E2E8F0;
+}
+
 /* Definition Card */
 .definition-card {
     background: #1E293B;
@@ -561,17 +576,16 @@ h1, h2, h3 {
 
 .proof-step {
     display: flex;
-    gap: 1rem;
-    margin: 1.5rem 0;
-    padding: 1rem;
-    background: #0F172A; /* Dark background for steps */
+    flex-direction: column; /* CHANGED from row to column for mobile/vertical layout */
+    align-items: flex-start;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
-    border-left: 3px solid #6366f1;
-    color: #CBD5E1;
+    padding: 1rem;
 }
 
 .proof-step-number {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background-color: #4f46e5;
     color: white;
     width: 32px;
     height: 32px;
@@ -579,7 +593,8 @@ h1, h2, h3 {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
+    font-weight: bold;
+    margin-bottom: 0.5rem; /* Margin bottom instead of right */
     flex-shrink: 0;
 }
 
@@ -9930,13 +9945,13 @@ def render_grim_trigger_proof(show_citations: bool):
                 <br><br>
                 For: $T = 8$, $R = 6$, $P = 3$
                 <div class="equation-display">
-                $$\\delta^* = \\frac{8 - 6}{8 - 3} = \\frac{2}{5} = 0.40$$
+                $$\delta^* = \frac{8 - 6}{8 - 3} = \frac{2}{5} = 0.40$$
                 </div>
             </div>
         </div>
         
         <div class="qed-box">
-            <strong>Conclusion:</strong> Cooperation requires $\\delta > 0.40$.
+            <strong>Conclusion:</strong> Cooperation requires $\delta > 0.40$.
         </div>
         
         </div>
@@ -11760,6 +11775,29 @@ def render_related_proofs(proof_type: str):
 
 def render_proof_navigator():
     """Render quick navigation for all proofs with working clickable buttons."""
+    
+    
+    # Custom CSS for mobile-friendly buttons within expanders
+    st.markdown("""
+    <style>
+    div[data-testid="stExpander"] .stButton button {
+        min-height: 3.5rem;  /* Larger touch target for mobile */
+        white-space: normal; /* Allow text wrap on small screens */
+        height: auto;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        line-height: 1.4;
+        border-radius: 8px;
+        transition: transform 0.1s ease, background-color 0.2s;
+    }
+    div[data-testid="stExpander"] .stButton button:active {
+        transform: scale(0.98); /* Touch feedback */
+    }
+    div[data-testid="stExpander"] .stButton button p {
+        font-size: 1rem; /* Ensure readable font size */
+    }
+    </style>
+    """, unsafe_allow_html=True)
     
     st.markdown("""
     <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); 
