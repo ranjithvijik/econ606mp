@@ -2827,14 +2827,14 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
             # 1. Tournament Heatmap
             fig = AdvancedVisualizationEngine.create_tournament_heatmap(results)
             fig.update_layout(height=600)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
             
             st.markdown("<div style='height: 20px'></div>", unsafe_allow_html=True)
             
             # 2. Tournament Rankings
             fig = AdvancedVisualizationEngine.create_tournament_rankings(results)
             fig.update_layout(height=600)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
             
             # Winner announcement
             rankings = results.groupby('Strategy_1')['Payoff_1'].sum().sort_values(ascending=False)
@@ -2850,7 +2850,7 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
             
             with st.expander("📋 View Detailed Results", expanded=True):
                 add_export_buttons(results, "tournament_results")
-                st.dataframe(results, use_container_width=True, hide_index=True)
+                st.dataframe(results, width="stretch", hide_index=True)
 
     # =========================================================================
     # EVOLUTIONARY DYNAMICS
@@ -2906,7 +2906,7 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
             results = st.session_state['evo_results']
             
             fig = AdvancedVisualizationEngine.create_evolutionary_dynamics_chart(results)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
             
             # Final state
             final_row = results.iloc[-1]
@@ -2979,7 +2979,7 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
             fig = AdvancedVisualizationEngine.create_learning_dynamics_chart(
                 results, algorithm_map[algorithm]
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
             
             # Summary statistics
             st.markdown('<h4 class="section-header">Learning Summary</h4>', unsafe_allow_html=True)
@@ -3033,7 +3033,7 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
         if st.session_state['stochastic_results'] is not None:
             results = st.session_state['stochastic_results']
             fig = AdvancedVisualizationEngine.create_stochastic_game_chart(results)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
             
             # State stats
             state_counts = results['State'].value_counts(normalize=True)
@@ -3103,7 +3103,7 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
             frame = st.slider("View Generation:", 0, len(history)-1, 0, key="sp_frame")
             
             fig = AdvancedVisualizationEngine.create_spatial_grid_animation(history, strats, frame)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
             
             # Play button (Manual loop implementation via st.empty if requested, but slider is safer)
             st.caption("Use the slider to watch the evolution.")
@@ -3164,7 +3164,7 @@ def render_enhanced_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_mat
                 showlegend=False
             )
             fig.update_layout(layout)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
             
         st.markdown("### 🧪 Benchmark Test")
         if st.button("Run Benchmark (vs Standard Bots)"):
@@ -3370,11 +3370,11 @@ def render_interactive_parameter_explorer(harmony_matrix: PayoffMatrix, pd_matri
     
     with col1:
         fig = VisualizationEngine.create_payoff_matrix_heatmap(custom_matrix, f"Custom {game_type} Game")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
     
     with col2:
         fig = VisualizationEngine.create_cooperation_margin_chart(engine, show_historical=False)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
     
     # Comparative statics
     st.markdown('<h3 class="section-header">Comparative Statics</h3>', unsafe_allow_html=True)
@@ -3475,7 +3475,7 @@ def render_interactive_parameter_explorer(harmony_matrix: PayoffMatrix, pd_matri
             fig.update_xaxes(gridcolor=grid_color, row=i, col=j)
             fig.update_yaxes(gridcolor=grid_color, title_text="δ*", row=i, col=j)
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     
 # =============================================================================
 # ABSTRACT BASE CLASSES (Dependency Injection Support)
@@ -5372,7 +5372,7 @@ def render_monte_carlo_dashboard(
         fig = EnhancedVisualizationEngine.create_comprehensive_monte_carlo_dashboard(
             mc_results, engine
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
         
         # Statistical analysis
         st.markdown("### 📉 Statistical Analysis")
@@ -5388,7 +5388,7 @@ def render_monte_carlo_dashboard(
             
             desc_stats = mc_results[['delta', 'margin', 'v_coop', 'v_defect', 
                                     'sharpe_ratio', 'cooperation_probability']].describe()
-            st.dataframe(desc_stats, use_container_width=True)
+            st.dataframe(desc_stats, width="stretch")
             
             # Percentile analysis
             st.markdown("#### Percentile Analysis")
@@ -5406,7 +5406,7 @@ def render_monte_carlo_dashboard(
                 index=['Cooperation Margin', 'Discount Factor']
             ).T
             
-            st.dataframe(percentile_df, use_container_width=True)
+            st.dataframe(percentile_df, width="stretch")
         
         with tab2:
             st.markdown("#### Bootstrap Confidence Intervals (95%)")
@@ -5427,11 +5427,11 @@ def render_monte_carlo_dashboard(
                 })
             
             ci_df = pd.DataFrame(ci_results)
-            st.dataframe(ci_df, use_container_width=True)
+            st.dataframe(ci_df, width="stretch")
         
         with tab3:
             st.markdown("#### Raw Simulation Data")
-            st.dataframe(mc_results, use_container_width=True)
+            st.dataframe(mc_results, width="stretch")
             
             # Download button
             csv = mc_results.to_csv(index=False)
@@ -5483,9 +5483,9 @@ def render_monte_carlo_dashboard(
                 fig = EnhancedVisualizationEngine.create_sensitivity_analysis_chart(
                     sensitivity_results
                 )
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, width="stretch")
                 
-                st.dataframe(sensitivity_results, use_container_width=True)
+                st.dataframe(sensitivity_results, width="stretch")
 
 
 def render_custom_analysis_workbench(
@@ -5579,7 +5579,7 @@ def render_custom_analysis_workbench(
     tab1, tab2, tab3 = st.tabs(["📊 Data View", "🔥 Correlation Matrix", "📈 Trend Plot"])
     
     with tab1:
-        st.dataframe(analysis_df, use_container_width=True)
+        st.dataframe(analysis_df, width="stretch")
         
     with tab2:
         if len(selected_cols) > 1:
@@ -5597,7 +5597,7 @@ def render_custom_analysis_workbench(
             layout.update(title=dict(text="<b>Correlation Matrix</b>", font=dict(color=layout['font']['color'])))
             fig.update_layout(layout)
             
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
         else:
             st.info("Select at least two variables for correlation analysis.")
             
@@ -5619,7 +5619,7 @@ def render_custom_analysis_workbench(
             fig.update_xaxes(gridcolor=grid_color)
             fig.update_yaxes(gridcolor=grid_color)
             
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
         else:
             st.info("No timeline column detected for trend plotting.")
 
@@ -5856,7 +5856,7 @@ def render_professional_table(df: pd.DataFrame, title: str = None,
     # Display styled table
     st.dataframe(
         df,
-        use_container_width=True,
+        width="stretch",
         height=min(400, len(df) * 40 + 50)
     )
     
@@ -5991,7 +5991,7 @@ def render_comparison_chart(data_dict: dict, title: str,
     else:
         fig = go.Figure()
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 def render_professional_timeline(events: list, title: str = "Historical Timeline"):
@@ -6103,7 +6103,7 @@ def render_professional_timeline(events: list, title: str = "Historical Timeline
     # Update marker stroke for dark mode
     fig.update_traces(marker=dict(line=dict(color=marker_line_color, width=3)))
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 def render_kpi_dashboard(kpis: list):
@@ -6235,7 +6235,7 @@ def render_professional_heatmap(data: np.ndarray,
         font=dict(family='Inter, sans-serif', color=text_color)
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 def render_sankey_diagram(source: list, target: list, value: list,
@@ -6288,7 +6288,7 @@ def render_sankey_diagram(source: list, target: list, value: list,
     
     fig.update_layout(layout)
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 def render_gauge_chart(value: float, title: str, 
@@ -6360,7 +6360,7 @@ def render_gauge_chart(value: float, title: str,
     
     fig.update_layout(layout)
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 def render_waterfall_chart(categories: list, values: list, title: str):
@@ -6404,7 +6404,7 @@ def render_waterfall_chart(categories: list, values: list, title: str):
     fig.update_xaxes(title="<b>Components</b>", showgrid=False)
     fig.update_yaxes(title="<b>Value</b>", showgrid=True, gridcolor=grid_color)
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 # =============================================================================
@@ -7582,7 +7582,7 @@ def main():
         with st.container():
             col1, col2, col3 = st.columns([1, 6, 1])
             with col2:
-                st.image("assets/hero.png", use_container_width=True)
+                st.image("assets/hero.png", width="stretch")
     
 
     st.markdown(
@@ -7872,7 +7872,7 @@ def render_executive_summary(harmony_matrix: PayoffMatrix, pd_matrix: PayoffMatr
     fig = VisualizationEngine.create_cooperation_index_chart(coop_data)
     # Increase height for better visibility due to full width
     fig.update_layout(height=600)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     st.caption("Figure 1: The composite cooperation index shows a structural break starting in 2018.")
     
     st.markdown("<div style='height: 20px'></div>", unsafe_allow_html=True) # Spacer
@@ -7882,7 +7882,7 @@ def render_executive_summary(harmony_matrix: PayoffMatrix, pd_matrix: PayoffMatr
     fig = VisualizationEngine.create_tariff_escalation_chart(tariff_data)
     # Increase height for better visibility due to full width
     fig.update_layout(height=600) 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     st.caption("Figure 2: Tariff rates follow a strict Tit-for-Tat retaliation pattern.")
 
     st.markdown("---")
@@ -8013,7 +8013,7 @@ def render_nash_equilibrium_page(harmony_matrix: PayoffMatrix, pd_matrix: Payoff
     # Display payoff matrix
     st.markdown("### Payoff Matrix Visualization")
     fig = VisualizationEngine.create_payoff_matrix_heatmap(matrix, f"Payoff Matrix: {game_type}")
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     
     # Nash equilibrium results
     st.markdown("### Nash Equilibrium Results")
@@ -8057,7 +8057,7 @@ def render_nash_equilibrium_page(harmony_matrix: PayoffMatrix, pd_matrix: Payoff
                 'Cooperate' if matrix.cd[0] >= matrix.dd[0] else 'Defect'
             ]
         })
-        st.dataframe(br_table, use_container_width=True)
+        st.dataframe(br_table, width="stretch")
     
     with col2:
         st.markdown("**China Best Response Function:**")
@@ -8071,7 +8071,7 @@ def render_nash_equilibrium_page(harmony_matrix: PayoffMatrix, pd_matrix: Payoff
                 'Cooperate' if matrix.dc[1] >= matrix.dd[1] else 'Defect'
             ]
         })
-        st.dataframe(br_table_china, use_container_width=True)
+        st.dataframe(br_table_china, width="stretch")
 
 
 def render_pareto_efficiency_page(harmony_matrix: PayoffMatrix, pd_matrix: PayoffMatrix):
@@ -8107,7 +8107,7 @@ def render_pareto_efficiency_page(harmony_matrix: PayoffMatrix, pd_matrix: Payof
         'Pareto Efficient': ['✅ Yes' if efficiency[k] else '❌ No' for k in outcomes.keys()]
     })
     
-    st.dataframe(efficiency_df, use_container_width=True)
+    st.dataframe(efficiency_df, width="stretch")
     
     # Pareto frontier visualization
     st.markdown("### Pareto Frontier Visualization")
@@ -8145,7 +8145,7 @@ def render_pareto_efficiency_page(harmony_matrix: PayoffMatrix, pd_matrix: Payof
         height=600
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     
     # Nash-Pareto alignment analysis
     st.markdown("### Nash-Pareto Alignment Analysis")
@@ -8220,7 +8220,7 @@ def render_repeated_games_page(harmony_matrix: PayoffMatrix, pd_matrix: PayoffMa
     st.markdown("### Cooperation Margin vs. Discount Factor")
     
     fig = VisualizationEngine.create_cooperation_margin_chart(engine)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     
     st.markdown("""
     <div class="citation-box">
@@ -8232,7 +8232,7 @@ def render_repeated_games_page(harmony_matrix: PayoffMatrix, pd_matrix: PayoffMa
     # Discount factor evolution
     st.markdown("### Historical Discount Factor Evolution")
     
-    st.dataframe(discount_data, use_container_width=True)
+    st.dataframe(discount_data, width="stretch")
     
     # Interactive discount factor calculator
     st.markdown("### Interactive Calculator")
@@ -8289,10 +8289,10 @@ def render_empirical_data_page(macro_data: pd.DataFrame, tariff_data: pd.DataFra
     with tab1:
         st.markdown("### Macroeconomic Indicators (2001-2024)")
         fig = VisualizationEngine.create_macroeconomic_dashboard(macro_data)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
         
         st.markdown("### Raw Data")
-        st.dataframe(macro_data, use_container_width=True)
+        st.dataframe(macro_data, width="stretch")
         
         st.markdown("""
         <div class="citation-box">
@@ -8307,10 +8307,10 @@ def render_empirical_data_page(macro_data: pd.DataFrame, tariff_data: pd.DataFra
     with tab2:
         st.markdown("### Tit-for-Tat Tariff Escalation (2018-2025)")
         fig = VisualizationEngine.create_tariff_escalation_chart(tariff_data)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
         
         st.markdown("### Tariff Data")
-        st.dataframe(tariff_data, use_container_width=True)
+        st.dataframe(tariff_data, width="stretch")
         
         # TFT validation metrics
         st.markdown("### Tit-for-Tat Validation Metrics")
@@ -8389,9 +8389,9 @@ def render_empirical_data_page(macro_data: pd.DataFrame, tariff_data: pd.DataFra
             hovermode='x unified'
         )
         
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
         
-        st.dataframe(treasury_data, use_container_width=True)
+        st.dataframe(treasury_data, width="stretch")
         
         st.markdown("""
         <div class="citation-box">
@@ -8404,7 +8404,7 @@ def render_empirical_data_page(macro_data: pd.DataFrame, tariff_data: pd.DataFra
         st.markdown("### Yield Suppression Analysis")
         
         fig = VisualizationEngine.create_yield_suppression_chart(yield_data)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
         
         st.markdown("""
         <div class="info-box">
@@ -8413,7 +8413,7 @@ def render_empirical_data_page(macro_data: pd.DataFrame, tariff_data: pd.DataFra
         </div>
         """, unsafe_allow_html=True)
         
-        st.dataframe(yield_data, use_container_width=True)
+        st.dataframe(yield_data, width="stretch")
         
         st.markdown("""
         <div class="citation-box">
@@ -8427,7 +8427,7 @@ def render_empirical_data_page(macro_data: pd.DataFrame, tariff_data: pd.DataFra
         st.markdown("### Federal Debt and China Holdings")
         
         fig = VisualizationEngine.create_federal_debt_chart(debt_data)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
         
         st.markdown("### Key Observations")
         
@@ -8448,14 +8448,14 @@ def render_empirical_data_page(macro_data: pd.DataFrame, tariff_data: pd.DataFra
             current_share = debt_data['China_Share_Pct'].iloc[-1]
             st.metric("Current Share", f"{current_share:.1f}%", "of Total Debt")
         
-        st.dataframe(debt_data, use_container_width=True)
+        st.dataframe(debt_data, width="stretch")
     
     with tab6:
         st.markdown("### Correlation Analysis")
         
         # Correlation heatmap
         fig = VisualizationEngine.create_correlation_heatmap(macro_data)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
         
         # Period-specific correlations
         st.markdown("### Period-Specific Correlations")
@@ -8505,7 +8505,7 @@ def render_empirical_data_page(macro_data: pd.DataFrame, tariff_data: pd.DataFra
             trendline='ols'
         )
         
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
         st.markdown("""
         <div class="info-box">
@@ -8591,7 +8591,7 @@ def render_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_matrix: Payo
         
         # Display results
         fig = VisualizationEngine.create_tft_simulation_chart(simulation_df)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
         
         # Summary statistics
         st.markdown("### Simulation Summary")
@@ -8630,7 +8630,7 @@ def render_strategy_simulator_page(harmony_matrix: PayoffMatrix, pd_matrix: Payo
         
         # Show data table
         st.markdown("### Round-by-Round Results")
-        st.dataframe(simulation_df, use_container_width=True)
+        st.dataframe(simulation_df, width="stretch")
 
 
 def render_mathematical_proofs_page():
@@ -9019,7 +9019,7 @@ def render_nash_uniqueness_harmony(show_citations: bool):
         'China: Cooperate': ['(8, 8)', '(5, 2)'],
         'China: Defect': ['(2, 5)', '(1, 1)']
     }, index=['U.S.: Cooperate', 'U.S.: Defect'])
-    st.dataframe(payoff_df, use_container_width=True)
+    st.dataframe(payoff_df, width="stretch")
     
     with st.expander("🔍 **Proof**", expanded=True):
         st.markdown("""
@@ -9112,7 +9112,7 @@ def render_nash_prisoners_dilemma(show_citations: bool):
         'China: Cooperate': ['(6, 6)', '(8, 2)'],
         'China: Defect': ['(2, 8)', '(3, 3)']
     }, index=['U.S.: Cooperate', 'U.S.: Defect'])
-    st.dataframe(payoff_df, use_container_width=True)
+    st.dataframe(payoff_df, width="stretch")
     
     with st.expander("🔍 **Proof**", expanded=True):
         st.markdown("""
@@ -9188,7 +9188,7 @@ def render_dominant_strategy_harmony(show_citations: bool):
         'China: Cooperate': ['(8, 8)', '(5, 2)'],
         'China: Defect': ['(2, 5)', '(1, 1)']
     }, index=['U.S.: Cooperate', 'U.S.: Defect'])
-    st.dataframe(payoff_df, use_container_width=True)
+    st.dataframe(payoff_df, width="stretch")
     
     with st.expander("🇺🇸 **Proof for United States**", expanded=True):
         st.markdown("""
@@ -9321,7 +9321,7 @@ def render_dominant_strategy_prisoners(show_citations: bool):
         'China: Cooperate': ['(6, 6)', '(8, 2)'],
         'China: Defect': ['(2, 8)', '(3, 3)']
     }, index=['U.S.: Cooperate', 'U.S.: Defect'])
-    st.dataframe(payoff_df, use_container_width=True)
+    st.dataframe(payoff_df, width="stretch")
     
     with st.expander("🇺🇸 **Proof for United States**", expanded=True):
         st.markdown("""
@@ -9858,7 +9858,7 @@ def render_folk_theorem_proof(show_citations: bool):
         'δ*': ['-0.75 (always cooperate)', '0.40 (cooperation fragile)'],
         'Cooperation': ['Extremely Stable', 'Requires High δ']
     })
-    st.dataframe(comparison_df, use_container_width=True)
+    st.dataframe(comparison_df, width="stretch")
     
     if show_citations:
         render_citation_box(
@@ -9900,7 +9900,7 @@ def render_grim_trigger_proof(show_citations: bool):
         """, unsafe_allow_html=True)
     
     with st.expander("🔍 **Proof**", expanded=True):
-        st.markdown("""
+        st.markdown(r"""
         <div class="proof-container">
         
         <div class="proof-step">
@@ -10004,7 +10004,7 @@ def render_tit_for_tat_sustainability(show_citations: bool):
         """, unsafe_allow_html=True)
     
     with st.expander("🔍 **Proof**", expanded=True):
-        st.markdown("""
+        st.markdown(r"""
         <div class="proof-container">
         
         <div class="proof-step">
@@ -10096,7 +10096,7 @@ def render_discount_factor_derivation(show_citations: bool):
     """, unsafe_allow_html=True)
     
     with st.expander("🔍 **Derivation**", expanded=True):
-        st.markdown("""
+        st.markdown(r"""
         <div class="proof-container">
         
         <div class="proof-step">
@@ -10168,7 +10168,7 @@ def render_cooperation_margin_proof(show_citations: bool):
     """, unsafe_allow_html=True)
     
     with st.expander("🔍 **Derivation**", expanded=True):
-        st.markdown("""
+        st.markdown(r"""
         <div class="proof-container">
         
         <div class="proof-step">
@@ -10235,7 +10235,7 @@ def render_cooperation_margin_proof(show_citations: bool):
         'Erosion from δ=0.85': ['0.0%', '40.9%', '62.5%', '74.5%', '81.7%', '84.1%']
     })
     
-    st.dataframe(margin_df, use_container_width=True)
+    st.dataframe(margin_df, width="stretch")
     
     if show_citations:
         render_citation_box(
@@ -10258,7 +10258,7 @@ def render_discount_factor_comparison(show_citations: bool):
     """, unsafe_allow_html=True)
     
     with st.expander("🔍 **Analysis**", expanded=True):
-        st.markdown("""
+        st.markdown(r"""
         <div class="proof-container">
         
         <div class="proof-step">
@@ -10327,7 +10327,7 @@ def render_discount_factor_comparison(show_citations: bool):
         ]
     })
     
-    st.dataframe(comparison_df, use_container_width=True)
+    st.dataframe(comparison_df, width="stretch")
     
     if show_citations:
         render_citation_box(
@@ -10515,7 +10515,7 @@ def render_counterfactual_yield(show_citations: bool):
         'Counterfactual Yield (%)': [5.23, 4.12, 3.35, 2.64, 1.39]
     })
     
-    st.dataframe(counterfactual_df, use_container_width=True)
+    st.dataframe(counterfactual_df, width="stretch")
     
     if show_citations:
         render_citation_box(
@@ -10587,7 +10587,7 @@ def render_payoff_normalization(show_citations: bool):
         'Normalized Payoffs': ['(10, 10)', '(1.4, 5.7)', '(5.7, 1.4)', '(0, 0)']
     })
     
-    st.dataframe(normalization_df, use_container_width=True)
+    st.dataframe(normalization_df, width="stretch")
     
     if show_citations:
         render_citation_box(
@@ -10753,7 +10753,7 @@ def render_game_identification_criteria(show_citations: bool):
         ]
     })
     
-    st.dataframe(classification_df, use_container_width=True)
+    st.dataframe(classification_df, width="stretch")
     
     with st.expander("🔍 **Identification Algorithm**", expanded=True):
         st.markdown("""
@@ -10844,7 +10844,7 @@ def render_margin_erosion_rate(show_citations: bool):
         ]
     })
     
-    st.dataframe(erosion_df, use_container_width=True)
+    st.dataframe(erosion_df, width="stretch")
     
     if show_citations:
         render_citation_box(
@@ -11121,7 +11121,7 @@ def render_tariff_correlation_proof(show_citations: bool):
         'Correlation': ['-', '0.85', '0.87', '0.88', '0.89', '0.89', '0.89']
     })
     
-    st.dataframe(tariff_df, use_container_width=True)
+    st.dataframe(tariff_df, width="stretch")
     
     if show_citations:
         render_citation_box(
@@ -11200,7 +11200,7 @@ def render_trade_fx_correlation(show_citations: bool):
         ]
     })
     
-    st.dataframe(trade_fx_df, use_container_width=True)
+    st.dataframe(trade_fx_df, width="stretch")
     
     if show_citations:
         render_citation_box(
@@ -11295,7 +11295,7 @@ def render_proof_visuals(proof_type: str):
             margin=dict(l=80, r=50, t=80, b=50),
             plot_bgcolor='white'
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
     elif "Dominant Strategy" in proof_type:
         # Bar chart comparing payoffs
@@ -11321,7 +11321,7 @@ def render_proof_visuals(proof_type: str):
                      color_discrete_map={"Cooperate": "#319795", "Defect": "#e53e3e"},
                      title=title, height=500)
         fig.update_layout(font_family="Inter", plot_bgcolor='white', yaxis_gridcolor='#F1F5F9')
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
     elif "Pareto" in proof_type:
         # Scatter plot of outcome space
@@ -11363,7 +11363,7 @@ def render_proof_visuals(proof_type: str):
             height=650
         )
         # Draw arrow to Pareto frontier
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
         
     elif "Discount Factor" in proof_type or "Folk" in proof_type:
         # Cooperation Margin Analysis
@@ -11411,7 +11411,7 @@ def render_proof_visuals(proof_type: str):
             xaxis_gridcolor='#F1F5F9',
             yaxis_gridcolor='#F1F5F9'
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
     elif "Yield Suppression" in proof_type:
          years = [2005, 2008, 2011, 2013, 2016, 2020, 2024]
@@ -11455,7 +11455,7 @@ def render_proof_visuals(proof_type: str):
              yaxis_gridcolor='#F1F5F9',
              legend=dict(x=0.02, y=0.02)
          )
-         st.plotly_chart(fig, use_container_width=True)
+         st.plotly_chart(fig, width="stretch")
 
     elif "Correlation" in proof_type:
          st.markdown("#### 📊 Statistical Evidence")
@@ -11502,7 +11502,7 @@ def render_proof_visuals(proof_type: str):
                  legend=dict(x=0.02, y=0.98),
                  height=650
              )
-             st.plotly_chart(fig, use_container_width=True)
+             st.plotly_chart(fig, width="stretch")
              
          with tab2:
              # Data from Theorem 9.3
@@ -11543,7 +11543,7 @@ def render_proof_visuals(proof_type: str):
                  legend=dict(x=0.02, y=0.98),
                  height=650
              )
-             st.plotly_chart(fig, use_container_width=True)
+             st.plotly_chart(fig, width="stretch")
     else:
         st.info("🖼️ **Visual Generation:** Select a specific theorem to view visualization.")
 
@@ -12201,7 +12201,8 @@ def render_research_documents_page():
     pdf_mapping = {
         "ECON 606 Mini Project Presentation.pdf": "ECON%20606%20Mini%20Project%20Presentation.pdf",
         "ECON 606 Mini Project Report.pdf": "ECON%20606%20Mini%20Project%20Report.pdf",
-        "Game Theory Analysis.pdf": "Game%20Theory%20Analysis.pdf",
+        "Game Theory Analysis Presentation.pdf": "Game%20Theory%20Analysis%20Presentation.pdf",
+        "Game Theory Analysis Report.pdf": "Game%20Theory%20Analysis%20Report.pdf",
         "User Guide.pdf": "User%20Guide.pdf"
     }
 
@@ -12559,14 +12560,14 @@ def render_tournament_arena_page(harmony_matrix: PayoffMatrix, pd_matrix: Payoff
                 # 1. Tournament Heatmap
                 fig = AdvancedVisualizationEngine.create_tournament_heatmap(results)
                 fig.update_layout(height=600)
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, width="stretch")
                 
                 st.markdown("<div style='height: 20px'></div>", unsafe_allow_html=True)
                 
                 # 2. Tournament Rankings
                 fig = AdvancedVisualizationEngine.create_tournament_rankings(results)
                 fig.update_layout(height=600)
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, width="stretch")
                 
                 # Winner announcement
                 rankings = results.groupby('Strategy_1')['Payoff_1'].sum().sort_values(ascending=False)
@@ -12583,7 +12584,7 @@ def render_tournament_arena_page(harmony_matrix: PayoffMatrix, pd_matrix: Payoff
                 # Detailed results
                 with st.expander("📋 View Detailed Match Results", expanded=True):
                     add_export_buttons(results, "tournament_results")
-                    st.dataframe(results, use_container_width=True, hide_index=True)
+                    st.dataframe(results, width="stretch", hide_index=True)
 
 
 def render_evolutionary_lab_page(harmony_matrix: PayoffMatrix, pd_matrix: PayoffMatrix):
@@ -12660,7 +12661,7 @@ def render_evolutionary_lab_page(harmony_matrix: PayoffMatrix, pd_matrix: Payoff
         st.markdown('<h3 class="section-header">Evolution Results</h3>', unsafe_allow_html=True)
         
         fig = AdvancedVisualizationEngine.create_evolutionary_dynamics_chart(results)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
         
         # Final state analysis
         st.markdown('<h3 class="section-header">Final Population Analysis</h3>', unsafe_allow_html=True)
@@ -12782,7 +12783,7 @@ def render_learning_dynamics_page(harmony_matrix: PayoffMatrix, pd_matrix: Payof
         fig = AdvancedVisualizationEngine.create_learning_dynamics_chart(
             results, algorithm_map[algorithm]
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
         
         # Summary statistics
         st.markdown('<h3 class="section-header">Learning Summary</h3>', unsafe_allow_html=True)
@@ -12918,14 +12919,14 @@ def render_parameter_explorer_page(harmony_matrix: PayoffMatrix, pd_matrix: Payo
     )
     # Heatmaps are square-ish, but let's give it proper height
     fig.update_layout(height=600)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     
     st.markdown("<div style='height: 20px'></div>", unsafe_allow_html=True) # Spacer
     
     # 2. Cooperation Margin Chart
     fig = VisualizationEngine.create_cooperation_margin_chart(engine, show_historical=False)
     fig.update_layout(height=600)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     
     # Comparative statics
     st.markdown('<h3 class="section-header">Comparative Statics</h3>', unsafe_allow_html=True)
@@ -12978,7 +12979,7 @@ def render_parameter_explorer_page(harmony_matrix: PayoffMatrix, pd_matrix: Payo
              fig.update_xaxes(gridcolor=grid_color, row=i, col=j)
              fig.update_yaxes(gridcolor=grid_color, row=i, col=j)
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 
